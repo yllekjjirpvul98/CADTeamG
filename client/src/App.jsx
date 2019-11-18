@@ -1,8 +1,7 @@
+import UpdateUser from './components/UpdateUser';
+import User from './components/User';
 
-import UpdateUser from "./components/UpdateUser";
-import User from "./components/User";
-
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 export default class App extends Component {
   render() {
