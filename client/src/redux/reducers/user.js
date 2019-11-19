@@ -1,16 +1,17 @@
-import { UPDATE_USER } from "../actionTypes";
+import { SIGN_IN } from '../types';
 
 const initialState = {
-  username: "",
+  username: '',
 };
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
   switch (action.type) {
-    case UPDATE_USER: {
-      const { content } = action.payload;
+    case SIGN_IN: {
+      const { username } = action.payload;
+
       return {
         ...state,
-        username: content
+        username,
       };
     }
     default:

@@ -25,6 +25,7 @@
         "operator-linebreak" : "off",
         "no-console" : "off",
         "no-use-before-define" : "off",
-        "no-param-reassign" : "off"
+        "no-param-reassign" : "off",
+        "destructuring-assignment": "off"
     }
 }
