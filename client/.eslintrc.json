@@ -26,6 +26,9 @@
         "no-console" : "off",
         "no-use-before-define" : "off",
         "no-param-reassign" : "off",
-        "destructuring-assignment": "off"
+        "destructuring-assignment": "off",
+        "react/prop-types": [0, {}],
+        "react/destructuring-assignment": [0, "always"],
+        "react/jsx-one-expression-per-line": [0, { }]
     }
 }

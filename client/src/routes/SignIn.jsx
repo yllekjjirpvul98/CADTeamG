@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Button, Input } from 'semantic-ui-react';
 import { signIn } from '../redux/actions';
-import Layout from '../components/Layout'
+import Layout from '../components/Layout';
 
 class SignIn extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       username: '',
+      password: '',
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -20,33 +21,47 @@ class SignIn extends React.Component {
   }
 
   handleSubmit() {
-    this.props.signIn(this.state.input);
-    this.setState({ username: '' });
+    const { username, password } = this.state;
+
+    this.props.signIn({ username, password });
+    this.setState({ username: '', password: '' });
   }
 
   render() {
-    const { username } = this.props;
+    const { username, password } = this.state;
 
     return (
       <Layout>
+
         <Link to="/sign-up">Sign Up</Link>
-  
+
+        <br />
+
         <Input
+          type="text"
+          placeholder="Username"
           name="username"
           onChange={this.handleChange}
-          value={this.state.username}
+          value={username}
         />
+
+        <br />
+
+        <Input
+          type="password"
+          placeholder="Password"
+          name="password"
+          onChange={this.handleChange}
+          value={password}
+        />
+
+        <br />
+
         <Button onClick={this.handleSubmit}>Sign In</Button>
-        {Boolean(username).toString()}
+
       </Layout>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-  const { username } = state.user;
-
-  return { username };
-};
-
-export default connect(mapStateToProps, { signIn })(SignIn);
+export default connect(null, { signIn })(SignIn);
