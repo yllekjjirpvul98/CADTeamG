@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Button, Input } from 'semantic-ui-react';
 import { signIn } from '../redux/actions';
-import Layout from '../components/Layout'
+import Layout from '../components/Layout';
+import SignInForm from '../components/SignInForm';
 
 class SignIn extends React.Component {
   constructor(props) {
@@ -11,6 +11,7 @@ class SignIn extends React.Component {
     this.state = {
       username: '',
     };
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -29,8 +30,7 @@ class SignIn extends React.Component {
 
     return (
       <Layout>
-        <Link to="/sign-up">Sign Up</Link>
-  
+        <SignInForm />
         <Input
           name="username"
           onChange={this.handleChange}

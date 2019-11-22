@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import Layout from '../components/Layout'
+import SignInForm from '../components/SignInForm';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -9,12 +9,11 @@ class SignUp extends React.Component {
   }
 
   render() {
-    const { username } = this.props; 
+    const { username } = this.props;
 
     return (
       <Layout>
-        <Link to="/sign-in">Sign In</Link>
-        <hr />
+        <SignInForm isSignUp/>
         username: {username}
       </Layout>
     );
