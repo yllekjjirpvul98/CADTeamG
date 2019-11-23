@@ -1,22 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
 import Layout from '../components/Layout';
+import { Header } from 'semantic-ui-react';
+import { connect } from 'react-redux';
 
 function Home({ username }) {
   return (
     <Layout>
-
-      <Link to="/sign-up">Sign Up</Link>
-
-      <br />
-
-      <Link to="/sign-in">Sign In</Link>
-
-      <br />
-
-      Username: {username}
-
+      <Header as='h1' textAlign='center' >Welcome to Rendezvous</Header>
     </Layout>
   );
 }

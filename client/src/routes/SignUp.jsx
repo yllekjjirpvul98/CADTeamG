@@ -1,9 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Button, Input } from 'semantic-ui-react';
-import { signUp } from '../redux/actions';
 import Layout from '../components/Layout';
+import SignInForm from '../components/SignInForm';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -29,47 +27,12 @@ class SignUp extends React.Component {
   }
 
   render() {
-    const { username, password, repassword } = this.state;
+    const { username } = this.props;
 
     return (
       <Layout>
-
-        <Link to="/sign-in">Sign In</Link>
-
-        <br />
-
-        <Input
-          type="text"
-          placeholder="Username"
-          name="username"
-          onChange={this.handleChange}
-          value={username}
-        />
-
-        <br />
-
-        <Input
-          type="password"
-          placeholder="Password"
-          name="password"
-          onChange={this.handleChange}
-          value={password}
-        />
-
-        <br />
-
-        <Input
-          type="password"
-          placeholder="Repeat password"
-          name="repassword"
-          onChange={this.handleChange}
-          value={repassword}
-        />
-
-        <br />
-
-        <Button onClick={this.handleSubmit}>Sign Up</Button>
-
+        <SignInForm isSignUp/>
+        username: {username}
       </Layout>
     );
   }
