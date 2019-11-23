@@ -1,26 +1,29 @@
 # register & login
 from flask import Flask, Blueprint, request, make_response
 from google.cloud import datastore
-from db import get, update, delete, getbyname
+from db import get, update, delete, getbyname, from_datastore
 from JSONObject.user import User
 import json
 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/')
-def hello():
-    return "Hello World"
-
 @auth.route('/login')
-def login(username, password):
-    user = get(username, "user")
-    if user is None:
-        return make_response("user not registered", 400)
-    elif user.password != password:
-        return make_response("wrong password", 400)
+def login():
+    data = request.get_json(force = True)
+    if data is not None:
+        username = data['username']
+        password = data['password']
+        user = getbyname("user", username)
+        if len(user) == 0:
+            return make_response("user not registered", 400)
+        else:
+            user = from_datastore(user[0])
+            if user['password'] != password:
+                return make_response("wrong password", 400)
+            else:
+                return make_response("successfully logged in")
     else:
-        return make_response("successfully logged in")
-
+        return make_response("empty input", 400)
 
 @auth.route('/register', methods=['POST'])
 def register():
