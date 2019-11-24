@@ -6,12 +6,12 @@ def get_client():
     return datastore.Client()
 
 def from_datastore(entity):
+    # convert entity object to dict
     if not entity:
         return None
-    if isinstance(entity, builtinlist):
-        entity = entity.pop()
-    entity['id'] = entity.key.id
-    return entity
+    result = dict(entity.items())
+    result['id'] = entity.key.id
+    return result
 
 def get(id, kind):
     ds = get_client()

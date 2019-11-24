@@ -37,6 +37,8 @@ def getEvents():
         if len(event) == 0:
             return make_response("empty event for the user", 400)
         else:
-            return from_datastore(event)
+            print(from_datastore(event[0]))
+            result = list(map(lambda x : from_datastore(x), event))
+            return json.dumps(result)
     else:
          return make_response("empty input", 400)   
