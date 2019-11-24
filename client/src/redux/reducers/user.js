@@ -7,19 +7,21 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case SIGN_IN: {
-      const { username } = action.payload;
+      const { username, password } = action.payload;
 
       return {
         ...state,
         username,
+        password,
       };
     }
     case SIGN_UP: {
-      const { username } = action.payload;
+      const { username, password } = action.payload;
 
       return {
         ...state,
         username,
+        password,
       };
     }
     default:

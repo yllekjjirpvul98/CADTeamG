@@ -1,21 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
-import { Header } from 'semantic-ui-react';
 import { connect } from 'react-redux';
+import Layout from '../components/Layout';
 
-function Home({ username }) {
+function Home({ username, password }) {
   return (
     <Layout>
-      <Header as='h1' textAlign='center' >Welcome to Rendezvous</Header>
+      username: {username}
+      <br />
+      password: {password}
     </Layout>
   );
 }
 
 const mapStateToProps = (state) => {
-  const { username } = state.user;
+  const { username, password } = state.user;
 
-  return { username };
+  return { username, password };
 };
 
 export default connect(mapStateToProps)(Home);

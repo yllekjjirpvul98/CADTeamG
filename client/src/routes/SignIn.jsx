@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button, Input } from 'semantic-ui-react';
+import { Button, Input, Segment } from 'semantic-ui-react';
 import { signIn } from '../redux/actions';
 import Layout from '../components/Layout';
-import SignInForm from '../components/SignInForm';
 
 class SignIn extends React.Component {
   constructor(props) {
@@ -30,35 +29,48 @@ class SignIn extends React.Component {
 
   render() {
     const { username, password } = this.state;
+    const { errors } = this.props;
 
     return (
       <Layout>
-        <SignInForm />
-        <Input
-          type="text"
-          placeholder="Username"
-          name="username"
-          onChange={this.handleChange}
-          value={username}
-        />
+        <Segment placeholder>
+          <Input
+            name="username"
+            icon="user"
+            iconPosition="left"
+            placeholder="Username"
+            type="text"
+            onChange={this.handleChange}
+            value={username}
+            error={Boolean(errors.username)}
+          />
+          <br />
+          <Input
+            name="password"
+            icon="lock"
+            iconPosition="left"
+            placeholder="Password"
+            type="password"
+            onChange={this.handleChange}
+            value={password}
+            error={Boolean(errors.password)}
+          />
+          <br />
+          <Button onClick={this.handleSubmit}>Sign In</Button>
 
-        <br />
-
-        <Input
-          type="password"
-          placeholder="Password"
-          name="password"
-          onChange={this.handleChange}
-          value={password}
-        />
-
-        <br />
-
-        <Button onClick={this.handleSubmit}>Sign In</Button>
-
+          {/* TODO: Find a way to display errors */}
+          {errors.username}
+          <br />
+          {errors.password}
+        </Segment>
       </Layout>
     );
   }
 }
 
-export default connect(null, { signIn })(SignIn);
+const mapStateToProps = (state) => {
+  const { errors } = state;
+  return { errors };
+};
+
+export default connect(mapStateToProps, { signIn })(SignIn);
