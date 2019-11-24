@@ -6,7 +6,4 @@ app = Flask(__name__)
 app.register_blueprint(auth)
 
 if __name__ == '__main__':
-    app.run(
-        port=1200,
-        threaded=True
-    )
+    app.run(host='0.0.0.0', port=8080)
