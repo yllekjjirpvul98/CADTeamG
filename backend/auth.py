@@ -21,7 +21,8 @@ def login():
             if user['password'] != password:
                 return make_response("wrong password", 400)
             else:
-                return make_response("successfully logged in")
+                # return user
+                return user
     else:
         return make_response("empty input", 400)
 
