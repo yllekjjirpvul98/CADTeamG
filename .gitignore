@@ -22,3 +22,9 @@ client/node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+.vscode
+.idea
+__pycache__
+
+cadcw2-teamg-b00dcdcd8ee1.json
