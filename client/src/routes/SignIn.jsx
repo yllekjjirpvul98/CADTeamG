@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button, Input, Segment } from 'semantic-ui-react';
-import { signIn } from '../redux/actions';
+import {
+  Button, Input, Segment, Message,
+} from 'semantic-ui-react';
+import { signIn, clearErrors } from '../redux/actions';
 import Layout from '../components/Layout';
 
 class SignIn extends React.Component {
@@ -11,7 +13,7 @@ class SignIn extends React.Component {
       username: '',
       password: '',
     };
-
+    this.props.clearErrors();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -29,7 +31,7 @@ class SignIn extends React.Component {
 
   render() {
     const { username, password } = this.state;
-    const { errors } = this.props;
+    const { loaders, errors } = this.props;
 
     return (
       <Layout>
@@ -42,7 +44,6 @@ class SignIn extends React.Component {
             type="text"
             onChange={this.handleChange}
             value={username}
-            error={Boolean(errors.username)}
           />
           <br />
           <Input
@@ -53,15 +54,24 @@ class SignIn extends React.Component {
             type="password"
             onChange={this.handleChange}
             value={password}
-            error={Boolean(errors.password)}
           />
           <br />
-          <Button onClick={this.handleSubmit}>Sign In</Button>
+          <Button
+            onClick={this.handleSubmit}
+            fluid
+            loading={loaders.SIGN_IN}
+          >
+            Sign In
+          </Button>
 
-          {/* TODO: Find a way to display errors */}
-          {errors.username}
-          <br />
-          {errors.password}
+          {Object.keys(errors).length > 0 ? (
+            <Message
+              compact
+              error
+              header="Error"
+              list={Object.values(errors).map((error) => <p key={error}>{error}</p>)}
+            />
+          ) : <></>}
         </Segment>
       </Layout>
     );
@@ -69,8 +79,8 @@ class SignIn extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const { errors } = state;
-  return { errors };
+  const { loaders, errors } = state;
+  return { loaders, errors };
 };
 
-export default connect(mapStateToProps, { signIn })(SignIn);
+export default connect(mapStateToProps, { signIn, clearErrors })(SignIn);

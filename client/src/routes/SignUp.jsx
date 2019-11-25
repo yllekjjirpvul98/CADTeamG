@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button, Input, Segment } from 'semantic-ui-react';
+import {
+  Button, Input, Segment, Message,
+} from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { signUp } from '../redux/actions';
+import { signUp, clearErrors } from '../redux/actions';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -12,6 +14,7 @@ class SignUp extends React.Component {
       password: '',
       password2: '',
     };
+    this.props.clearErrors();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -20,15 +23,18 @@ class SignUp extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  handleSubmit() {
+  async handleSubmit() {
     const { username, password, password2 } = this.state;
 
-    this.props.signUp({ username, password, password2 });
+    const { payload } = await this.props.signUp({ username, password, password2 });
+    console.log(payload);
+
     this.setState({ username: '', password: '', password2: '' });
   }
 
   render() {
     const { username, password, password2 } = this.state;
+    const { loaders, errors } = this.props;
 
     return (
       <Layout>
@@ -62,11 +68,31 @@ class SignUp extends React.Component {
             value={password2}
           />
           <br />
-          <Button onClick={this.handleSubmit}>Sign Up</Button>
+          <Button
+            loading={loaders.SIGN_UP}
+            onClick={this.handleSubmit}
+            fluid
+          >
+            Sign Up
+          </Button>
+          {Object.keys(errors).length > 0 ? (
+            <Message
+              compact
+              error
+              header="Error"
+              list={Object.values(errors).map((error) => <p key={error}>{error}</p>)}
+            />
+          ) : <></>}
         </Segment>
       </Layout>
     );
   }
 }
 
-export default connect(null, { signUp })(SignUp);
+const mapStateToProps = (state) => {
+  const { loaders, errors } = state;
+  return { loaders, errors };
+};
+
+
+export default connect(mapStateToProps, { signUp, clearErrors })(SignUp);
