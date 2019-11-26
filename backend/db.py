@@ -17,7 +17,7 @@ def from_datastore(entity):
     if not entity:
         return None
     result = dict(entity.items())
-    result['id'] = entity.key.id
+    result['id'] = entity.key.id_or_name
     return result
 
 def get(id, kind):
@@ -47,11 +47,17 @@ def delete(kind, id):
 def getbyname(kind, username):
     ds = get_client()
     query = ds.query(kind='user')
-    query.add_filter('username', '=', username)
+    query.add_filter('username', '=', username) 
     return list(query.fetch())
 
 def getEventByUserId(kind, userid):
     ds = get_client()
     query = ds.query(kind='event')
     query.add_filter('userid', '=', userid)
+    return list(query.fetch())
+
+def getEventByEventId(kind, eventid):
+    ds = get_client()
+    query = ds.query(kind='event')
+    query.add_filter('eventid', '=', eventid)
     return list(query.fetch())
