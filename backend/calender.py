@@ -1,9 +1,10 @@
 from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
-from db import get, update, delete, from_datastore, getEventByUserId
+from db import get, update, delete, from_datastore, getEventByUserId, getEventByEventId
 from JSONObject.event import Event
 import json
 
+# TODO: Fix typo : calender -> calendar
 calender = Blueprint('calender', __name__)
 
 @calender.route('/createEvent', methods=['POST'])
@@ -27,12 +28,21 @@ def createEvent():
 
 @calender.route('/deleteEvent', methods=['POST'])
 def deleteEvent():
-    # TODO: This method needs to be refined as multiple rows have same eventid
     data = request.get_json(force = True)
     eventid = data["eventid"]
-    delete("event", eventid)
-    return make_response("Event deleted")
-    
+    # TODO: change when jwt is done
+    userid = data["userid"]
+    events = getEventByEventId("event", eventid)
+    if len(events) != 0:
+        if from_datastore(events[0])['hostId']== userid:
+            for event in events:
+                delete("event", event.key.id_or_name)
+            return make_response("Event deleted")
+        else:
+            return make_response("Unauthorized", 401)
+    else:
+        return make_response("No matching event", 400)
+        
 @calender.route('/getEvents', methods=['POST'])
 def getEvents():
     data = request.get_json(force = True)
