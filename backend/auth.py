@@ -1,5 +1,5 @@
 # register & login
-from flask import Flask, Blueprint, request, make_response
+from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
 from db import get, update, delete, getbyname, from_datastore
 from JSONObject.user import User
@@ -7,7 +7,8 @@ import json
 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/login')
+# TODO: Use JWT Web Token
+@auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json(force = True)
     if data is not None:
@@ -22,7 +23,7 @@ def login():
                 return make_response("wrong password", 400)
             else:
                 # return user
-                return user
+                return jsonify(user)
     else:
         return make_response("empty input", 400)
 
@@ -32,7 +33,6 @@ def register():
     if data is not None:
         username = data['username']
         password = data['password']
-        print(getbyname("user", username))
         if len(getbyname("user", username)) != 0:
             return make_response("user already exist", 400)
         else:
