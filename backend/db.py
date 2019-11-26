@@ -5,6 +5,13 @@ builtinlist = list
 def get_client():
     return datastore.Client()
 
+def id_as_key(id):
+    # convert string id to id if id is numeric
+    try:
+        return int(id)
+    except Exception as e:
+        return id
+
 def from_datastore(entity):
     # convert entity object to dict
     if not entity:
@@ -15,14 +22,14 @@ def from_datastore(entity):
 
 def get(id, kind):
     ds = get_client()
-    key = ds.key(kind, int(id))
+    key = ds.key(kind, id_as_key(id))
     results = ds.get(key)
     return from_datastore(results)
 
 def update(data, kind, id=None):
     ds = get_client()
     if id:
-        key = ds.key(kind, int(id))
+        key = ds.key(kind, id_as_key(id))
     else:
         key = ds.key(kind)
     entity = datastore.Entity(
@@ -34,7 +41,7 @@ def update(data, kind, id=None):
 
 def delete(kind, id):
     ds = get_client()
-    key = ds.key(kind, int(id))
+    key = ds.key(kind, id_as_key(id))
     ds.delete(key)
 
 def getbyname(kind, username):

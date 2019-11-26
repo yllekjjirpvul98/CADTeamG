@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, make_response
+from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
 from db import get, update, delete, from_datastore, getEventByUserId
 from JSONObject.event import Event
@@ -10,35 +10,39 @@ calender = Blueprint('calender', __name__)
 def createEvent():
      data = request.get_json(force = True)
      if data is not None:
+        eventid = data['eventid']
         userid = data['userid']
         starttime = data['starttime']
         endtime = data['endtime']
         repeatable = data['repeatable']
-        hostFlag = data['hostFlag']
+        hostId = data['hostId']
+        location = data['location']
+        title = data['title']
             
-        event = Event(userid, starttime, endtime, repeatable, hostFlag)
-        update(event.__dict__, "event")
+        event = Event(eventid, userid, starttime, endtime, repeatable, hostId, location, title)
+        update(event.__dict__, "event", eventid+":"+userid)
         return make_response("event created")
      else:
         return make_response("empty data", 400)
 
-@calender.route('/deleteEvent')
+@calender.route('/deleteEvent', methods=['POST'])
 def deleteEvent():
+    # TODO: This method needs to be refined as multiple rows have same eventid
     data = request.get_json(force = True)
     eventid = data["eventid"]
     delete("event", eventid)
+    return make_response("Event deleted")
     
-@calender.route('/getEvents', methods= ['GET'])
+@calender.route('/getEvents', methods=['POST'])
 def getEvents():
     data = request.get_json(force = True)
+    userid = data['userid']
     if data is not None:
-        userid = data['userid']
         event = getEventByUserId("event", userid)
         if len(event) == 0:
             return make_response("empty event for the user", 400)
         else:
-            print(from_datastore(event[0]))
             result = list(map(lambda x : from_datastore(x), event))
-            return json.dumps(result)
+            return jsonify(result)
     else:
          return make_response("empty input", 400)   
