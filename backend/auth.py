@@ -6,6 +6,7 @@ from JSONObject.user import User
 from jose import jwt
 from functools import wraps
 import json
+import bcrypt
 
 auth = Blueprint('auth', __name__)
 
@@ -46,29 +47,30 @@ def login():
             return make_response(jsonify(username='User does not exist'), 400)
         else:
             user = from_datastore(user[0])
-            if user['password'] != password:
-                return make_response(jsonify(password='Wrong password'), 400)
-            else:
+            if bcrypt.checkpw(password.encode('UTF-8'), user['password']):
                 token = jwt.encode({'id': user.get('id'), 'username': user.get('username')}, secret, algorithm='HS256')
-                return jsonify(token=token, user=user)
-    else:
+                return jsonify(token=token)
+            else:
+                return make_response(jsonify(password='Wrong password'), 400)
         return make_response(jsonify(errors=errors), 400)
 
 @auth.route('/register', methods=['POST'])
 def register():
 
     username = request.form.get('username')
-    password = request.form.get('password')
+    password = request.form.get('password').encode('UTF-8')
 
     errors = {}
     if(username is None): errors['username'] = 'Username is empty'
     if(password is None): errors['password'] = 'Password is empty'
 
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+
     if len(errors.keys()) == 0:
         if len(getbyname('user', username)) != 0:
             return make_response(jsonify(username='User already exists'), 400)
         else:
-            user = User(username, password)
+            user = User(username, hashed)
             update(user.__dict__, 'user')
             return make_response('User registered sucessfully')
     else:
