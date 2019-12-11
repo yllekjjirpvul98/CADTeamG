@@ -33,10 +33,11 @@ def test():
 
 @auth.route('/login', methods=['POST'])
 def login():
-
-    username = request.form.get('username')
-    password = request.form.get('password')
-
+    data = request.get_json()
+ 
+    username = data.get('username')
+    password = data.get('password')
+    
     errors = {}
     if(username is None): errors['username'] = 'Username is empty'
     if(password is None): errors['password'] = 'Password is empty'
@@ -49,16 +50,16 @@ def login():
             user = from_datastore(user[0])
             if bcrypt.checkpw(password.encode('UTF-8'), user['password']):
                 token = jwt.encode({'id': user.get('id'), 'username': user.get('username')}, secret, algorithm='HS256')
-                return jsonify(token=token)
+                return make_response(jsonify(token=token), 200)
             else:
                 return make_response(jsonify(password='Wrong password'), 400)
         return make_response(jsonify(errors=errors), 400)
 
 @auth.route('/register', methods=['POST'])
 def register():
-
-    username = request.form.get('username')
-    password = request.form.get('password').encode('UTF-8')
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password').encode('UTF-8')
 
     errors = {}
     if(username is None): errors['username'] = 'Username is empty'
@@ -72,6 +73,6 @@ def register():
         else:
             user = User(username, hashed)
             update(user.__dict__, 'user')
-            return make_response('User registered sucessfully')
+            return make_response(jsonify(message='Registration successful'))
     else:
         return make_response(jsonify(errors=errors), 400)

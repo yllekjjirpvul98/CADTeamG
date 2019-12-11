@@ -8,11 +8,12 @@ calendar = Blueprint('calendar', __name__)
 
 @calendar.route('/createEvent', methods=['POST'])
 def createEvent():
-    userid = request.form.get('userid')
-    starttime = request.form.get('starttime')
-    endtime = request.form.get('endtime')
-    repeatable = request.form.get('repeatable')
-    hostFlag = request.form.get('hostFlag')
+    data = request.get_json()
+    userid = data.get('userid')
+    starttime = data.get('starttime')
+    endtime = data.get('endtime')
+    repeatable = data.get('repeatable')
+    hostFlag = data.get('hostFalg')
 
     errors = {}
     if(userid is None): errors['userid'] = 'User id is empty'
@@ -30,13 +31,15 @@ def createEvent():
 
 @calendar.route('/deleteEvent', methods=['DELETE'])
 def deleteEvent():
-    eventid = request.form.get("eventid")
+    data = request.get_json()
+    eventid = data.get("eventid")
     if(eventid is None): return make_response(jsonify(eventid='Event id is empty'), 400)
     delete("event", eventid)
     
 @calendar.route('/getEvents', methods= ['GET'])
 def getEvents():
-    userid = request.form.get('userid')
+    data = request.get_json()
+    userid = data.get('userid')
 
     if(userid is None): return make_response(jsonify(userid='User id is empty'), 400)
 
