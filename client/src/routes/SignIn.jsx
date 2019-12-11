@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   Button, Input, Segment, Message,
@@ -6,7 +7,7 @@ import {
 import { signIn, clearErrors } from '../redux/actions';
 import Layout from '../components/Layout';
 
-class SignIn extends React.Component {
+class SignInComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -22,16 +23,18 @@ class SignIn extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  handleSubmit() {
+  async handleSubmit() {
     const { username, password } = this.state;
 
-    this.props.signIn({ username, password });
-    this.setState({ username: '', password: '' });
+    const { payload } = await this.props.signIn({ username, password });
+
+    if (payload.token) return this.props.history.push('/home');
+    return payload;
   }
 
   render() {
     const { username, password } = this.state;
-    const { loaders, errors } = this.props;
+    const { loader, errors } = this.props;
 
     return (
       <Layout>
@@ -59,7 +62,7 @@ class SignIn extends React.Component {
           <Button
             onClick={this.handleSubmit}
             fluid
-            loading={loaders.SIGN_IN}
+            loading={loader.SIGN_IN}
           >
             Sign In
           </Button>
@@ -78,9 +81,17 @@ class SignIn extends React.Component {
   }
 }
 
+function SignIn(props) {
+  const history = useHistory();
+
+  return (
+    <SignInComponent {...props} history={history} />
+  );
+}
+
 const mapStateToProps = (state) => {
-  const { loaders, errors } = state;
-  return { loaders, errors };
+  const { user, loader, errors } = state;
+  return { user, loader, errors };
 };
 
 export default connect(mapStateToProps, { signIn, clearErrors })(SignIn);

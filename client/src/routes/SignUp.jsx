@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import {
   Button, Input, Segment, Message,
 } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { signUp, clearErrors } from '../redux/actions';
 
-class SignUp extends React.Component {
+class SignUpComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -27,14 +28,13 @@ class SignUp extends React.Component {
     const { username, password, password2 } = this.state;
 
     const { payload } = await this.props.signUp({ username, password, password2 });
-    console.log(payload);
 
-    this.setState({ username: '', password: '', password2: '' });
+    if (payload.message) this.props.history.push('/sign-in');
   }
 
   render() {
     const { username, password, password2 } = this.state;
-    const { loaders, errors } = this.props;
+    const { loader, errors } = this.props;
 
     return (
       <Layout>
@@ -69,7 +69,7 @@ class SignUp extends React.Component {
           />
           <br />
           <Button
-            loading={loaders.SIGN_UP}
+            loading={loader.SIGN_UP}
             onClick={this.handleSubmit}
             fluid
           >
@@ -89,9 +89,17 @@ class SignUp extends React.Component {
   }
 }
 
+function SignUp(props) {
+  const history = useHistory();
+
+  return (
+    <SignUpComponent {...props} history={history} />
+  );
+}
+
 const mapStateToProps = (state) => {
-  const { loaders, errors } = state;
-  return { loaders, errors };
+  const { loader, errors } = state;
+  return { loader, errors };
 };
 
 
