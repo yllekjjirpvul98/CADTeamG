@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import Navbar from './Navbar';
 
 class Layout extends Component {
@@ -14,11 +14,15 @@ class Layout extends Component {
   }
 
   render() {
+    const token = localStorage.getItem('jwt');
+    const redirect = token === null && this.props.protected ? <Redirect to={{ pathname: '/sign-in' }} /> : <></>;
+
     return (
       <div style={{ paddingTop: '1%', marginLeft: '10%', marginRight: '10%' }}>
         <Navbar />
         <br />
         {this.props.children}
+        {redirect}
       </div>
     );
   }

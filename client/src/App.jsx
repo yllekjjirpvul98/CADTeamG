@@ -4,8 +4,11 @@ import Home from './routes/Home';
 import SignUp from './routes/SignUp';
 import SignIn from './routes/SignIn';
 import Index from './routes/Index';
+import axios from './utils/axios';
 
 export default function App() {
+  axios.defaults.headers.common.authorization = localStorage.getItem('jwt');
+
   return (
     <Router>
       <Switch>
