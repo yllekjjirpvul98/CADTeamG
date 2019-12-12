@@ -39,7 +39,12 @@ class SignInComponent extends React.Component {
     return (
       <Layout>
         <Header as="h1" textAlign="center" style={{ marginTop: '3%' }}>Login to Account</Header>
-        <Segment placeholder style={{ width: '40%', marginLeft: '30%', marginRight: '30%', marginTop: '2%' }}>
+        <Segment
+          placeholder
+          style={{
+            width: '40%', marginLeft: '30%', marginRight: '30%', marginTop: '2%',
+          }}
+        >
           <Input
             name="username"
             icon="user"
@@ -64,6 +69,7 @@ class SignInComponent extends React.Component {
             onClick={this.handleSubmit}
             color="blue"
             loading={loader.SIGN_IN}
+            fluid
           >
             Sign In
           </Button>
