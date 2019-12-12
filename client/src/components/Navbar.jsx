@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
 import { Menu, Icon, Header } from 'semantic-ui-react';
 
-const activeStyle = { color: '#010101' };
+const activeStyle = { color: '#0e0e0e' };
 
 function Navbar({ username }) {
   const token = localStorage.getItem('jwt');
@@ -53,6 +53,9 @@ function Navbar({ username }) {
           <Header as="h2" content="Rendezvous" color="blue" />
         </Menu.Item>
       </NavLink>
+      <Menu.Item>
+        <Header content="Rendezvous" color="blue" />
+      </Menu.Item>
       {token !== null ? loggedIn : loggedOut}
     </Menu>
   );

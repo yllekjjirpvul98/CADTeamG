@@ -11,7 +11,7 @@ const signIn = (data) => (dispatch) => {
   if (Object.values(errors).length > 0) return dispatch({ type: GET_ERRORS, payload: errors });
 
   dispatch({ type: SET_LOADER, payload: SIGN_IN });
-  return axios.post('/login', data)
+  return axios.post('/auth/login', data)
               .then((res) => dispatch({ type: SIGN_IN, payload: res.data }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: SIGN_IN }));
@@ -24,7 +24,7 @@ const signUp = (data) => (dispatch) => {
 
   dispatch({ type: SET_LOADER, payload: SIGN_UP });
 
-  return axios.post('/register', data)
+  return axios.post('/auth/register', data)
               .then((res) => dispatch({ type: SIGN_UP, payload: res.data }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: SIGN_UP }));
@@ -35,7 +35,7 @@ const authenticate = () => (dispatch) => {
 
   dispatch({ type: SET_LOADER, payload: AUTH });
 
-  return axios.get('/authenticate')
+  return axios.get('/auth/authenticate')
               .then((res) => dispatch({ type: AUTH, payload: res.data }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: AUTH }));
