@@ -27,7 +27,7 @@ def auth_required(f):
 
 @auth.route('/authenticate')
 @auth_required
-def test():
+def getUser():
     user = get(request.id, 'user')
     return jsonify(id=user.get('id'), username=user.get('username'))
 
