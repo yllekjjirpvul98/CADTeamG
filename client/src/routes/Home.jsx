@@ -1,35 +1,54 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Loader, Dimmer } from 'semantic-ui-react';
+import { NavLink } from 'react-router-dom';
+import { Loader, Dimmer, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { authenticate } from '../redux/actions';
 
 class Home extends React.Component {
-  async componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.state = { join: '' };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
     if (!this.props.id && !this.props.username) this.props.authenticate();
   }
 
+  handleChange(event) {
+    this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleSubmit() {
+
+  }
+
   render() {
-    const { id, username, loader } = this.props;
+    const { loader } = this.props;
 
     return (
       <Layout protected>
-        your id: {id}
-        <br />
-        your username: {username}
         <Dimmer inverted active={loader.AUTH}>
           <Loader inverted size="huge" inline="centered" />
         </Dimmer>
+        <NavLink to="/join">
+          <Button fluid>Join</Button>
+        </NavLink>
+        <br />
+        <NavLink to="/host">
+          <Button fluid>Host</Button>
+        </NavLink>
       </Layout>
     );
   }
 }
 
 const mapStateToProps = (state) => {
-  const { id, username } = state.user;
   const { loader } = state;
 
-  return { id, username, loader };
+  return { loader };
 };
 
 export default connect(mapStateToProps, { authenticate })(Home);

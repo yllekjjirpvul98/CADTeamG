@@ -31,6 +31,8 @@ const signUp = (data) => (dispatch) => {
 };
 
 const authenticate = () => (dispatch) => {
+  axios.defaults.headers.common.authorization = localStorage.getItem('jwt');
+
   dispatch({ type: SET_LOADER, payload: AUTH });
 
   return axios.get('/authenticate')

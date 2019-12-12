@@ -4,6 +4,7 @@ import Home from './routes/Home';
 import SignUp from './routes/SignUp';
 import SignIn from './routes/SignIn';
 import Index from './routes/Index';
+import Schedule from './routes/Schedule';
 import axios from './utils/axios';
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
   return (
     <Router>
       <Switch>
+        <Route path="/schedule" component={Schedule} />
         <Route path="/sign-up" component={SignUp} />
         <Route path="/sign-in" component={SignIn} />
         <Route path="/home" component={Home} />
