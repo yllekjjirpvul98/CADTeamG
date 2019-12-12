@@ -1,17 +1,38 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Menu } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { NavLink, useHistory } from 'react-router-dom';
+import { Menu, Icon } from 'semantic-ui-react';
 import Logo from '../images/logo-small.png';
 
 const activeStyle = { color: '#010101' };
 
-const Navbar = () => (
-  <Menu borderless text style={{ margin: '0px' }}>
-    <NavLink to="/home">
+function Navbar({ username }) {
+  const token = localStorage.getItem('jwt');
+  const history = useHistory();
+
+  function logout() {
+    localStorage.removeItem('jwt');
+    history.push('/sign-in');
+  }
+
+  const loggedIn =
+  (
+    <Menu.Menu position="right">
       <Menu.Item>
-        <img src={Logo} alt="logo" />
+        {username.charAt(0).toUpperCase() + username.slice(1)}
       </Menu.Item>
-    </NavLink>
+      <Menu.Item>
+        <NavLink to="/schedule" activeStyle={activeStyle}>
+          Schedule
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item>
+        <Icon onClick={logout} name="power off" size="large" />
+      </Menu.Item>
+    </Menu.Menu>
+  );
+  const loggedOut =
+  (
     <Menu.Menu position="right">
       <Menu.Item>
         <NavLink to="/sign-up" activeStyle={activeStyle}>
@@ -24,8 +45,24 @@ const Navbar = () => (
         </NavLink>
       </Menu.Item>
     </Menu.Menu>
-  </Menu>
-);
+  );
 
+  return (
+    <Menu borderless text style={{ margin: '0px' }}>
+      <NavLink to="/home">
+        <Menu.Item>
+          <img src={Logo} alt="logo" />
+        </Menu.Item>
+      </NavLink>
+      {token !== null ? loggedIn : loggedOut}
+    </Menu>
+  );
+}
 
-export default Navbar;
+const mapStateToProps = (state) => {
+  const { username } = state.user;
+
+  return { username };
+};
+
+export default connect(mapStateToProps)(Navbar);
