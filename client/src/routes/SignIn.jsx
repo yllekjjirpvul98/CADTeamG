@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
-  Button, Input, Segment, Message,
+  Button, Input, Segment, Message, Header,
 } from 'semantic-ui-react';
 import { signIn, clearErrors } from '../redux/actions';
 import Layout from '../components/Layout';
@@ -38,7 +38,8 @@ class SignInComponent extends React.Component {
 
     return (
       <Layout>
-        <Segment placeholder>
+        <Header as="h1" textAlign="center" style={{ marginTop: '3%' }}>Login to Account</Header>
+        <Segment placeholder style={{ width: '40%', marginLeft: '30%', marginRight: '30%', marginTop: '2%' }}>
           <Input
             name="username"
             icon="user"
@@ -61,7 +62,7 @@ class SignInComponent extends React.Component {
           <br />
           <Button
             onClick={this.handleSubmit}
-            fluid
+            color="blue"
             loading={loader.SIGN_IN}
           >
             Sign In

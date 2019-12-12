@@ -13,61 +13,17 @@
 			"password": "mas"
 		}
     ],
-	
+
 	"events": [
 		{
 			"eventId": "EVENT1",
 			"userId": "John",
+      "hostId": "John",
 			"startTime": "1574206743535",
 			"endTime": "1574216743535",
 			"repeatable": "WEEK",
-			"hostFlag": "true"
+      "location": "BUILDING 16",
+      "title": "CAD meeting",
 		},
-		{
-			"eventId": "EVENT2",
-			"userId": "Dan",
-			"startTime": "1574206743535",
-			"endTime": "1574216743535",
-			"repeatable": "DAY",
-			"hostFlag": "true"
-		},
-		{
-			"eventId": "EVENT3",
-			"userId": "Dan",
-			"startTime": "1574106743535",
-			"endTime": "1574116743535",
-			"repeatable": "DAY",
-			"hostFlag": "true"
-		}
 	],
-	
-	"sessions": [
-		{
-			"id": "SESSION1",
-			"hostId": "John",
-			"participantIds": [
-				"Dan",
-				"Sam"
-			],
-			"votes": [
-				{
-					"timeslot": "1574206743535",
-					"numOfVotes": "1"
-				},
-				{
-					"timeslot": "1574226743535",
-					"numOfVotes": "0"
-				},
-				{
-					"timeslot": "1574246743535",
-					"numOfVotes": "0"
-				},
-				{
-					"timeslot": "1574286743535",
-					"numOfVotes": "2"
-				},
-			],
-			"event": "EVENT1"
-		}
-	]
 }

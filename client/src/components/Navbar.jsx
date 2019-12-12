@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
-import { Menu, Icon } from 'semantic-ui-react';
+import { Menu, Icon, Header } from 'semantic-ui-react';
 import Logo from '../images/logo-small.png';
 
 const activeStyle = { color: '#010101' };
@@ -25,6 +25,7 @@ function Navbar({ username }) {
         <NavLink to="/schedule" activeStyle={activeStyle}>
           Schedule
         </NavLink>
+        <Header as="h2" content="Rendezvous" color="blue" />
       </Menu.Item>
       <Menu.Item>
         <Icon onClick={logout} name="power off" size="large" />
