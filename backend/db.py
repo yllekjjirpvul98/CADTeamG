@@ -1,6 +1,7 @@
 from google.cloud import datastore
 
 builtinlist = list
+secret = 'x'
 
 def get_client():
     return datastore.Client()

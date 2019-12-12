@@ -39,7 +39,15 @@ class SignUpComponent extends React.Component {
     return (
       <Layout>
         <Header as="h1" textAlign="center" style={{ marginTop: '3%' }}>Register an Account</Header>
-        <Segment placeholder style={{ width: '40%', marginLeft: '30%', marginRight: '30%', marginTop: '2%' }}>
+        <Segment
+          placeholder
+          style={{
+            width: '40%',
+            marginLeft: '30%',
+            marginRight: '30%',
+            marginTop: '2%',
+          }}
+        >
           <Input
             name="username"
             icon="user"
