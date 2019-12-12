@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  Button, Input, Segment, Message,
+  Button, Input, Segment, Message, Header,
 } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { signUp, clearErrors } from '../redux/actions';
@@ -38,7 +38,8 @@ class SignUpComponent extends React.Component {
 
     return (
       <Layout>
-        <Segment placeholder>
+        <Header as="h1" textAlign="center" style={{ marginTop: '3%' }}>Register an Account</Header>
+        <Segment placeholder style={{ width: '40%', marginLeft: '30%', marginRight: '30%', marginTop: '2%' }}>
           <Input
             name="username"
             icon="user"
@@ -71,7 +72,7 @@ class SignUpComponent extends React.Component {
           <Button
             loading={loader.SIGN_UP}
             onClick={this.handleSubmit}
-            fluid
+            color="blue"
           >
             Sign Up
           </Button>
