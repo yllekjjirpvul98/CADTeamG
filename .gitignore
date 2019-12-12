@@ -23,3 +23,13 @@ client/.vscode
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+.vscode
+.idea
+
+# Byte-compiled / optimized / DLL files
+backend/__pycache__
+backend/JSONObject/__pycache__
+*.py[cod]
+
+cadcw2-teamg-b00dcdcd8ee1.json
