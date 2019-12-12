@@ -22,7 +22,6 @@ class Home extends React.Component {
   }
 
   handleSubmit() {
-
   }
 
   render() {
