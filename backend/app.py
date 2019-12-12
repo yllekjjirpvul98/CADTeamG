@@ -5,8 +5,8 @@ from calender import calendar
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.register_blueprint(auth)
-app.register_blueprint(calendar)
+app.register_blueprint(auth, url_prefix='/auth')
+app.register_blueprint(calendar, url_prefix='/calendar')
 CORS(app)
 
 if __name__ == '__main__':
