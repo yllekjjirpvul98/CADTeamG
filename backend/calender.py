@@ -12,7 +12,6 @@ calendar = Blueprint('calendar', __name__)
 @auth_required
 def createEvent():
     data = request.get_json()
-    print(getUser().json)
     userid = getUser().json['id']
     starttime = data.get('starttime')
     endtime = data.get('endtime')
@@ -20,7 +19,7 @@ def createEvent():
     hostFlag = data.get('hostFlag')
     title = data.get('title')
     location = data.get('location')
-    eventid = str(uuid.uuid4())[:8]
+    eventid = data.get('eventid')
 
     errors = {}
     if(userid is None): errors['userid'] = 'User id is empty'
@@ -30,6 +29,7 @@ def createEvent():
     if(hostFlag is None): errors['hostFlag'] = 'Host flag is empty'
     if(title is None): errors['title'] = 'Title is empty'
     if(location is None): errors['location'] = 'Location is empty'
+    if(eventid is None): errors['eventid'] = 'eventid is empty'
 
 
     if len(errors.keys()) == 0:

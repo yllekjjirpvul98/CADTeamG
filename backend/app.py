@@ -9,7 +9,6 @@ from flask_socketio import SocketIO
 app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(calendar, url_prefix='/calendar')
-app.register_blueprint(lobby, url_prefix='/lobby')
 CORS(app)
 
 if __name__ == '__main__':
