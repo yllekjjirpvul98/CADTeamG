@@ -72,7 +72,6 @@ class SignInComponent extends React.Component {
             onClick={this.handleSubmit}
             color="blue"
             loading={loader.SIGN_IN}
-            fluid
           >
             Sign In
           </Button>

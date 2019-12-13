@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
- Button, Input,
-} from 'semantic-ui-react';
+import { Button, Input } from 'semantic-ui-react';
 import { authenticate } from '../redux/actions';
 
 class JoinForm extends React.Component {
@@ -30,7 +28,7 @@ class JoinForm extends React.Component {
     return (
       <>
         <Input
-          fluid 
+          fluid
           name="code"
           iconPosition="left"
           placeholder="Enter code"

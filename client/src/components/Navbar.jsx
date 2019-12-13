@@ -53,9 +53,6 @@ function Navbar({ username }) {
           <Header as="h2" content="Rendezvous" color="blue" />
         </Menu.Item>
       </NavLink>
-      <Menu.Item>
-        <Header content="Rendezvous" color="blue" />
-      </Menu.Item>
       {token !== null ? loggedIn : loggedOut}
     </Menu>
   );
