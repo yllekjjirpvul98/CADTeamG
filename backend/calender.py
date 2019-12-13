@@ -12,7 +12,6 @@ calendar = Blueprint('calendar', __name__)
 @auth_required
 def createEvent():
     data = request.get_json()
-    print(getUser().json)
     userid = getUser().json['id']
     starttime = data.get('starttime')
     endtime = data.get('endtime')
