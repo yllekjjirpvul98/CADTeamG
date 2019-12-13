@@ -2,15 +2,19 @@ from flask import Flask
 from google.cloud import datastore
 from auth import auth
 from calender import calendar
+from lobby import session
 from flask_cors import CORS
-from lobby import lobby
-from flask_socketio import SocketIO
+import socketio
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
+from lobby import sio
 
 app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(calendar, url_prefix='/calendar')
+app.register_blueprint(session, url_prefix='/session')
+app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
 CORS(app)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
-
+    app.run(threaded=True, port=8080)
