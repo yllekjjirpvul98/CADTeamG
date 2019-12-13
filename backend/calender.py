@@ -39,7 +39,7 @@ def createEvent():
     else:
         return make_response(jsonify(errors), 400)
 
-@calender.route('/deleteEvent', methods=['POST'])
+@calendar.route('/deleteEvent', methods=['POST'])
 @auth_required
 def deleteEvent():
     data = request.get_json(force = True)
@@ -56,7 +56,7 @@ def deleteEvent():
     else:
         return make_response("No matching event", 400)
     
-@calender.route('/getEvents', methods=['POST'])
+@calendar.route('/getEvents', methods=['POST'])
 @auth_required
 def getEvents():
     data = request.get_json(force = True)
