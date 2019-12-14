@@ -13,14 +13,24 @@ session = Blueprint('session', __name__)
 
 sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins='*')
 
-@sio.on('test')
+@sio.on('message')
 def test(sid, data):
-    print('xd')
+    sio.emit('message', data, room=sio.get_session(sid)['room'], skip_sid=sid)
+    pass
+
+@sio.on('join')
+def test(sid, data):
+    sio.enter_room(sid, data)
+    sio.save_session(sid, {'room': data})
     pass
 
 @sio.event
 def connect(sid, environ):
     print('Connected', sid)
+
+@sio.event
+def disconnect(sid):
+    print('Disconnected', sid)
 
 @session.route('/join', methods=['POST'])
 @auth_required
@@ -34,11 +44,11 @@ def joinSession():
 
     if len(errors.keys()) == 0:
         room = getSessionByCode(code)
-        if len(user) == 0:
+        if len(room) == 0:
             return make_response(jsonify(username='Room does not exist'), 400)
         else:
             room = from_datastore(room[0])
-            make_response(jsonify(session=room), 200)
+            return make_response(jsonify(session=room), 200)
     else: 
         return make_response(jsonify(errors=errors), 400)
 
@@ -56,7 +66,8 @@ def hostSess():
     endtime = data.get('endtime')
     votingtime = data.get('votingtime')
     weekends = data.get('weekends')
-    
+
+    # TODO Validation 
     errors = {}
     if(title is None): errors['title'] = 'Title is empty'
     if(location is None): errors['location'] = 'Location is empty'
