@@ -2,10 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  Button, Input, Segment, Message, Header,
+  Button, Input, Segment, Header,
 } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { signUp, clearErrors } from '../redux/actions';
+import { signUp, clearErrors } from '../redux/actions/auth';
+import ErrorList from '../components/ErrorList';
 
 class SignUpComponent extends React.Component {
   constructor(props) {
@@ -82,14 +83,7 @@ class SignUpComponent extends React.Component {
           >
             Sign Up
           </Button>
-          {Object.keys(errors).length > 0 ? (
-            <Message
-              compact
-              error
-              header="Error"
-              list={Object.values(errors).map((error) => <p key={error}>{error}</p>)}
-            />
-          ) : <></>}
+          <ErrorList data={errors} />
         </Segment>
       </Layout>
     );

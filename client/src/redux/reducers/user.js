@@ -1,8 +1,9 @@
-import { SIGN_IN, SIGN_UP, AUTH } from '../types';
+import { SIGN_IN, SIGN_UP, AUTH, JOIN_SESSION, HOST_SESSION } from '../types';
 
 const initialState = {
   id: '',
   username: '',
+  session: {}
 };
 
 export default function (state = initialState, action) {
@@ -18,6 +19,18 @@ export default function (state = initialState, action) {
     case SIGN_UP: {
       return {
         ...state,
+      };
+    }
+    case JOIN_SESSION: {
+      return {
+        ...state,
+        session: action.payload
+      };
+    }
+    case HOST_SESSION: {
+      return {
+        ...state,
+        session: action.payload
       };
     }
     case AUTH: {

@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
- Button, Input,
-} from 'semantic-ui-react';
-import { authenticate } from '../redux/actions';
+import { useHistory } from 'react-router-dom';
+import { Button, Input } from 'semantic-ui-react';
+import ErrorList from './ErrorList';
+import { joinSession } from '../redux/actions/session';
 
-class JoinForm extends React.Component {
+class JoinFormComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,18 +19,22 @@ class JoinForm extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  handleJoin() {
-    return 0;
-  }
+  async handleJoin() {
+    // TODO Check if the input can be converted to number in the first place
+    const { payload: { id } } =  await this.props.joinSession({ code: Number(this.state.code) });
+    
+    if(id) this.props.history.push(`/rooms/${id}`)
 
+  }
 
   render() {
     const { code } = this.state;
+    const { loader, errors } = this.props;
 
     return (
       <>
         <Input
-          fluid 
+          fluid
           name="code"
           iconPosition="left"
           placeholder="Enter code"
@@ -38,15 +42,31 @@ class JoinForm extends React.Component {
           onChange={this.handleChange}
           value={code}
         />
+        <br />
         <Button
           onClick={this.handleJoin}
           fluid
+          loading={loader.JOIN_SESSION}
         >
           Join
         </Button>
+        <ErrorList data={errors}/>
       </>
     );
   }
 }
 
-export default JoinForm;
+function JoinForm(props) {
+  const history = useHistory();
+
+  return (
+    <JoinFormComponent {...props} history={history} />
+  );
+}
+
+const mapStateToProps = (state) => {
+  const { loader, errors } = state;
+  return { loader, errors };
+};
+
+export default connect(mapStateToProps, { joinSession })(JoinForm);

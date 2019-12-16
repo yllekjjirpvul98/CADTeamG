@@ -1,11 +1,21 @@
 import React from 'react';
-import { Input, Button } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { Input, Button, Checkbox } from 'semantic-ui-react';
+import { hostSession } from '../redux/actions/session';
+import ErrorList from './ErrorList';
 
-class HostForm extends React.Component {
+class HostFormComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      code: '',
+      title: '',
+      location: '',
+      duration: '',
+      starttime: '',
+      endtime: '',
+      votingtime: '',
+      weekends: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleHost = this.handleHost.bind(this);
@@ -15,33 +25,109 @@ class HostForm extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  handleHost() {
-    return 0;
+  async handleHost() {
+    const { payload: { id } } =  await this.props.hostSession({ ...this.state });
+    console.log(id)
+    if(id) this.props.history.push(`/rooms/${id}`)
   }
 
-
   render() {
-    const { code } = this.state;
+    const { title, location, duration, starttime, endtime, votingtime, weekends } = this.state;
+    const { loader, errors } = this.props;
 
     return (
       <>
         <Input
-          name="code"
+          name="title"
           iconPosition="left"
-          placeholder="Enter code"
+          placeholder="Enter title"
           type="text"
+          fluid
           onChange={this.handleChange}
-          value={code}
+          value={title}
         />
+        <br />
+        <Input
+          name="location"
+          iconPosition="left"
+          placeholder="Enter location"
+          type="text"
+          fluid
+          onChange={this.handleChange}
+          value={location}
+        />
+        <br />
+        <Input
+          name="duration"
+          iconPosition="left"
+          placeholder="Enter duration"
+          type="text"
+          fluid
+          onChange={this.handleChange}
+          value={duration}
+        />
+        <br />
+        <Input
+          name="starttime"
+          iconPosition="left"
+          placeholder="Enter start time"
+          type="text"
+          fluid
+          onChange={this.handleChange}
+          value={starttime}
+        />
+        <br />
+        <Input
+          name="endtime"
+          iconPosition="left"
+          placeholder="Enter end time"
+          type="text"
+          fluid
+          onChange={this.handleChange}
+          value={endtime}
+        />
+        <br />
+        <Input
+          name="votingtime"
+          iconPosition="left"
+          placeholder="Enter voting time"
+          type="text"
+          fluid
+          onChange={this.handleChange}
+          value={votingtime}
+        />
+        <br />
+        <Checkbox
+          label='Weekends'
+          onChange={() => this.setState({ weekends: !weekends })}
+          checked={weekends}
+        />
+        <br />
+        <br />
         <Button
-          onClick={this.handleJoin}
+          onClick={this.handleHost}
+          loading={loader.HOST_SESSION}
           fluid
         >
           Host
         </Button>
+        <ErrorList data={errors}/>
       </>
     );
   }
 }
 
-export default HostForm;
+function HostForm(props) {
+  const history = useHistory();
+
+  return (
+    <HostFormComponent {...props} history={history} />
+  );
+}
+
+const mapStateToProps = (state) => {
+  const { loader, errors } = state;
+  return { loader, errors };
+};
+
+export default connect(mapStateToProps, { hostSession })(HostForm);

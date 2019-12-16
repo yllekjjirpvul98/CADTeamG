@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Loader, Dimmer, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { authenticate } from '../redux/actions';
+import { authenticate, clearErrors } from '../redux/actions/auth';
 import JoinForm from '../components/JoinForm';
 import HostForm from '../components/HostForm';
 
@@ -15,6 +15,7 @@ class Home extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleReset = this.handleReset.bind(this);
+
   }
 
   componentDidMount() {
@@ -27,6 +28,7 @@ class Home extends React.Component {
 
   handleReset() {
     this.setState({ join: false, host: false })
+    this.props.clearErrors();
   }
 
   render() {
@@ -66,4 +68,4 @@ const mapStateToProps = (state) => {
   return { loader };
 };
 
-export default connect(mapStateToProps, { authenticate })(Home);
+export default connect(mapStateToProps, { authenticate, clearErrors })(Home);

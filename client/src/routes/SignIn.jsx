@@ -2,10 +2,11 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
-  Button, Input, Segment, Message, Header,
+  Button, Input, Segment, Header,
 } from 'semantic-ui-react';
-import { signIn, clearErrors } from '../redux/actions';
+import { signIn, clearErrors } from '../redux/actions/auth';
 import Layout from '../components/Layout';
+import ErrorList from '../components/ErrorList';
 
 class SignInComponent extends React.Component {
   constructor(props) {
@@ -26,10 +27,11 @@ class SignInComponent extends React.Component {
   async handleSubmit() {
     const { username, password } = this.state;
 
-    const { payload } = await this.props.signIn({ username, password });
-
-    if (payload.token) return this.props.history.push('/home');
-    return payload;
+    const { payload: { token } } =  await this.props.signIn({ username, password });
+    
+    if (token) return this.props.history.push('/home');
+    
+    return this;
   }
 
   render() {
@@ -74,14 +76,7 @@ class SignInComponent extends React.Component {
             Sign In
           </Button>
 
-          {Object.keys(errors).length > 0 ? (
-            <Message
-              compact
-              error
-              header="Error"
-              list={Object.values(errors).map((error) => <p key={error}>{error}</p>)}
-            />
-          ) : <></>}
+          <ErrorList data={errors} />
         </Segment>
       </Layout>
     );
