@@ -6,6 +6,7 @@ import SignIn from './routes/SignIn';
 import Index from './routes/Index';
 import Schedule from './routes/Schedule';
 import Room from './routes/Room';
+import './index.css'
 import axios from './utils/axios';
 
 export default function App() {

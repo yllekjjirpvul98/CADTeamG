@@ -1,4 +1,4 @@
-import { SIGN_IN, SIGN_UP, AUTH, JOIN_SESSION, HOST_SESSION } from '../types';
+import { SIGN_IN, SIGN_UP, AUTH, JOIN_SESSION, HOST_SESSION, GET_SESSION } from '../types';
 
 const initialState = {
   id: '',
@@ -19,6 +19,12 @@ export default function (state = initialState, action) {
     case SIGN_UP: {
       return {
         ...state,
+      };
+    }
+    case GET_SESSION: {
+      return {
+        ...state,
+        session: action.payload
       };
     }
     case JOIN_SESSION: {

@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import axios from '../../utils/axios';
 import {
- JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER,
+ JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER, GET_SESSION
 } from '../types';
 import { validateJoinSession, validateHostSession } from '../validation/session';
 
@@ -27,7 +27,15 @@ const hostSession = (data) => (dispatch) => {
                 .then((res) => dispatch({ type: HOST_SESSION, payload: res.data }))
                 .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
                 .finally(() => dispatch({ type: CLEAR_LOADER, payload: HOST_SESSION }));
-  };
+};
   
+const getSession = (id) => (dispatch) => {
 
-export { joinSession, hostSession };
+  dispatch({ type: SET_LOADER, payload: GET_SESSION });
+  return axios.get(`/session/${id}`)
+              .then((res) => dispatch({ type: GET_SESSION, payload: res.data }))
+              .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
+              .finally(() => dispatch({ type: CLEAR_LOADER, payload: GET_SESSION }));
+};
+
+export { joinSession, hostSession, getSession };

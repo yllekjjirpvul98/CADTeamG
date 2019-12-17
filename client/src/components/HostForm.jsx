@@ -27,7 +27,7 @@ class HostFormComponent extends React.Component {
 
   async handleHost() {
     const { payload: { id } } =  await this.props.hostSession({ ...this.state });
-    console.log(id)
+
     if(id) this.props.history.push(`/rooms/${id}`)
   }
 
