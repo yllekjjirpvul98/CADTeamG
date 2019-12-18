@@ -29,8 +29,8 @@ def postEvent():
     userid = request.id
     title = data.get('title')
     location = data.get('location')
-    starttime = data.get('starttime')
-    endtime = data.get('endtime')
+    starttime = data.get('starttime') 
+    endtime = data.get('endtime')   # TODO END CANNOT OCCUR BEFORE START
 
     errors = {}
     if(title is None): errors['title'] = 'Title is empty'
@@ -40,8 +40,8 @@ def postEvent():
 
     if len(errors.keys()) == 0:
         event = Event(userid, username, title, location, starttime, endtime)
-        update(event.__dict__, 'event')
-        return make_response(jsonify(userid=userid, username=username, title=title, 
+        event = update(event.__dict__, 'event')
+        return make_response(jsonify(id=event.get('id'), userid=userid, username=username, title=title, 
                                 location=location, starttime=starttime, endtime=endtime), 200)
     else:
         return make_response(jsonify(errors), 400)
@@ -98,8 +98,8 @@ def deleteEvent(id):
     if event is not None:
         if event.get('userid') == request.id:
             delete('event', id)
-            return make_response("Event deleted")
+            return make_response(jsonify(id=id), 200)
         else:
-            return make_response("Thats not your event", 401)
+            return make_response('Thats not your event', 401)
     else:
-        return make_response("No matching event", 400)
+        return make_response('No matching event', 400)
