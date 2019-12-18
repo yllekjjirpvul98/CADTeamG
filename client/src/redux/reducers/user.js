@@ -3,7 +3,7 @@ import { SIGN_IN, SIGN_UP, AUTH, JOIN_SESSION, HOST_SESSION, GET_SESSION } from 
 const initialState = {
   id: '',
   username: '',
-  session: {}
+  session: {},
 };
 
 export default function (state = initialState, action) {
@@ -24,19 +24,19 @@ export default function (state = initialState, action) {
     case GET_SESSION: {
       return {
         ...state,
-        session: action.payload
+        session: action.payload,
       };
     }
     case JOIN_SESSION: {
       return {
         ...state,
-        session: action.payload
+        session: action.payload,
       };
     }
     case HOST_SESSION: {
       return {
         ...state,
-        session: action.payload
+        session: action.payload,
       };
     }
     case AUTH: {

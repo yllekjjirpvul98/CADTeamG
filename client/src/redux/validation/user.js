@@ -6,7 +6,7 @@ function validateSignIn(user) {
   if (username.length === 0) errors.username = 'Username cannot be empty';
   if (password.length === 0) errors.password = 'Password cannot be empty';
 
-  return errors;
+  return { errors, validated: Object.values(errors).length === 0 };
 }
 
 function validateSignUp(user) {
@@ -18,7 +18,7 @@ function validateSignUp(user) {
   if (password.length === 0) errors.password = 'Password cannot be empty';
   if (password2.length === 0) errors.password2 = 'Repeated password cannot be empty';
 
-  return errors;
+  return { errors, validated: Object.values(errors).length === 0 };
 }
 
 export { validateSignUp, validateSignIn };

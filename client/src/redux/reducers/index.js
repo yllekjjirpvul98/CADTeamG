@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import user from './user';
-import errors from './errors';
+import events from './events';
 import loader from './loader';
+import errors from './errors';
 
-export default combineReducers({ user, loader, errors });
+export default combineReducers({ user, events, loader, errors });

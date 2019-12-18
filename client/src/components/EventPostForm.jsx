@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button, Form, Header } from 'semantic-ui-react';
-import { postEvent } from '../redux/actions/event';
 import { TimeInput } from 'semantic-ui-calendar-react';
+import { postEvent } from '../redux/actions/event';
 
 class EventPostForm extends React.Component {
   constructor(props) {
@@ -21,15 +21,18 @@ class EventPostForm extends React.Component {
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
-  handleTimeChange = (event, {name, value}) => {
-    if (this.state.hasOwnProperty(name)) this.setState({ [name]: value });
+
+  handleTimeChange(event, { name, value }) {
+    this.setState({ [name]: value });
   }
+
   async handleSave() {
     const starttime = new Date(`${this.props.date} ${this.state.starttime}`);
     const endtime = new Date(`${this.props.date} ${this.state.endtime}`);
     const event = { ...this.state, starttime, endtime };
-    const { payload } =  await this.props.postEvent(event);
-    this.props.handlePost(payload);
+    const { payload } = await this.props.postEvent(event);
+    const { id } = payload;
+    if (id) this.props.closeModal();
   }
 
   render() {
@@ -62,7 +65,7 @@ class EventPostForm extends React.Component {
         <TimeInput
           fluid
           closable
-          autoComplete='off'
+          autoComplete="off"
           hideMobileKeyboard
           name="starttime"
           iconPosition="left"
@@ -75,7 +78,7 @@ class EventPostForm extends React.Component {
         <TimeInput
           fluid
           closable
-          autoComplete='off'
+          autoComplete="off"
           hideMobileKeyboard
           name="endtime"
           iconPosition="left"

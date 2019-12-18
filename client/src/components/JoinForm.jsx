@@ -21,10 +21,9 @@ class JoinFormComponent extends React.Component {
 
   async handleJoin() {
     // TODO Check if the input can be converted to number in the first place
-    const { payload: { id } } =  await this.props.joinSession({ code: Number(this.state.code) });
-    
-    if(id) this.props.history.push(`/rooms/${id}`)
+    const { payload: { id } } = await this.props.joinSession({ code: Number(this.state.code) });
 
+    if (id) this.props.history.push(`/rooms/${id}`);
   }
 
   render() {
@@ -50,7 +49,7 @@ class JoinFormComponent extends React.Component {
         >
           Join
         </Button>
-        <ErrorList data={errors}/>
+        <ErrorList data={errors} />
       </>
     );
   }

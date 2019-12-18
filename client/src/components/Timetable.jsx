@@ -4,10 +4,10 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { connect } from 'react-redux';
 import EventPostForm from './EventPostForm';
 import EventUpdateForm from './EventUpdateForm';
 import ErrorList from './ErrorList';
-import { connect } from 'react-redux';
 import { getEvents } from '../redux/actions/event';
 
 class Timetable extends Component {
@@ -18,68 +18,60 @@ class Timetable extends Component {
       modalEdit: false,
       selectedDate: null,
       selectedEvent: null,
-      events: []
     };
     this.handleDateClick = this.handleDateClick.bind(this);
     this.handleEventClick = this.handleEventClick.bind(this);
-    this.handlePostEvent = this.handlePostEvent.bind(this);
-    this.handleUpdateEvent = this.handleUpdateEvent.bind(this);
-    this.handleDeleteEvent = this.handleDeleteEvent.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
+
   async componentDidMount() {
-    const { payload: { events } } = await this.props.getEvents();
-    this.setState({ events })
+    await this.props.getEvents();
   }
+
   handleDateClick(arg) {
-    this.setState({ modalNew: true, selectedDate: arg.dateStr })
+    this.setState({ modalNew: true, selectedDate: arg.dateStr });
   }
+
   handleEventClick(arg) {
-    this.setState({ modalEdit: true, selectedEvent: arg.event})
+    this.setState({ modalEdit: true, selectedEvent: arg.event });
   }
-  handlePostEvent(event) {
-    this.setState({ events: this.state.events.concat(event) })
-    this.setState({ modalNew: false })
+
+  handleCloseModal() {
+    this.setState({ modalNew: false, modalEdit: false });
   }
-  handleUpdateEvent(event) {
-    this.setState({ events: this.state.events.filter(e => e.id !== event.id).concat(event)  })
-    this.setState({ modalEdit: false })
-  }
-  handleDeleteEvent(id) {
-    this.setState({ events: this.state.events.filter(event => event.id !== id) })
-    this.setState({ modalEdit: false })
-  }
+
   render() {
     const { modalNew, modalEdit, selectedDate, selectedEvent } = this.state;
     const { errors } = this.props;
-    let events = this.state.events.map(e => { return { ...e, start: e.starttime, end: e.endtime } })
+    const events = this.props.events.map((e) => ({ ...e, start: e.starttime, end: e.endtime }));
 
     return (
       <>
-        <FullCalendar 
-          defaultView="dayGridMonth"  
-          events={ events }
-          plugins={[ dayGridPlugin, timeGridPlugin, interactionPlugin  ]} 
+        <FullCalendar
+          defaultView="dayGridMonth"
+          events={events}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           dateClick={this.handleDateClick}
           eventClick={this.handleEventClick}
         />
         <Modal
           open={modalNew}
-          onClose={() => this.setState({ modalNew: false})}
+          onClose={() => this.setState({ modalNew: false })}
           size="small"
         >
           <Modal.Content>
-            <EventPostForm date={ selectedDate } handlePost={this.handlePostEvent}/>
-            <ErrorList data={ errors } />
+            <EventPostForm date={selectedDate} closeModal={this.handleCloseModal} />
+            <ErrorList data={errors} />
           </Modal.Content>
         </Modal>
         <Modal
           open={modalEdit}
-          onClose={() => this.setState({ modalEdit: false})}
+          onClose={() => this.setState({ modalEdit: false })}
           size="small"
         >
           <Modal.Content>
-            <EventUpdateForm event={ selectedEvent } handleUpdate={this.handleUpdateEvent} handleDelete={this.handleDeleteEvent}/>
-            <ErrorList data={ errors } />
+            <EventUpdateForm event={selectedEvent} closeModal={this.handleCloseModal} />
+            <ErrorList data={errors} />
           </Modal.Content>
         </Modal>
       </>
@@ -88,8 +80,8 @@ class Timetable extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { errors } = state;
-  return { errors };
+  const { events, errors } = state;
+  return { events, errors };
 };
 
 export default connect(mapStateToProps, { getEvents })(Timetable);

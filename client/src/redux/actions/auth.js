@@ -1,14 +1,12 @@
 /* eslint-disable indent */
 import axios from '../../utils/axios';
-import {
- SIGN_IN, SIGN_UP, AUTH, GET_ERRORS, CLEAR_ERRORS, SET_LOADER, CLEAR_LOADER,
-} from '../types';
+import { SIGN_IN, SIGN_UP, AUTH, GET_ERRORS, CLEAR_ERRORS, SET_LOADER, CLEAR_LOADER } from '../types';
 import { validateSignIn, validateSignUp } from '../validation/user';
 
 const signIn = (data) => (dispatch) => {
-  const errors = validateSignIn(data);
+  const { validated, errors } = validateSignIn(data);
 
-  if (Object.values(errors).length > 0) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
+  if (!validated) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
 
   dispatch({ type: SET_LOADER, payload: SIGN_IN });
   return axios.post('/auth/login', data)
@@ -18,9 +16,9 @@ const signIn = (data) => (dispatch) => {
 };
 
 const signUp = (data) => (dispatch) => {
-  const errors = validateSignUp(data);
+  const { validated, errors } = validateSignUp(data);
 
-  if (Object.values(errors).length > 0) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
+  if (!validated) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
 
   dispatch({ type: SET_LOADER, payload: SIGN_UP });
 
@@ -43,6 +41,4 @@ const authenticate = () => (dispatch) => {
 
 const clearErrors = () => (dispatch) => dispatch({ type: CLEAR_ERRORS });
 
-export {
- signIn, signUp, authenticate, clearErrors,
-};
+export { signIn, signUp, authenticate, clearErrors };

@@ -15,7 +15,7 @@ class HostFormComponent extends React.Component {
       starttime: '',
       endtime: '',
       votingtime: '',
-      weekends: false
+      weekends: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleHost = this.handleHost.bind(this);
@@ -26,9 +26,9 @@ class HostFormComponent extends React.Component {
   }
 
   async handleHost() {
-    const { payload: { id } } =  await this.props.hostSession({ ...this.state });
+    const { payload: { id } } = await this.props.hostSession({ ...this.state });
 
-    if(id) this.props.history.push(`/rooms/${id}`)
+    if (id) this.props.history.push(`/rooms/${id}`);
   }
 
   render() {
@@ -98,7 +98,7 @@ class HostFormComponent extends React.Component {
         />
         <br />
         <Checkbox
-          label='Weekends'
+          label="Weekends"
           onChange={() => this.setState({ weekends: !weekends })}
           checked={weekends}
         />
@@ -111,7 +111,7 @@ class HostFormComponent extends React.Component {
         >
           Host
         </Button>
-        <ErrorList data={errors}/>
+        <ErrorList data={errors} />
       </>
     );
   }

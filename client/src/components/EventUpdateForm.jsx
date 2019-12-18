@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button, Form, Header } from 'semantic-ui-react';
-import { updateEvent, deleteEvent } from '../redux/actions/event';
 import { TimeInput } from 'semantic-ui-calendar-react';
+import { updateEvent, deleteEvent } from '../redux/actions/event';
 
 class EventUpdateForm extends React.Component {
   constructor(props) {
@@ -22,24 +22,31 @@ class EventUpdateForm extends React.Component {
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
-  handleTimeChange = (event, {name, value}) => {
-    if (this.state.hasOwnProperty(name)) this.setState({ [name]: value });
+
+  handleTimeChange(event, { name, value }) {
+    this.setState({ [name]: value });
   }
+
   async handleUpdate() {
-    const starttime = new Date(`${this.props.date} ${this.state.starttime}`);
-    const endtime = new Date(`${this.props.date} ${this.state.endtime}`);
+    const starttime = this.state.starttime ? new Date(`${this.props.event.start.toDateString()} ${this.state.starttime}`) : '';
+    const endtime = this.state.endtime ? new Date(`${this.props.event.end.toDateString()} ${this.state.endtime}`) : '';
     const event = { ...this.state, starttime, endtime };
-    const { payload } =  await this.props.updateEvent(event, this.props.event.id);
-    this.props.handleUpdate(payload);
+    const { payload } = await this.props.updateEvent(event, this.props.event.id);
+    const { id } = payload;
+    if (id) this.props.closeModal();
   }
+
   async handleDelete() {
-    const { payload } =  await this.props.deleteEvent(this.props.event.id);
-    this.props.handleDelete(this.props.event.id)
+    const { payload: { id } } = await this.props.deleteEvent(this.props.event.id);
+    if (id) this.props.closeModal();
   }
+
   render() {
-    const { title, location, starttime, endtime } = this.state;
+    const {
+      title, location, starttime, endtime,
+    } = this.state;
     const { event, loader } = this.props;
-    
+
     return (
       <Form>
         <Header>Update {event.title}</Header>
@@ -69,7 +76,7 @@ class EventUpdateForm extends React.Component {
           fluid
           closable
           label={event.start.toUTCString()}
-          autoComplete='off'
+          autoComplete="off"
           hideMobileKeyboard
           name="starttime"
           iconPosition="left"
@@ -83,7 +90,7 @@ class EventUpdateForm extends React.Component {
           fluid
           closable
           label={event.end.toUTCString()}
-          autoComplete='off'
+          autoComplete="off"
           hideMobileKeyboard
           name="endtime"
           iconPosition="left"
@@ -100,6 +107,7 @@ class EventUpdateForm extends React.Component {
         >
           Update
         </Button>
+        <br />
         <Button
           onClick={this.handleDelete}
           fluid

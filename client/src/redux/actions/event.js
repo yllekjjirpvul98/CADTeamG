@@ -1,10 +1,9 @@
 /* eslint-disable indent */
 import axios from '../../utils/axios';
 import { GET_EVENTS, POST_EVENT, PUT_EVENT, DELETE_EVENT, GET_ERRORS, SET_LOADER, CLEAR_LOADER } from '../types';
-import { validateEvent } from '../validation/event';
+import { validateEvent, validateUpdateEvent } from '../validation/event';
 
 const getEvents = () => (dispatch) => {
-
     dispatch({ type: SET_LOADER, payload: GET_EVENTS });
     return axios.get('/events/')
                 .then((res) => dispatch({ type: GET_EVENTS, payload: res.data }))
@@ -13,9 +12,9 @@ const getEvents = () => (dispatch) => {
 };
 
 const postEvent = (event) => (dispatch) => {
-  const errors = validateEvent(event);
-    
-  if (Object.values(errors).length > 0) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
+  const { validated, errors } = validateEvent(event);
+
+  if (!validated) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
 
   dispatch({ type: SET_LOADER, payload: POST_EVENT });
   return axios.post('/events/', event)
@@ -24,7 +23,10 @@ const postEvent = (event) => (dispatch) => {
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: POST_EVENT }));
 };
 
-const updateEvent = (event, id) => (dispatch) => {      
+const updateEvent = (event, id) => (dispatch) => {
+    const { validated, errors } = validateUpdateEvent(event);
+
+    if (!validated) return dispatch({ type: GET_ERRORS, payload: { data: errors } });
 
     dispatch({ type: SET_LOADER, payload: PUT_EVENT });
     return axios.put(`/events/${id}`, event)
@@ -34,7 +36,6 @@ const updateEvent = (event, id) => (dispatch) => {
 };
 
 const deleteEvent = (id) => (dispatch) => {
-  
     dispatch({ type: SET_LOADER, payload: DELETE_EVENT });
     return axios.delete(`/events/${id}`)
                 .then((res) => dispatch({ type: DELETE_EVENT, payload: res.data }))
