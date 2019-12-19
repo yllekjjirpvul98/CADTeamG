@@ -1,6 +1,7 @@
 # Session JSON object
 import random
 import json
+import uuid
 
 class Session(object):
     def __init__(self, hostId, title, location, duration, starttime, endtime, votingtime, weekends):
@@ -13,4 +14,5 @@ class Session(object):
         self.endtime = endtime
         self.votingtime = votingtime
         self.weekends = weekends
-        self.code = random.randint(0, 100) # Find a better way to generate code
+        ## TODO: validate if code not already exists, regenerate if neccessary
+        self.code = str(uuid.uuid4())[:8]

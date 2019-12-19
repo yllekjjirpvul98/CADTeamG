@@ -27,6 +27,7 @@ def join(sid, data, username):
 @sio.event
 def connect(sid, environ):
     # TODO Update datastore participants
+    # TODO emit update event when there is new participants
     print('Connected', sid)
 
 @sio.event
@@ -105,4 +106,9 @@ def hostSess():
         return make_response(jsonify(id=room.get('id'), hostId=hostId, title=title, location=location, duration=duration, starttime=starttime,
                 endtime=endtime, votingtime=votingtime, weekends=weekends, participants=room.get('paprticipants')), 200)
     else:
-        return make_response(jsonify(errors=errors.__dict__), 400)
+        return make_response(jsonify(errors=errors), 400)
+
+    # TODO: startVote : REST
+    # emit startVote event to every participant
+    # client = onStartVote => move to voting page 
+

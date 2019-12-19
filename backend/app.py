@@ -5,8 +5,6 @@ from event import event
 from lobby import session
 from flask_cors import CORS
 import socketio
-from gevent import pywsgi
-from geventwebsocket.handler import WebSocketHandler
 from lobby import sio
 
 app = Flask(__name__)
