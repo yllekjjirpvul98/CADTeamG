@@ -2,12 +2,11 @@ from flask import Flask
 from google.cloud import datastore
 from auth import auth
 from event import event
-from lobby import session
+from session import session, sio
 from flask_cors import CORS
 import socketio
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
-from lobby import sio
 
 app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
