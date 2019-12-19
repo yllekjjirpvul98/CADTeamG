@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Loader, Dimmer, Button } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { authenticate, clearErrors } from '../redux/actions/auth';
+import { authenticate } from '../redux/actions/auth';
 import JoinForm from '../components/JoinForm';
 import HostForm from '../components/HostForm';
 
@@ -15,11 +15,10 @@ class Home extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleReset = this.handleReset.bind(this);
-
   }
 
   componentDidMount() {
-    if (!this.props.id && !this.props.username) this.props.authenticate();
+    if (!this.props.user.id) this.props.authenticate();
   }
 
   handleChange(event) {
@@ -27,8 +26,7 @@ class Home extends React.Component {
   }
 
   handleReset() {
-    this.setState({ join: false, host: false })
-    this.props.clearErrors();
+    this.setState({ join: false, host: false });
   }
 
   render() {
@@ -50,10 +48,7 @@ class Home extends React.Component {
     if (host) currentState = <HostForm />;
 
     return (
-      <Layout protected>
-        <Dimmer inverted active={loader.AUTH}>
-          <Loader inverted size="huge" inline="centered" />
-        </Dimmer>
+      <Layout protected loader={loader.AUTH}>
         {currentState}
         <br />
         {back}
@@ -63,9 +58,9 @@ class Home extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const { loader } = state;
+  const { user, loader } = state;
 
-  return { loader };
+  return { user, loader };
 };
 
-export default connect(mapStateToProps, { authenticate, clearErrors })(Home);
+export default connect(mapStateToProps, { authenticate })(Home);

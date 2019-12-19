@@ -5,7 +5,7 @@ import {
   Button, Input, Segment, Header,
 } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { signUp, clearErrors } from '../redux/actions/auth';
+import { signUp } from '../redux/actions/auth';
 import ErrorList from '../components/ErrorList';
 
 class SignUpComponent extends React.Component {
@@ -16,7 +16,6 @@ class SignUpComponent extends React.Component {
       password: '',
       password2: '',
     };
-    this.props.clearErrors();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -104,4 +103,4 @@ const mapStateToProps = (state) => {
 };
 
 
-export default connect(mapStateToProps, { signUp, clearErrors })(SignUp);
+export default connect(mapStateToProps, { signUp })(SignUp);

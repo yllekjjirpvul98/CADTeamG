@@ -1,49 +1,29 @@
 import React, { Component } from 'react';
-import { Modal } from 'semantic-ui-react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { connect } from 'react-redux';
-import EventPostForm from './EventPostForm';
-import EventUpdateForm from './EventUpdateForm';
-import ErrorList from './ErrorList';
-import { getEvents } from '../redux/actions/event';
+import { getSessionEvents } from '../redux/actions/session';
 
 class Timetable extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      modalNew: false,
-      modalEdit: false,
-      selectedDate: null,
-      selectedEvent: null,
-    };
-    this.handleDateClick = this.handleDateClick.bind(this);
-    this.handleEventClick = this.handleEventClick.bind(this);
-    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.state = {};
   }
 
   async componentDidMount() {
-    await this.props.getEvents();
-  }
-
-  handleDateClick(arg) {
-    this.setState({ modalNew: true, selectedDate: arg.dateStr });
-  }
-
-  handleEventClick(arg) {
-    this.setState({ modalEdit: true, selectedEvent: arg.event });
-  }
-
-  handleCloseModal() {
-    this.setState({ modalNew: false, modalEdit: false });
+    const { payload } = await this.props.getSessionEvents(this.props.room);
+    console.log(payload);
   }
 
   render() {
-    const { modalNew, modalEdit, selectedDate, selectedEvent } = this.state;
-    const { errors } = this.props;
-    const events = this.props.events.map((e) => ({ ...e, start: e.starttime, end: e.endtime }));
+    let { events } = this.props;
+
+    const colors = ['#0000ff', '#ff0000'];
+    const map = [...new Set(events.map((e) => e.userid))].reduce((acc, id, i) => acc.set(id, colors[i]), new Map());
+    events = events.map((e) => ({ ...e, start: e.starttime, end: e.endtime, backgroundColor: map.get(e.userid), 
+      borderColor: map.get(e.userid) }));
 
     return (
       <>
@@ -51,29 +31,7 @@ class Timetable extends Component {
           defaultView="dayGridMonth"
           events={events}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          dateClick={this.handleDateClick}
-          eventClick={this.handleEventClick}
         />
-        <Modal
-          open={modalNew}
-          onClose={() => this.setState({ modalNew: false })}
-          size="small"
-        >
-          <Modal.Content>
-            <EventPostForm date={selectedDate} closeModal={this.handleCloseModal} />
-            <ErrorList data={errors} />
-          </Modal.Content>
-        </Modal>
-        <Modal
-          open={modalEdit}
-          onClose={() => this.setState({ modalEdit: false })}
-          size="small"
-        >
-          <Modal.Content>
-            <EventUpdateForm event={selectedEvent} closeModal={this.handleCloseModal} />
-            <ErrorList data={errors} />
-          </Modal.Content>
-        </Modal>
       </>
     );
   }
@@ -84,4 +42,4 @@ const mapStateToProps = (state) => {
   return { events, errors };
 };
 
-export default connect(mapStateToProps, { getEvents })(Timetable);
+export default connect(mapStateToProps, { getSessionEvents })(Timetable);

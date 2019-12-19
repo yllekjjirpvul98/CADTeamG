@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import {
   Button, Input, Segment, Header,
 } from 'semantic-ui-react';
-import { signIn, clearErrors } from '../redux/actions/auth';
+import { signIn } from '../redux/actions/auth';
 import Layout from '../components/Layout';
 import ErrorList from '../components/ErrorList';
 
@@ -15,7 +15,6 @@ class SignInComponent extends React.Component {
       username: '',
       password: '',
     };
-    this.props.clearErrors();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -27,10 +26,10 @@ class SignInComponent extends React.Component {
   async handleSubmit() {
     const { username, password } = this.state;
 
-    const { payload: { token } } =  await this.props.signIn({ username, password });
-    
+    const { payload: { token } } = await this.props.signIn({ username, password });
+
     if (token) return this.props.history.push('/home');
-    
+
     return this;
   }
 
@@ -96,4 +95,4 @@ const mapStateToProps = (state) => {
   return { user, loader, errors };
 };
 
-export default connect(mapStateToProps, { signIn, clearErrors })(SignIn);
+export default connect(mapStateToProps, { signIn })(SignIn);

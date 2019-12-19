@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import axios from '../../utils/axios';
-import { SIGN_IN, SIGN_UP, AUTH, GET_ERRORS, CLEAR_ERRORS, SET_LOADER, CLEAR_LOADER } from '../types';
+import { SIGN_IN, SIGN_UP, AUTH, GET_ERRORS, SET_LOADER, CLEAR_LOADER, CLEAR_ERRORS } from '../types';
 import { validateSignIn, validateSignUp } from '../validation/user';
 
 const signIn = (data) => (dispatch) => {
@@ -11,6 +11,7 @@ const signIn = (data) => (dispatch) => {
   dispatch({ type: SET_LOADER, payload: SIGN_IN });
   return axios.post('/auth/login', data)
               .then((res) => dispatch({ type: SIGN_IN, payload: res.data }))
+              .then(dispatch({ type: CLEAR_ERRORS }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: SIGN_IN }));
 };
@@ -24,6 +25,7 @@ const signUp = (data) => (dispatch) => {
 
   return axios.post('/auth/register', data)
               .then((res) => dispatch({ type: SIGN_UP, payload: res.data }))
+              .then(dispatch({ type: CLEAR_ERRORS }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: SIGN_UP }));
 };
@@ -35,10 +37,9 @@ const authenticate = () => (dispatch) => {
 
   return axios.get('/auth/authenticate')
               .then((res) => dispatch({ type: AUTH, payload: res.data }))
+              .then(dispatch({ type: CLEAR_ERRORS }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: AUTH }));
 };
 
-const clearErrors = () => (dispatch) => dispatch({ type: CLEAR_ERRORS });
-
-export { signIn, signUp, authenticate, clearErrors };
+export { signIn, signUp, authenticate };
