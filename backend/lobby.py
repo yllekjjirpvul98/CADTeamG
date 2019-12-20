@@ -1,5 +1,5 @@
 import socketio
-from flask import Flask, Blueprint, request, make_response, jsonify
+from flask import Flask, Blueprint, request, make_response, jsonify, session
 from google.cloud import datastore
 from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode
 from JSONObject.user import User
@@ -8,8 +8,10 @@ from functools import wraps
 from auth import auth_required
 from JSONObject.session import Session
 import json
+import threading
+from time import sleep
 
-session = Blueprint('session', __name__)
+lobby = Blueprint('session', __name__)
 
 sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins='*')
 
@@ -35,7 +37,7 @@ def disconnect(sid):
     sio.emit('disconnect', sio.get_session(sid)['username'], room=sio.get_session(sid)['room'], skip_sid=sid)
     sio.save_session(sid, { })
 
-@session.route('/<int:id>')
+@lobby.route('/<int:id>')
 @auth_required
 def getSession(id):
     room = get(id, 'session')
@@ -47,7 +49,7 @@ def getSession(id):
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
             weekends=room.get('weekends'), participants=room.get('participants')), 200)
 
-@session.route('/join', methods=['POST'])
+@lobby.route('/join', methods=['POST'])
 @auth_required
 def joinSession():
     data = request.get_json()
@@ -72,7 +74,7 @@ def joinSession():
     else: 
         return make_response(jsonify(errors=errors), 400)
 
-@session.route('/host', methods=['POST'])
+@lobby.route('/host', methods=['POST'])
 @auth_required
 def hostSess():
     data = request.get_json()
@@ -99,6 +101,7 @@ def hostSess():
 
     if len(errors.keys()) == 0:
         # TODO Sessions cannot generate the same code
+
         room = Session(hostId, title, location, duration, starttime, endtime, votingtime, weekends)
         update(room.__dict__, 'session')
         room = getSessionByCode(room.code) ## TODO Find a better way to extract session id than fetching it from db
@@ -108,7 +111,93 @@ def hostSess():
     else:
         return make_response(jsonify(errors=errors), 400)
 
-    # TODO: startVote : REST
-    # emit startVote event to every participant
-    # client = onStartVote => move to voting page 
+############### Voting.py ###############
+
+@sio.on('startVote')
+def startVote(sid):
+    # TODO: Validate whether initiator = host
+    # TODO：Client on beginVote => move to voting page
+    sio.emit('beginVote', room=sio.get_session(sid)['room'], skip_sid=sid)
+    
+    # Run algorithm and store the generated available timeslots to session
+    availableSlots = None
+
+    # Add available slots to session
+    room = sio.get_session(sid)['room']
+    room = getSessionByCode(room)
+    room = from_datastore(room[0])
+
+    dictionary = dict()
+    dictionary['availableSlots'] = availableSlots
+    session[room] = dictionary
+
+    # start the timer
+    global timer
+    timer = Countdown(room.get('votingTime'), room)
+    timer.start()
+
+# TODO: Client emits getTimeslot
+@lobby.route('/<int:id>/getAvailableTimeslots')
+def getTimeslots(id):
+    while('availableSlots' not in session[id]):
+        print ("Generating slots...")
+    return session[id]['availableSlots']
+
+@sio.on('vote')
+def vote(sid, timeslot):
+    # add vote of each participant to session
+    room = sio.get_session(sid)['room']
+    dictionary = session[room]
+    if 'vote' in dictionary:
+        votelist = dictionary['vote']
+        if timeslot in votelist:
+            votelist[timeslot] = votelist[timeslot] + 1
+        else:
+            votelist[timeslot] = 1
+    else:
+        votelist = dict()
+        votelist[timeslot] = 1
+    dictionary['vote'] = votelist
+    session[room] = dictionary
+    # get number of participant in the room
+    room_obj = getSessionByCode(room)
+    room_obj = from_datastore(room[0])
+    total = len(room_obj['participants'])
+     # check if every participant has already voted
+    num_of_votes = sum(list(votelist.values()))
+    if (total == num_of_votes):
+        timer.cancel()
+        result = majorityVote(votelist)
+        sio.emit('result', result, room=room)
+    # onResult needed in client side
+
+# Countdown Timer
+class Countdown(threading.Thread):
+    def __init__(self, sec, room):
+        threading.Thread.__init__(self)
+        self.sec = sec
+        self.room = room
+        self.stopFlag = False
+
+    def run(self):
+        while not self.stopFlag:
+            for secs in range(self.sec, 0, -1):
+                # emit countdown time to client
+                sio.emit('countdown', secs, room=self.room)
+                sleep(1)
+            sio.emit('countdown', 0, room=self.room)
+            # perform majority voting when timeout
+            votelist = session[self.room]['vote']
+            result = majorityVote(votelist)
+            sio.emit('result', result, room=self.room)
+    
+    def cancel(self):
+        self.stopFlag = True
+        
+
+    
+def majorityVote(votelist):
+    return max(votelist, key=votelist.get)
+
+
 
