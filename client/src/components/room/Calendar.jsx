@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { connect } from 'react-redux';
-import { getSessionEvents } from '../redux/actions/session';
+import { getSessionEvents } from '../../redux/actions/session';
 
 class Timetable extends Component {
   constructor(props) {
@@ -30,6 +30,7 @@ class Timetable extends Component {
         <FullCalendar
           defaultView="dayGridMonth"
           events={events}
+          header={false}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         />
       </>

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Segment } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import TimetableEdit from '../components/TimetableEdit';
+import Calendar from '../components/schedule/Calendar';
 
 class Schedule extends Component {
   constructor(props) {
@@ -14,7 +15,9 @@ class Schedule extends Component {
 
     return (
       <Layout protected loader={loader.GET_EVENTS}>
-        <TimetableEdit />
+        <Segment secondary>
+          <Calendar />
+        </Segment>
       </Layout>
     );
   }

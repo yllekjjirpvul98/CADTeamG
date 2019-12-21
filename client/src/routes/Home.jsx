@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button } from 'semantic-ui-react';
+import { Grid, Segment, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { authenticate } from '../redux/actions/auth';
-import JoinForm from '../components/JoinForm';
-import HostForm from '../components/HostForm';
+import JoinForm from '../components/home/JoinForm';
+import HostForm from '../components/home/HostForm';
 
 class Home extends React.Component {
   constructor(props) {
@@ -42,16 +42,21 @@ class Home extends React.Component {
       </>
     );
 
-    const back = join || host ? <Button fluid onClick={this.handleReset}>Back</Button> : null;
+    const back = join || host ? (<><br /><Button fluid onClick={this.handleReset}>Back</Button></>) : null;
     let currentState = selection;
     if (join) currentState = <JoinForm />;
     if (host) currentState = <HostForm />;
 
     return (
       <Layout protected loader={loader.AUTH}>
-        {currentState}
-        <br />
-        {back}
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable>
+          <Grid.Column>
+            <Segment secondary>
+              {currentState}
+              {back}
+            </Segment>
+          </Grid.Column>
+        </Grid>
       </Layout>
     );
   }

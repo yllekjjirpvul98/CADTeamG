@@ -7,8 +7,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import { connect } from 'react-redux';
 import EventPostForm from './EventPostForm';
 import EventUpdateForm from './EventUpdateForm';
-import ErrorList from './ErrorList';
-import { getEvents } from '../redux/actions/event';
+import ErrorList from '../ErrorList';
+import { getEvents } from '../../redux/actions/event';
 
 class TimetableEdit extends Component {
   constructor(props) {

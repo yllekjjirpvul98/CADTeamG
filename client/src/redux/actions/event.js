@@ -1,4 +1,5 @@
 /* eslint-disable indent */
+import { toast } from 'react-toastify';
 import axios from '../../utils/axios';
 import { GET_EVENTS, POST_EVENT, PUT_EVENT, DELETE_EVENT, GET_ERRORS, SET_LOADER, CLEAR_LOADER, CLEAR_ERRORS } from '../types';
 import { validateEvent, validateUpdateEvent } from '../validation/event';
@@ -21,6 +22,7 @@ const postEvent = (event) => (dispatch) => {
   return axios.post('/events/', event)
               .then((res) => dispatch({ type: POST_EVENT, payload: res.data }))
               .then(dispatch({ type: CLEAR_ERRORS }))
+              .then(toast('Event created'))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: POST_EVENT }));
 };
@@ -34,6 +36,7 @@ const updateEvent = (event, id) => (dispatch) => {
     return axios.put(`/events/${id}`, event)
                 .then((res) => dispatch({ type: PUT_EVENT, payload: res.data }))
                 .then(dispatch({ type: CLEAR_ERRORS }))
+                .then(toast('Event updated'))
                 .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
                 .finally(() => dispatch({ type: CLEAR_LOADER, payload: PUT_EVENT }));
 };
@@ -43,6 +46,7 @@ const deleteEvent = (id) => (dispatch) => {
     return axios.delete(`/events/${id}`)
                 .then((res) => dispatch({ type: DELETE_EVENT, payload: res.data }))
                 .then(dispatch({ type: CLEAR_ERRORS }))
+                .then(toast('Event deleted'))
                 .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
                 .finally(() => dispatch({ type: CLEAR_LOADER, payload: DELETE_EVENT }));
 };

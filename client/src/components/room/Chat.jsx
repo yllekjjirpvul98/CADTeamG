@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Form, Button, Message } from 'semantic-ui-react';
-import { ioMsg } from '../redux/actions/socket';
+import { Segment, Form, Button, Message } from 'semantic-ui-react';
+import { ioMsg } from '../../redux/actions/socket';
 
 class Chat extends Component {
   constructor(props) {
@@ -26,26 +26,28 @@ class Chat extends Component {
     const { messages } = this.props;
 
     return (
-      <Form>
-        <Form.Input
-          name="message"
-          icon="envelope"
-          iconPosition="left"
-          placeholder="Enter message"
-          type="text"
-          fluid
-          onChange={this.handleChange}
-          value={message}
-        />
-        <br />
-        <Button
-          onClick={this.handleSubmit}
-          fluid
-        >
-          Send
-        </Button>
-        {messages.map((msg) => <Message key={msg}>{msg}</Message>)}
-      </Form>
+      <Segment secondary style={{ overflow: 'auto', maxHeight: '10em' }}>
+        <Form>
+          <Form.Input
+            name="message"
+            icon="envelope"
+            iconPosition="left"
+            placeholder="Enter message"
+            type="text"
+            fluid
+            onChange={this.handleChange}
+            value={message}
+          />
+          <br />
+          <Button
+            onClick={this.handleSubmit}
+            fluid
+          >
+            Send
+          </Button>
+          {messages.map((msg) => <Message key={msg}>{msg}</Message>)}
+        </Form>
+      </Segment>
     );
   }
 }

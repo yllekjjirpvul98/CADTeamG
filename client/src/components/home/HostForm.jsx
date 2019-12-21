@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Input, Button, Checkbox } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
-import { hostSession } from '../redux/actions/session';
-import ErrorList from './ErrorList';
+import { hostSession } from '../../redux/actions/session';
+import ErrorList from '../ErrorList';
 
 class HostFormComponent extends React.Component {
   constructor(props) {
@@ -46,6 +46,7 @@ class HostFormComponent extends React.Component {
         <Input
           name="title"
           iconPosition="left"
+          icon="calendar outline"
           placeholder="Enter title"
           type="text"
           fluid
@@ -56,6 +57,7 @@ class HostFormComponent extends React.Component {
         <Input
           name="location"
           iconPosition="left"
+          icon="building"
           placeholder="Enter location"
           type="text"
           fluid
@@ -108,6 +110,7 @@ class HostFormComponent extends React.Component {
         <Input
           name="votingtime"
           iconPosition="left"
+          icon="hourglass outline"
           placeholder="Enter voting time"
           type="text"
           fluid

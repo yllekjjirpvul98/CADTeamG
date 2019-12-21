@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
+import { Grid, GridColumn } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import Chat from '../components/Chat';
-import HostPanel from '../components/HostPanel';
-import ParticipantPanel from '../components/ParticipantPanel';
-import Session from '../components/Session';
-import Timetable from '../components/Timetable';
+import Chat from '../components/room/Chat';
+import HostPanel from '../components/room/HostPanel';
+import ParticipantPanel from '../components/room/ParticipantPanel';
+import RoomInfo from '../components/room/RoomInfo';
+import Calendar from '../components/room/Calendar';
 import { authenticate } from '../redux/actions/auth';
 import { getSession } from '../redux/actions/session';
 import { ioOnMsg, ioOnJoin, ioLeave, ioClose } from '../redux/actions/socket';
@@ -45,12 +46,16 @@ class Room extends Component {
 
     return (
       <Layout protected error={errors.id} loader={loader.AUTH || loader.GET_SESSION}>
-        <Timetable room={match.params.id} />
-        <Session session={session} />
-        <br />
-        {panel}
-        <br />
-        <Chat room={match.params.id} socket={socket} />
+        <Grid columns={2} relaxed="very" stackable>
+          <Grid.Column width={6}>
+            <RoomInfo session={session} />
+            {panel}
+            <Chat room={match.params.id} socket={socket} />
+          </Grid.Column>
+          <GridColumn width={10}>
+            <Calendar room={match.params.id} />
+          </GridColumn>
+        </Grid>
       </Layout>
     );
   }

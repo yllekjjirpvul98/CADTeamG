@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Message, Button } from 'semantic-ui-react';
-import { startSession, closeSession } from '../redux/actions/session';
+import { startSession, closeSession } from '../../redux/actions/session';
 
 function HostPanel(props) {
   const history = useHistory();
@@ -17,7 +17,7 @@ function HostPanel(props) {
     <>
       <Message info>
         <Message.Header>Code</Message.Header>
-        <Message.Content>Your code is <b>{props.session.code}</b></Message.Content>
+        <Message.Content>Room code is <b>{props.session.code}</b></Message.Content>
       </Message>
       <Button
         onClick={props.startSession}

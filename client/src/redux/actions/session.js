@@ -1,4 +1,5 @@
 /* eslint-disable indent */
+import { toast } from 'react-toastify';
 import axios from '../../utils/axios';
 import { JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER,
   GET_SESSION, CLEAR_ERRORS, CLOSE_SESSION, START_SESSION, GET_SESSION_EVENTS } from '../types';
@@ -13,6 +14,7 @@ const joinSession = (data) => (dispatch) => {
   return axios.post('/session/join', data)
               .then((res) => dispatch({ type: JOIN_SESSION, payload: res.data }))
               .then(dispatch({ type: CLEAR_ERRORS }))
+              .then(toast('Room joined'))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: JOIN_SESSION }));
 };
@@ -29,6 +31,7 @@ const hostSession = (data) => (dispatch) => {
     return axios.post('/session/host', data)
                 .then((res) => dispatch({ type: HOST_SESSION, payload: res.data }))
                 .then(dispatch({ type: CLEAR_ERRORS }))
+                .then(toast('Room created'))
                 .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
                 .finally(() => dispatch({ type: CLEAR_LOADER, payload: HOST_SESSION }));
 };

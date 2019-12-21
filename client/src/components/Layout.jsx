@@ -20,7 +20,7 @@ class Layout extends Component {
     let redirect = error !== undefined ? <Redirect to={{ pathname: '/home' }} /> : <></>;
     redirect = token === null && this.props.protected ? <Redirect to={{ pathname: '/sign-in' }} /> : redirect;
     return (
-      <div style={{ paddingTop: '1%', marginLeft: '10%', marginRight: '10%' }}>
+      <div style={{ height: '100%', paddingTop: '1%', marginLeft: '10%', marginRight: '10%' }}>
         <Navbar />
         <Dimmer inverted active={loader}>
           <Loader inverted size="huge" inline="centered" />

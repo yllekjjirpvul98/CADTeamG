@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 
-export default function HostPanel() {
+export default function ParticipantPanel() {
   function handleLeave() {
 
   }
