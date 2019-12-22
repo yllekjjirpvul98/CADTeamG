@@ -30,7 +30,7 @@ def postEvent():
     title = data.get('title')
     location = data.get('location')
     starttime = data.get('starttime') 
-    endtime = data.get('endtime')   # TODO END CANNOT OCCUR BEFORE START
+    endtime = data.get('endtime')   
 
     errors = {}
     if(title is None): errors['title'] = 'Title is empty'
@@ -91,8 +91,6 @@ def putEvent(id):
 @event.route('/<id>', methods=['DELETE'])
 @auth_required
 def deleteEvent(id):
-    data = request.get_json()
-
     event = get(id, 'event')
    
     if event is not None:
