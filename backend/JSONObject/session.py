@@ -2,7 +2,7 @@
 import random
 import json
 import uuid
-from backend.db import getAllSession
+# from db import getAllSession
 
 
 class Session(object):
@@ -18,14 +18,14 @@ class Session(object):
         self.weekends = weekends
         self.code = str(uuid.uuid4())[:8]
         ## validate if code not already exists, regenerate if neccessary
-        sessions = getAllSession()
-        ifExist = True
-        while ifExist:
-            if session['id'].exists(self.code):
-                    self.code = str(uuid.uuid4())[:8]
-                    continue
-            else:
-                ifExist = False
+        # sessions = getAllSession()
+        # ifExist = True
+        # while ifExist:
+        #     if session['id'].exists(self.code):
+        #             self.code = str(uuid.uuid4())[:8]
+        #             continue
+        #     else:
+        #         ifExist = False
             
                     
             

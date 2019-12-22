@@ -1,9 +1,9 @@
 from flask import Flask
-from flask.ext.session import Session
+from flask_session import Session
 from google.cloud import datastore
 from auth import auth
 from event import event
-from lobby import session
+from lobby import lobby
 from flask_cors import CORS
 import socketio
 from lobby import sio
