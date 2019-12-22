@@ -47,6 +47,7 @@ class JoinFormComponent extends React.Component {
           onClick={this.handleJoin}
           fluid
           loading={loader.JOIN_SESSION}
+          color="blue"
         >
           Join
         </Button>

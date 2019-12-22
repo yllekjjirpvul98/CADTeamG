@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Grid, Segment, Button } from 'semantic-ui-react';
+import { Grid, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { authenticate } from '../redux/actions/auth';
 import JoinForm from '../components/home/JoinForm';
@@ -34,13 +34,15 @@ class Home extends React.Component {
     const { loader } = this.props;
 
     const selection =
-    (
-      <>
-        <Button onClick={() => this.setState({ join: true })} fluid>Join</Button>
-        <br />
-        <Button onClick={() => this.setState({ host: true })} fluid>Host</Button>
-      </>
-    );
+      (
+        <>
+          <Button.Group size="massive" fluid color="blue">
+            <Button onClick={() => this.setState({ host: true })}>Host</Button>
+            <Button.Or text="OR" />
+            <Button onClick={() => this.setState({ join: true })}>Join</Button>
+          </Button.Group>
+        </>
+      );
 
     const back = join || host ? (<><br /><Button fluid onClick={this.handleReset}>Back</Button></>) : null;
     let currentState = selection;
@@ -49,12 +51,10 @@ class Home extends React.Component {
 
     return (
       <Layout protected loader={loader.AUTH}>
-        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable>
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ height: '75%' }}>
           <Grid.Column>
-            <Segment secondary>
-              {currentState}
-              {back}
-            </Segment>
+            {currentState}
+            {back}
           </Grid.Column>
         </Grid>
       </Layout>

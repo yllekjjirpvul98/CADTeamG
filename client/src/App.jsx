@@ -25,7 +25,7 @@ export default function App() {
   return (
     <Router>
       <Switch>
-      <Route path="/rooms/:id" component={Room} />
+        <Route path="/rooms/:id" component={Room} />
         <Route path="/schedule" component={Schedule} />
         <Route path="/sign-up" component={SignUp} />
         <Route path="/sign-in" component={SignIn} />

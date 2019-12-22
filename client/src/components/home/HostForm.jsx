@@ -129,6 +129,7 @@ class HostFormComponent extends React.Component {
           onClick={this.handleHost}
           loading={loader.HOST_SESSION}
           fluid
+          color="blue"
         >
           Host
         </Button>

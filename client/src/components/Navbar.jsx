@@ -14,8 +14,7 @@ function Navbar({ username }) {
     history.push('/sign-in');
   }
 
-  const loggedIn =
-  (
+  const loggedIn = (
     <Menu.Menu position="right">
       <Menu.Item>
         <NavLink to="/home" activeStyle={activeStyle}>

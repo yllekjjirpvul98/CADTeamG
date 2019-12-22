@@ -36,9 +36,9 @@ class SignUpComponent extends React.Component {
 
     return (
       <Layout>
-        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable>
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ marginTop: '7%' }}>
           <Grid.Column>
-            <Segment secondary>
+            <Segment secondary textAlign="center">
               <Header as="h1" textAlign="center">Register an Account</Header>
               <br />
               <Input
@@ -77,7 +77,6 @@ class SignUpComponent extends React.Component {
                 loading={loader.SIGN_UP}
                 onClick={this.handleSubmit}
                 color="blue"
-                fluid
               >
                 Sign Up
               </Button>
