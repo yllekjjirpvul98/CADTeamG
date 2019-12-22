@@ -1,4 +1,4 @@
-import { GET_EVENT, GET_EVENTS, POST_EVENT, PUT_EVENT, DELETE_EVENT } from '../types';
+import { GET_EVENT, GET_EVENTS, POST_EVENT, PUT_EVENT, DELETE_EVENT, GET_SESSION_EVENTS } from '../types';
 
 const initialState = [];
 
@@ -12,7 +12,7 @@ export default function (state = initialState, action) {
     case GET_EVENTS: {
       const { events } = action.payload;
 
-      return state.concat(events);
+      return events;
     }
     case POST_EVENT: {
       const { payload } = action;
@@ -28,6 +28,11 @@ export default function (state = initialState, action) {
       const { id } = action.payload;
 
       return state.filter((event) => event.id !== Number(id));
+    }
+    case GET_SESSION_EVENTS: {
+      const { payload } = action;
+
+      return payload.events;
     }
     default:
       return state;

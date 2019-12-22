@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Input, Button, Checkbox } from 'semantic-ui-react';
-import { hostSession } from '../redux/actions/session';
-import ErrorList from './ErrorList';
+import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
+import { hostSession } from '../../redux/actions/session';
+import ErrorList from '../ErrorList';
 
 class HostFormComponent extends React.Component {
   constructor(props) {
@@ -11,7 +12,7 @@ class HostFormComponent extends React.Component {
     this.state = {
       title: '',
       location: '',
-      duration: '',
+      date: '',
       starttime: '',
       endtime: '',
       votingtime: '',
@@ -19,10 +20,15 @@ class HostFormComponent extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleHost = this.handleHost.bind(this);
+    this.handleTimeChange = this.handleTimeChange.bind(this);
   }
 
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleTimeChange(event, { name, value }) {
+    this.setState({ [name]: value });
   }
 
   async handleHost() {
@@ -32,7 +38,7 @@ class HostFormComponent extends React.Component {
   }
 
   render() {
-    const { title, location, duration, starttime, endtime, votingtime, weekends } = this.state;
+    const { title, location, date, starttime, endtime, votingtime, weekends } = this.state;
     const { loader, errors } = this.props;
 
     return (
@@ -40,6 +46,7 @@ class HostFormComponent extends React.Component {
         <Input
           name="title"
           iconPosition="left"
+          icon="calendar outline"
           placeholder="Enter title"
           type="text"
           fluid
@@ -50,6 +57,7 @@ class HostFormComponent extends React.Component {
         <Input
           name="location"
           iconPosition="left"
+          icon="building"
           placeholder="Enter location"
           type="text"
           fluid
@@ -57,39 +65,52 @@ class HostFormComponent extends React.Component {
           value={location}
         />
         <br />
-        <Input
-          name="duration"
-          iconPosition="left"
-          placeholder="Enter duration"
-          type="text"
+        <DateInput
           fluid
-          onChange={this.handleChange}
-          value={duration}
+          closable
+          autoComplete="off"
+          hideMobileKeyboard
+          name="date"
+          iconPosition="left"
+          placeholder="Date"
+          type="text"
+          popupPosition="bottom center"
+          onChange={this.handleTimeChange}
+          value={date}
         />
         <br />
-        <Input
+        <TimeInput
+          fluid
+          closable
+          autoComplete="off"
+          hideMobileKeyboard
           name="starttime"
           iconPosition="left"
           placeholder="Enter start time"
+          popupPosition="bottom center"
           type="text"
-          fluid
-          onChange={this.handleChange}
+          onChange={this.handleTimeChange}
           value={starttime}
         />
         <br />
-        <Input
+        <TimeInput
+          fluid
+          closable
+          autoComplete="off"
+          hideMobileKeyboard
           name="endtime"
           iconPosition="left"
-          placeholder="Enter end time"
+          placeholder="Enter start time"
+          popupPosition="bottom center"
           type="text"
-          fluid
-          onChange={this.handleChange}
+          onChange={this.handleTimeChange}
           value={endtime}
         />
         <br />
         <Input
           name="votingtime"
           iconPosition="left"
+          icon="hourglass outline"
           placeholder="Enter voting time"
           type="text"
           fluid

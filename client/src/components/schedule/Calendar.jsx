@@ -7,10 +7,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import { connect } from 'react-redux';
 import EventPostForm from './EventPostForm';
 import EventUpdateForm from './EventUpdateForm';
-import ErrorList from './ErrorList';
-import { getEvents } from '../redux/actions/event';
+import ErrorList from '../ErrorList';
+import { getEvents } from '../../redux/actions/event';
 
-class Timetable extends Component {
+class TimetableEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,8 +24,8 @@ class Timetable extends Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
-  async componentDidMount() {
-    await this.props.getEvents();
+  componentDidMount() {
+    if (!this.props.events.length) this.props.getEvents();
   }
 
   handleDateClick(arg) {
@@ -84,4 +84,4 @@ const mapStateToProps = (state) => {
   return { events, errors };
 };
 
-export default connect(mapStateToProps, { getEvents })(Timetable);
+export default connect(mapStateToProps, { getEvents })(TimetableEdit);

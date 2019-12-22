@@ -2,8 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Button, Input } from 'semantic-ui-react';
-import ErrorList from './ErrorList';
-import { joinSession } from '../redux/actions/session';
+import ErrorList from '../ErrorList';
+import { joinSession } from '../../redux/actions/session';
 
 class JoinFormComponent extends React.Component {
   constructor(props) {
@@ -36,6 +36,7 @@ class JoinFormComponent extends React.Component {
           fluid
           name="code"
           iconPosition="left"
+          icon="hashtag"
           placeholder="Enter code"
           type="text"
           onChange={this.handleChange}

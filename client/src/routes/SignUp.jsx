@@ -1,11 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import {
-  Button, Input, Segment, Header,
-} from 'semantic-ui-react';
+import { Grid, Button, Input, Segment, Header } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { signUp, clearErrors } from '../redux/actions/auth';
+import { signUp } from '../redux/actions/auth';
 import ErrorList from '../components/ErrorList';
 
 class SignUpComponent extends React.Component {
@@ -16,7 +14,6 @@ class SignUpComponent extends React.Component {
       password: '',
       password2: '',
     };
-    this.props.clearErrors();
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -39,52 +36,55 @@ class SignUpComponent extends React.Component {
 
     return (
       <Layout>
-        <Header as="h1" textAlign="center" style={{ marginTop: '3%' }}>Register an Account</Header>
-        <Segment
-          placeholder
-          style={{
-            width: '40%', marginLeft: '30%', marginRight: '30%', marginTop: '2%',
-          }}
-        >
-          <Input
-            name="username"
-            icon="user"
-            iconPosition="left"
-            placeholder="Username"
-            onChange={this.handleChange}
-            value={username}
-          />
-          <br />
-          <Input
-            name="password"
-            icon="lock"
-            iconPosition="left"
-            placeholder="Password"
-            type="password"
-            onChange={this.handleChange}
-            value={password}
-          />
-          <br />
-          <Input
-            name="password2"
-            icon="lock"
-            iconPosition="left"
-            placeholder="Repeat Password"
-            type="password"
-            onChange={this.handleChange}
-            value={password2}
-          />
-          <br />
-          <Button
-            loading={loader.SIGN_UP}
-            onClick={this.handleSubmit}
-            color="blue"
-            fluid
-          >
-            Sign Up
-          </Button>
-          <ErrorList data={errors} />
-        </Segment>
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable>
+          <Grid.Column>
+            <Segment secondary>
+              <Header as="h1" textAlign="center">Register an Account</Header>
+              <br />
+              <Input
+                name="username"
+                icon="user"
+                fluid
+                iconPosition="left"
+                placeholder="Username"
+                onChange={this.handleChange}
+                value={username}
+              />
+              <br />
+              <Input
+                name="password"
+                icon="lock"
+                fluid
+                iconPosition="left"
+                placeholder="Password"
+                type="password"
+                onChange={this.handleChange}
+                value={password}
+              />
+              <br />
+              <Input
+                name="password2"
+                icon="lock"
+                fluid
+                iconPosition="left"
+                placeholder="Repeat Password"
+                type="password"
+                onChange={this.handleChange}
+                value={password2}
+              />
+              <br />
+              <Button
+                loading={loader.SIGN_UP}
+                onClick={this.handleSubmit}
+                color="blue"
+                fluid
+              >
+                Sign Up
+              </Button>
+              <ErrorList data={errors} />
+            </Segment>
+          </Grid.Column>
+        </Grid>
       </Layout>
     );
   }
@@ -104,4 +104,4 @@ const mapStateToProps = (state) => {
 };
 
 
-export default connect(mapStateToProps, { signUp, clearErrors })(SignUp);
+export default connect(mapStateToProps, { signUp })(SignUp);

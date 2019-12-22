@@ -5,6 +5,9 @@ export const AUTH = 'AUTH';
 export const JOIN_SESSION = 'JOIN_SESSION';
 export const HOST_SESSION = 'HOST_SESSION';
 export const GET_SESSION = 'GET_SESSION';
+export const GET_SESSION_EVENTS = 'GET_SESSION_EVENTS';
+export const START_SESSION = 'START_SESSION';
+export const CLOSE_SESSION = 'CLOSE_SESSION';
 
 export const GET_EVENTS = 'GET_EVENTS';
 export const GET_EVENT = 'GET_EVENT';
@@ -17,3 +20,6 @@ export const CLEAR_ERRORS = 'CLEAR_ERRORS';
 
 export const SET_LOADER = 'SET_LOADER';
 export const CLEAR_LOADER = 'CLEAR_LOADER';
+
+// Websocket stuff
+export const ADD_MESSAGE = 'ADD_MESSAGE';

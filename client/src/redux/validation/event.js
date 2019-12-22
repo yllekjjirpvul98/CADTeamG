@@ -13,10 +13,11 @@ function validateEvent(event) {
 }
 
 function validateUpdateEvent(event) {
-  const { starttime, endtime } = event;
+  const { title, location, starttime, endtime } = event;
 
   const errors = {};
 
+  if (!title && !location && !starttime && !endtime) errors.title = 'You have to update atleast one property';
   if (Date.parse(starttime) > Date.parse(endtime)) errors.endtime = 'End cannot occur before start';
 
   return { errors, validated: Object.values(errors).length === 0 };

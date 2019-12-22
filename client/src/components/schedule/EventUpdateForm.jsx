@@ -2,9 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Button, Form, Header } from 'semantic-ui-react';
 import { TimeInput } from 'semantic-ui-calendar-react';
-import { postEvent } from '../redux/actions/event';
+import { updateEvent, deleteEvent } from '../../redux/actions/event';
 
-class EventPostForm extends React.Component {
+class EventUpdateForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,7 +15,8 @@ class EventPostForm extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   handleChange(event) {
@@ -26,27 +27,33 @@ class EventPostForm extends React.Component {
     this.setState({ [name]: value });
   }
 
-  async handleSave() {
-    const starttime = new Date(`${this.props.date} ${this.state.starttime}`);
-    const endtime = new Date(`${this.props.date} ${this.state.endtime}`);
+  async handleUpdate() {
+    const starttime = this.state.starttime ? new Date(`${this.props.event.start.toDateString()} ${this.state.starttime}`) : '';
+    const endtime = this.state.endtime ? new Date(`${this.props.event.end.toDateString()} ${this.state.endtime}`) : '';
     const event = { ...this.state, starttime, endtime };
-    const { payload } = await this.props.postEvent(event);
+    const { payload } = await this.props.updateEvent(event, this.props.event.id);
     const { id } = payload;
+    if (id) this.props.closeModal();
+  }
+
+  async handleDelete() {
+    const { payload: { id } } = await this.props.deleteEvent(this.props.event.id);
     if (id) this.props.closeModal();
   }
 
   render() {
     const { title, location, starttime, endtime } = this.state;
-    const { date, loader } = this.props;
+    const { event, loader } = this.props;
 
     return (
       <Form>
-        <Header>Create new event on {date}</Header>
+        <Header block textAlign="center">Update Event</Header>
         <Form.Input
           fluid
           name="title"
           iconPosition="left"
-          placeholder="Enter title"
+          icon="calendar outline"
+          placeholder={event.title}
           type="text"
           onChange={this.handleChange}
           value={title}
@@ -56,7 +63,8 @@ class EventPostForm extends React.Component {
           fluid
           name="location"
           iconPosition="left"
-          placeholder="Enter location"
+          icon="building outline"
+          placeholder={event.extendedProps.location}
           type="text"
           onChange={this.handleChange}
           value={location}
@@ -69,7 +77,7 @@ class EventPostForm extends React.Component {
           hideMobileKeyboard
           name="starttime"
           iconPosition="left"
-          placeholder="Enter start time"
+          placeholder={event.start.toUTCString()}
           type="text"
           onChange={this.handleTimeChange}
           value={starttime}
@@ -82,19 +90,26 @@ class EventPostForm extends React.Component {
           hideMobileKeyboard
           name="endtime"
           iconPosition="left"
-          placeholder="Enter end time"
+          placeholder={event.end.toUTCString()}
           type="text"
           onChange={this.handleTimeChange}
           value={endtime}
         />
         <br />
         <Button
-          onClick={this.handleSave}
+          onClick={this.handleUpdate}
           fluid
-          loading={loader.POST_EVENT}
+          loading={loader.PUT_EVENT}
         >
           Save
         </Button>
+        <br />
+        <Button
+          onClick={this.handleDelete}
+          fluid
+          loading={loader.DELETE_EVENT}
+          icon="trash"
+        />
       </Form>
     );
   }
@@ -105,4 +120,4 @@ const mapStateToProps = (state) => {
   return { loader };
 };
 
-export default connect(mapStateToProps, { postEvent })(EventPostForm);
+export default connect(mapStateToProps, { updateEvent, deleteEvent })(EventUpdateForm);
