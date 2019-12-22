@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Loader, Dimmer, Button } from 'semantic-ui-react';
+import { Grid, Segment, Button } from 'semantic-ui-react';
 import Layout from '../components/Layout';
-import { authenticate } from '../redux/actions';
-import JoinForm from '../components/JoinForm';
-import HostForm from '../components/HostForm';
+import { authenticate } from '../redux/actions/auth';
+import JoinForm from '../components/home/JoinForm';
+import HostForm from '../components/home/HostForm';
 
 class Home extends React.Component {
   constructor(props) {
@@ -18,7 +18,7 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.props.id && !this.props.username) this.props.authenticate();
+    if (!this.props.user.id) this.props.authenticate();
   }
 
   handleChange(event) {
@@ -42,28 +42,30 @@ class Home extends React.Component {
       </>
     );
 
-    const back = join || host ? <Button fluid onClick={this.handleReset}>Back</Button> : null;
+    const back = join || host ? (<><br /><Button fluid onClick={this.handleReset}>Back</Button></>) : null;
     let currentState = selection;
     if (join) currentState = <JoinForm />;
     if (host) currentState = <HostForm />;
 
     return (
-      <Layout protected>
-        <Dimmer inverted active={loader.AUTH}>
-          <Loader inverted size="huge" inline="centered" />
-        </Dimmer>
-        {currentState}
-        <br />
-        {back}
+      <Layout protected loader={loader.AUTH}>
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable>
+          <Grid.Column>
+            <Segment secondary>
+              {currentState}
+              {back}
+            </Segment>
+          </Grid.Column>
+        </Grid>
       </Layout>
     );
   }
 }
 
 const mapStateToProps = (state) => {
-  const { loader } = state;
+  const { user, loader } = state;
 
-  return { loader };
+  return { user, loader };
 };
 
 export default connect(mapStateToProps, { authenticate })(Home);

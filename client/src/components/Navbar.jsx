@@ -18,6 +18,14 @@ function Navbar({ username }) {
   (
     <Menu.Menu position="right">
       <Menu.Item>
+        {username.charAt(0).toUpperCase() + username.slice(1)}
+      </Menu.Item>
+      <Menu.Item>
+        <NavLink to="/home" activeStyle={activeStyle}>
+          Home
+        </NavLink>
+      </Menu.Item>
+      <Menu.Item>
         <NavLink to="/schedule" activeStyle={activeStyle}>
           Schedule
         </NavLink>
