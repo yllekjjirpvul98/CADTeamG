@@ -1,7 +1,7 @@
 from google.cloud import datastore
 
 builtinlist = list
-secret = 'x'
+secret = 'somethinghere'
 
 def get_client():
     return datastore.Client()
@@ -51,14 +51,14 @@ def getbyname(kind, username):
     query.add_filter('username', '=', username) 
     return list(query.fetch())
 
-def getEventByUserId(kind, userid):
+def getEventsByUserId(userid):
     ds = get_client()
     query = ds.query(kind='event')
     query.add_filter('userid', '=', userid)
     return list(query.fetch())
 
-def getEventByEventId(kind, eventid):
+def getSessionByCode(code):
     ds = get_client()
-    query = ds.query(kind='event')
-    query.add_filter('eventid', '=', eventid)
+    query = ds.query(kind='session')
+    query.add_filter('code', '=', code)
     return list(query.fetch())

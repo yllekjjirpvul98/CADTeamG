@@ -1,11 +1,10 @@
 # event JSON object
 class Event(object):
-    def __init__(self, eventid, starttime, endtime, repeatable, location, title, hostFlag):
-        self.eventid = eventid
+    def __init__(self, userid, username, title, location, starttime, endtime):
+        self.userid = userid
+        self.username = username
+        self.title = title
+        self.location = location
         self.starttime = starttime
         self.endtime = endtime
-        self.repeatable = repeatable
-        self.location = location
-        self.title = title
-        self.hostFlag = hostFlag
     
