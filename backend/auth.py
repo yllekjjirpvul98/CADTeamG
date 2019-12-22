@@ -14,23 +14,22 @@ def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')
-        if token is not None:
-            try:
+        try:
+            if token is not None:
                 decoded = jwt.decode(token, secret, algorithms=['HS256'])
-            except:
-                return make_response(jsonify(authentication='Signature verification failed'), 400)
-            request.id = decoded.get('id')
-            request.username = decoded.get('username')
-            return f(*args, **kwargs)
-        else:
+                request.id = decoded.get('id')
+                request.username = decoded.get('username')
+                return f(*args, **kwargs)
             return make_response(jsonify(authentication='Authentication failed'), 400)
+        except:
+            return make_response(jsonify(authentication='Signature verification failed'), 400)
     return decorated
 
 @auth.route('/authenticate')
 @auth_required
 def getUser():
     user = get(request.id, 'user')
-    return make_response(jsonify(id=user.get('id'), username=user.get('username')))
+    return jsonify(id=user.get('id'), username=user.get('username'))
 
 @auth.route('/login', methods=['POST'])
 def login():
