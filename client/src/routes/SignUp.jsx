@@ -49,6 +49,7 @@ class SignUpComponent extends React.Component {
                 placeholder="Username"
                 onChange={this.handleChange}
                 value={username}
+                error={Boolean(errors.username)}
               />
               <br />
               <Input
@@ -60,6 +61,7 @@ class SignUpComponent extends React.Component {
                 type="password"
                 onChange={this.handleChange}
                 value={password}
+                error={Boolean(errors.password)}
               />
               <br />
               <Input

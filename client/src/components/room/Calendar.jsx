@@ -28,7 +28,7 @@ class Timetable extends Component {
     return (
       <>
         <FullCalendar
-          defaultView="dayGridMonth"
+          defaultView="timeGridWeek"
           events={events}
           header={false}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

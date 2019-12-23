@@ -51,6 +51,7 @@ class SignInComponent extends React.Component {
                 type="text"
                 onChange={this.handleChange}
                 value={username}
+                error={Boolean(errors.username)}
               />
               <br />
               <Input
@@ -62,6 +63,7 @@ class SignInComponent extends React.Component {
                 type="password"
                 onChange={this.handleChange}
                 value={password}
+                error={Boolean(errors.password)}
               />
               <br />
               <Button

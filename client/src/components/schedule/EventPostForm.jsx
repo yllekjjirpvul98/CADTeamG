@@ -10,37 +10,38 @@ class EventPostForm extends React.Component {
     this.state = {
       title: '',
       location: '',
-      starttime: '',
       endtime: '',
     };
     this.handleChange = this.handleChange.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
+    this.handleTimeChange = this.handleTimeChange.bind(this);
   }
 
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
 
+
   handleTimeChange(event, { name, value }) {
     this.setState({ [name]: value });
   }
 
   async handleSave() {
-    const starttime = this.state.starttime ? new Date(`${this.props.date} ${this.state.starttime}`) : '';
-    const endtime = this.state.endtime ? new Date(`${this.props.date} ${this.state.endtime}`) : '';
-    const event = { ...this.state, starttime, endtime };
+    const starttime = new Date(this.props.date);
+    const endtime = this.state.endtime ? new Date(`${new Date(this.props.date).toDateString()} ${this.state.endtime}`) : '';
+    const event = { title: this.state.title, location: this.state.location, starttime, endtime };
+
     const { payload: { id } } = await this.props.postEvent(event);
     if (id) this.props.closeModal();
   }
 
   render() {
-    const { title, location, starttime, endtime } = this.state;
+    const { title, location, endtime } = this.state;
     const { date, loader } = this.props;
 
     return (
       <Form>
-        <Header block textAlign="center">Create Event on {date}</Header>
+        <Header block textAlign="center">Create Event on {new Date(date).toUTCString()}</Header>
         <Form.Input
           fluid
           name="title"
@@ -61,19 +62,6 @@ class EventPostForm extends React.Component {
           type="text"
           onChange={this.handleChange}
           value={location}
-        />
-        <br />
-        <TimeInput
-          fluid
-          closable
-          autoComplete="off"
-          hideMobileKeyboard
-          name="starttime"
-          iconPosition="left"
-          placeholder="Enter start time"
-          type="text"
-          onChange={this.handleTimeChange}
-          value={starttime}
         />
         <br />
         <TimeInput

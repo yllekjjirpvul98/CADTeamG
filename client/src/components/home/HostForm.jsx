@@ -52,6 +52,7 @@ class HostFormComponent extends React.Component {
           fluid
           onChange={this.handleChange}
           value={title}
+          errors={Boolean(errors.title)}
         />
         <br />
         <Input
@@ -63,6 +64,7 @@ class HostFormComponent extends React.Component {
           fluid
           onChange={this.handleChange}
           value={location}
+          errors={Boolean(errors.location)}
         />
         <br />
         <DateInput
@@ -77,6 +79,7 @@ class HostFormComponent extends React.Component {
           popupPosition="bottom center"
           onChange={this.handleTimeChange}
           value={date}
+          errors={Boolean(errors.date)}
         />
         <br />
         <TimeInput
@@ -91,6 +94,7 @@ class HostFormComponent extends React.Component {
           type="text"
           onChange={this.handleTimeChange}
           value={starttime}
+          errors={Boolean(errors.starttime)}
         />
         <br />
         <TimeInput
@@ -105,6 +109,7 @@ class HostFormComponent extends React.Component {
           type="text"
           onChange={this.handleTimeChange}
           value={endtime}
+          errors={Boolean(errors.endtime)}
         />
         <br />
         <Input
@@ -116,6 +121,7 @@ class HostFormComponent extends React.Component {
           fluid
           onChange={this.handleChange}
           value={votingtime}
+          errors={Boolean(errors.votingtime)}
         />
         <br />
         <Checkbox

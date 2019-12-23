@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { Dimmer, Loader } from 'semantic-ui-react';
+import { clearErrors } from '../redux/actions/errors';
 import Navbar from './Navbar';
 
 class Layout extends Component {
   componentDidMount() {
     this.unlisten = this.props.history.listen((location, action) => {
       console.log('Route change', location, action);
+      this.props.clearErrors();
     });
   }
 
@@ -33,4 +36,4 @@ class Layout extends Component {
   }
 }
 
-export default withRouter(Layout);
+export default connect(null, { clearErrors })(withRouter(Layout));

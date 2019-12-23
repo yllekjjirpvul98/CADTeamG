@@ -48,7 +48,7 @@ class TimetableEdit extends Component {
     return (
       <>
         <FullCalendar
-          defaultView="dayGridMonth"
+          defaultView="timeGridWeek"
           events={events}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           dateClick={this.handleDateClick}
