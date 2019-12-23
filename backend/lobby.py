@@ -136,7 +136,7 @@ def startVote(sid):
     timer = Countdown(room.get('votingTime'), room)
     timer.start()
 
-# TODO: Client emits getTimeslot
+# TODO: Client invokes REST API
 @lobby.route('/<int:id>/getAvailableTimeslots')
 def getTimeslots(id):
     while('availableSlots' not in session[id]):

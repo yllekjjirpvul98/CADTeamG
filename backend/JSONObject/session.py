@@ -17,6 +17,8 @@ class Session(object):
         self.votingtime = votingtime
         self.weekends = weekends
         self.code = str(uuid.uuid4())[:8]
+
+        #TODO: You do not need a getAllSession! You just need to query whether there is a record such that session.code = code by checking whether the list return has length zero!!!
         ## validate if code not already exists, regenerate if neccessary
         # sessions = getAllSession()
         # ifExist = True
