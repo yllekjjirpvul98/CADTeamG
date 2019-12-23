@@ -126,12 +126,11 @@ def startVote(sid):
     room = sio.get_session(sid)['room']
     room = getSessionByCode(room)
     room = from_datastore(room[0])
-
     dictionary = dict()
     dictionary['availableSlots'] = availableSlots
     session[room] = dictionary
 
-    # start the timer
+    # start the timer here???? 
     global timer
     timer = Countdown(room.get('votingTime'), room)
     timer.start()
@@ -140,7 +139,7 @@ def startVote(sid):
 @lobby.route('/<int:id>/getAvailableTimeslots')
 def getTimeslots(id):
     while('availableSlots' not in session[id]):
-        print ("Generating slots...")
+       print ("Generating slots...")
     return session[id]['availableSlots']
 
 @sio.on('vote')
