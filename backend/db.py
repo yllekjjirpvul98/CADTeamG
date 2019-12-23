@@ -51,7 +51,7 @@ def getbyname(kind, username):
     query.add_filter('username', '=', username) 
     return list(query.fetch())
 
-def getEventsByUserId(kind, userid):
+def getEventsByUserId(userid):
     ds = get_client()
     query = ds.query(kind='event')
     query.add_filter('userid', '=', userid)
