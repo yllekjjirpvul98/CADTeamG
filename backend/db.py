@@ -1,6 +1,5 @@
 from google.cloud import datastore
 
-builtinlist = list
 secret = 'somethinghere'
 
 def get_client():
@@ -67,4 +66,9 @@ def getSessionByCode(code):
     ds = get_client()
     query = ds.query(kind='session')
     query.add_filter('code', '=', code)
+    return list(query.fetch())
+
+def getAllSession():
+    ds = get_client()
+    query = ds.query(kind='session')
     return list(query.fetch())

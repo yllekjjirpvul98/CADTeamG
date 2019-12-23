@@ -136,3 +136,93 @@ def hostSess():
                 endtime=endtime, votingtime=votingtime, weekends=weekends, participants=room.get('paprticipants')), 200)
     else:
         return make_response(jsonify(errors=errors), 400)
+
+############### Voting.py ###############
+
+@sio.on('startVote')
+def startVote(sid):
+    # TODO: Validate whether initiator = host
+    # TODO：Client on beginVote => move to voting page
+    sio.emit('beginVote', room=sio.get_session(sid)['room'], skip_sid=sid)
+    
+    # Run algorithm and store the generated available timeslots to session
+    availableSlots = None
+
+    # Add available slots to session
+    room = sio.get_session(sid)['room']
+    room = getSessionByCode(room)
+    room = from_datastore(room[0])
+    dictionary = dict()
+    dictionary['availableSlots'] = availableSlots
+    session[room] = dictionary
+
+    # start the timer here???? 
+    global timer
+    timer = Countdown(room.get('votingTime'), room)
+    timer.start()
+
+# TODO: Client invokes REST API
+@lobby.route('/<int:id>/getAvailableTimeslots')
+def getTimeslots(id):
+    while('availableSlots' not in session[id]):
+       print ("Generating slots...")
+    return session[id]['availableSlots']
+
+@sio.on('vote')
+def vote(sid, timeslot):
+    # add vote of each participant to session
+    room = sio.get_session(sid)['room']
+    dictionary = session[room]
+    if 'vote' in dictionary:
+        votelist = dictionary['vote']
+        if timeslot in votelist:
+            votelist[timeslot] = votelist[timeslot] + 1
+        else:
+            votelist[timeslot] = 1
+    else:
+        votelist = dict()
+        votelist[timeslot] = 1
+    dictionary['vote'] = votelist
+    session[room] = dictionary
+    # get number of participant in the room
+    room_obj = getSessionByCode(room)
+    room_obj = from_datastore(room[0])
+    total = len(room_obj['participants'])
+     # check if every participant has already voted
+    num_of_votes = sum(list(votelist.values()))
+    if (total == num_of_votes):
+        timer.cancel()
+        result = majorityVote(votelist)
+        sio.emit('result', result, room=room)
+    # onResult needed in client side
+
+# Countdown Timer
+class Countdown(threading.Thread):
+    def __init__(self, sec, room):
+        threading.Thread.__init__(self)
+        self.sec = sec
+        self.room = room
+        self.stopFlag = False
+
+    def run(self):
+        while not self.stopFlag:
+            for secs in range(self.sec, 0, -1):
+                # emit countdown time to client
+                sio.emit('countdown', secs, room=self.room)
+                sleep(1)
+            sio.emit('countdown', 0, room=self.room)
+            # perform majority voting when timeout
+            votelist = session[self.room]['vote']
+            result = majorityVote(votelist)
+            sio.emit('result', result, room=self.room)
+    
+    def cancel(self):
+        self.stopFlag = True
+        
+
+    
+def majorityVote(votelist):
+    return max(votelist, key=votelist.get)
+
+
+
