@@ -1,8 +1,7 @@
 import socketio
-from flask import Flask, Blueprint, request, make_response, jsonify, session
-from flask import copy_current_request_context
+from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
-from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId
+from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, update_entity
 from JSONObject.user import User
 from jose import jwt
 from functools import wraps
@@ -153,30 +152,36 @@ def startVote(sid):
     availableSlots = None
 
     # Add available slots to session
-    room = sio.get_session(sid)['room'] 
-    room = get(room, 'session')
-
-    dictionary = dict()
-    dictionary['availableSlots'] = availableSlots
-    session[room] = dictionary
-
+    room_code = sio.get_session(sid)['room']
+    room = getSessionByCode(room_code)[0]
+    if room.get('availableSlots') == {}:
+        room['availableSlots'] = availableSlots
+        update_entity(room)
     # start the timer here???? 
-    timer = Countdown(int(room.get('votingtime')), room)
+    global timer
+    timer = Countdown(room.get('votingTime'), room_code)
     timer.start()
 
 # TODO: Client invokes REST API
+# TODO: There should be a better way to do this...
 @lobby.route('/<int:id>/getAvailableTimeslots')
 def getTimeslots(id):
-    while('availableSlots' not in session[id]):
+    room = sio.get_session(id)['room']
+    room = getSessionByCode(room)
+    room = from_datastore(room[0])
+    while(room.get('availableSlots') == {}):
        print ("Generating slots...")
-    return session[id]['availableSlots']
+       room = sio.get_session(id)['room']
+       room = getSessionByCode(room)
+       room = from_datastore(room[0])
+    return room.get('availableSlots')
 
 @sio.on('vote')
 def vote(sid, timeslot):
     # add vote of each participant to session
     room = sio.get_session(sid)['room']
-    dictionary = session[room]
-    if 'vote' in dictionary:
+    dictionary = getSessionByCode(room)[0]
+    if dictionary['vote'] != {}:
         votelist = dictionary['vote']
         if timeslot in votelist:
             votelist[timeslot] = votelist[timeslot] + 1
@@ -186,12 +191,10 @@ def vote(sid, timeslot):
         votelist = dict()
         votelist[timeslot] = 1
     dictionary['vote'] = votelist
-    session[room] = dictionary
+    update_entity(dictionary)
     # get number of participant in the room
-    room_obj = getSessionByCode(room)
-    room_obj = from_datastore(room[0])
-    total = len(room_obj['participants'])
-     # check if every participant has already voted
+    total = len(dictionary['participants'])
+    # check if every participant has already voted
     num_of_votes = sum(list(votelist.values()))
     if (total == num_of_votes):
         timer.cancel()
@@ -215,7 +218,9 @@ class Countdown(threading.Thread):
                 sleep(1)
             sio.emit('countdown', 0, room=self.room)
             # perform majority voting when timeout
-            votelist = session[self.room]['vote']
+            dictionary = getSessionByCode(self.room)
+            dictionary = from_datastore(dictionary[0])
+            votelist = dictionary['vote']
             result = majorityVote(votelist)
             sio.emit('result', result, room=self.room)
     

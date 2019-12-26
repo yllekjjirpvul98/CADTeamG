@@ -16,14 +16,6 @@ app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(event, url_prefix='/events')
 app.register_blueprint(lobby, url_prefix='/session')
 app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
-app.config['SESSION_TYPE'] = 'redis'
-# Redis configuration
-host = 'redis-15168.c55.eu-central-1-1.ec2.cloud.redislabs.com'
-port = 15168
-# keep this safe somewhere
-password = 'XJWNtWEBxXphdszQEkScY3B5LryyPLSX'
-app.config['SESSION_REDIS'] = redis.StrictRedis(host=host, port=port, password=password)
-Session(app)
 CORS(app)
 
 if __name__ == '__main__':

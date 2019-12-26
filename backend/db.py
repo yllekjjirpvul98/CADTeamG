@@ -39,6 +39,10 @@ def update(data, kind, id=None):
     ds.put(entity)
     return from_datastore(entity)
 
+def update_entity(entity):
+    ds = get_client()
+    ds.put(entity)
+
 def delete(kind, id):
     ds = get_client()
     key = ds.key(kind, id_as_key(id))
