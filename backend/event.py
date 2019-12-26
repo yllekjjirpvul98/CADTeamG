@@ -11,7 +11,7 @@ event = Blueprint('event', __name__)
 @event.route('/', methods=['GET'])
 @auth_required
 def getEvents():
-    events = getEventsByUserId('event', request.id)
+    events = getEventsByUserId(request.id)
     for event in events:
         event['id'] = event.id # THIS ACTUALLY WORKS LOL
     if len(events) != 0:

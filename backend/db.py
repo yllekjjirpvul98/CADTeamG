@@ -68,6 +68,7 @@ def getSessionByCode(code):
     query.add_filter('code', '=', code)
     return list(query.fetch())
 
+
 def getAllSession():
     ds = get_client()
     query = ds.query(kind='session')
