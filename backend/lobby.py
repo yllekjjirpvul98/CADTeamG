@@ -1,7 +1,7 @@
 import socketio
 from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
-from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, update_entity
+from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId, update_entity
 from JSONObject.user import User
 from jose import jwt
 from functools import wraps
@@ -9,12 +9,11 @@ from auth import auth_required
 from JSONObject.session import Session
 import json
 import threading
-from time import sleep
+import datetime
 
 lobby = Blueprint('session', __name__)
 
-mgr = socketio.RedisManager('redis://127.0.0.1:8080', channel='socketio', write_only=False)
-sio = socketio.Server(logger=False, client_manager=mgr, async_mode='threading', cors_allowed_origins='*')
+sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins='*')
 
 @lobby.route('/<int:id>')
 @auth_required
@@ -26,7 +25,7 @@ def getSession(id):
 
     return make_response(jsonify(id=id, code=room.get('code'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
-            weekends=room.get('weekends'), participants=room.get('participants')), 200)
+            weekends=room.get('weekends'), votingend=room.get('votingend') or None, participants=room.get('participants')), 200)
 
 @lobby.route('/join', methods=['POST'])
 @auth_required
@@ -115,7 +114,7 @@ def deleteSession(id):
     if request.id == room.get('hostId'):
         delete('session', id)
         id=str(id)
-        sio.emit('close', 'Room was closed', room=id)
+        sio.emit('close', room=id)
         return make_response(jsonify(id=id), 200)     
     return make_response(jsonify(code='You need host permission to delete this room'), 400)
 
@@ -125,56 +124,42 @@ def connect(sid, environ):
 
 @sio.event
 def disconnect(sid):
-    user = sio.get_session(sid)
-    sio.emit('disconnect', sio.get_session(sid)['username'], room=user['room'], skip_sid=sid)
-    sio.save_session(user['room'], None)
+    try:
+        user = sio.get_session(sid)
+        sio.emit('leave', sio.get_session(sid).get('username'), room=user.get('room'), skip_sid=sid)
+        print(user.get('username') + ' disconnects from room ' + user.get('room'))
+    except TypeError:
+        pass
+    except KeyError:
+        pass
     sio.save_session(sid, None)
 
 @sio.on('join')
 def join(sid, room, username):
-    sio.enter_room(sid, room, username)
+    sio.enter_room(sid, room)
     sio.save_session(sid, {'username': username, 'room': room})
-    sio.emit('connect', username, room=room, skip_sid=sid)
+    sio.emit('join', username, room=room, skip_sid=sid)
+    print(username + ' joins ' + room)
 
 @sio.on('message')
-def message(sid, data):
-    sio.emit('message', data, room=sio.get_session(sid)['room'], skip_sid=sid)
+def message(sid, msg):
+    user = sio.get_session(sid)
+    sio.emit('message', json.dumps({'message': msg, 'username': user.get('username') }), room=user.get('room'))
+    print(user.get('username') + ' sends message "' + msg + '" to room ' + user.get('room'))
 
-############### Voting.py ###############
+@sio.on('start')
+def start(sid):    
+    time = datetime.datetime.now()
+    user = sio.get_session(sid)
+    room = get(user.get('room'), 'session')
 
-@sio.on('startVote')
-def startVote(sid):
-    # TODO: Validate whether initiator = host
-    # TODO：Client on beginVote => move to voting page
-    sio.emit('beginVote', room=sio.get_session(sid)['room'], skip_sid=sid)
-    
-    # Run algorithm and store the generated available timeslots to session
-    availableSlots = None
+    # Generate possible timeslots here
 
-    # Add available slots to session
-    room_code = sio.get_session(sid)['room']
-    room = getSessionByCode(room_code)[0]
-    if room.get('availableSlots') == {}:
-        room['availableSlots'] = availableSlots
-        update_entity(room)
-    # start the timer here???? 
-    global timer
-    timer = Countdown(room.get('votingTime'), room_code)
-    timer.start()
-
-# TODO: Client invokes REST API
-# TODO: There should be a better way to do this...
-@lobby.route('/<int:id>/getAvailableTimeslots')
-def getTimeslots(id):
-    room = sio.get_session(id)['room']
-    room = getSessionByCode(room)
-    room = from_datastore(room[0])
-    while(room.get('availableSlots') == {}):
-       print ("Generating slots...")
-       room = sio.get_session(id)['room']
-       room = getSessionByCode(room)
-       room = from_datastore(room[0])
-    return room.get('availableSlots')
+    # if room is not None and room.get('votingend') is None:
+    if room is not None:
+        room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
+        updated = update(room, 'session', user.get('room'))
+        sio.emit('start', str(updated.get('votingend')), room=sio.get_session(sid)['room'])
 
 @sio.on('vote')
 def vote(sid, timeslot):
@@ -201,33 +186,3 @@ def vote(sid, timeslot):
         result = majorityVote(votelist)
         sio.emit('result', result, room=room)
     # onResult needed in client side
-
-# Countdown Timer
-class Countdown(threading.Thread):
-    def __init__(self, sec, room):
-        threading.Thread.__init__(self)
-        self.sec = sec
-        self.room = room
-        self.stopFlag = False
-
-    def run(self):
-        while not self.stopFlag:
-            for secs in range(self.sec, 0, -1):
-                # emit countdown time to client
-                sio.emit('countdown', secs, room=self.room)
-                sleep(1)
-            sio.emit('countdown', 0, room=self.room)
-            # perform majority voting when timeout
-            dictionary = getSessionByCode(self.room)
-            dictionary = from_datastore(dictionary[0])
-            votelist = dictionary['vote']
-            result = majorityVote(votelist)
-            sio.emit('result', result, room=self.room)
-    
-    def cancel(self):
-        self.stopFlag = True
-        
-
-    
-def majorityVote(votelist):
-    return max(votelist, key=votelist.get)

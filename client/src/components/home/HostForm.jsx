@@ -33,7 +33,6 @@ class HostFormComponent extends React.Component {
 
   async handleHost() {
     const { payload: { id } } = await this.props.hostSession({ ...this.state });
-
     if (id) this.props.history.push(`/rooms/${id}`);
   }
 
@@ -52,7 +51,7 @@ class HostFormComponent extends React.Component {
           fluid
           onChange={this.handleChange}
           value={title}
-          errors={Boolean(errors.title)}
+          error={Boolean(errors.title)}
         />
         <br />
         <Input
@@ -64,7 +63,7 @@ class HostFormComponent extends React.Component {
           fluid
           onChange={this.handleChange}
           value={location}
-          errors={Boolean(errors.location)}
+          error={Boolean(errors.location)}
         />
         <br />
         <DateInput
@@ -79,7 +78,7 @@ class HostFormComponent extends React.Component {
           popupPosition="bottom center"
           onChange={this.handleTimeChange}
           value={date}
-          errors={Boolean(errors.date)}
+          error={Boolean(errors.date)}
         />
         <br />
         <TimeInput
@@ -94,7 +93,7 @@ class HostFormComponent extends React.Component {
           type="text"
           onChange={this.handleTimeChange}
           value={starttime}
-          errors={Boolean(errors.starttime)}
+          error={Boolean(errors.starttime)}
         />
         <br />
         <TimeInput
@@ -104,12 +103,12 @@ class HostFormComponent extends React.Component {
           hideMobileKeyboard
           name="endtime"
           iconPosition="left"
-          placeholder="Enter start time"
+          placeholder="Enter end time"
           popupPosition="bottom center"
           type="text"
           onChange={this.handleTimeChange}
           value={endtime}
-          errors={Boolean(errors.endtime)}
+          error={Boolean(errors.endtime)}
         />
         <br />
         <Input
@@ -121,7 +120,7 @@ class HostFormComponent extends React.Component {
           fluid
           onChange={this.handleChange}
           value={votingtime}
-          errors={Boolean(errors.votingtime)}
+          error={Boolean(errors.votingtime)}
         />
         <br />
         <Checkbox

@@ -14,7 +14,6 @@ class Timetable extends Component {
 
   async componentDidMount() {
     const { payload } = await this.props.getSessionEvents(this.props.room);
-    console.log(payload);
   }
 
   render() {

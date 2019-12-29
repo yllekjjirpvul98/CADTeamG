@@ -33,7 +33,7 @@ const signUp = (data) => (dispatch) => {
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: SIGN_UP }));
 };
 
-const authenticate = () => (dispatch) => {
+const authenticate = (socket) => (dispatch) => { 
   axios.defaults.headers.common.authorization = localStorage.getItem('jwt');
 
   dispatch({ type: SET_LOADER, payload: AUTH });

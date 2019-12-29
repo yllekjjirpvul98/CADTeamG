@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
-import { Menu, Icon, Header } from 'semantic-ui-react';
+import { Menu, Icon, Header, Divider } from 'semantic-ui-react';
 
 const activeStyle = { color: '#0e0e0e' };
 
@@ -51,14 +51,17 @@ function Navbar({ username }) {
   );
 
   return (
-    <Menu borderless text style={{ margin: '0px' }}>
-      <NavLink to="/home">
-        <Menu.Item>
-          <Header as="h2" content="Rendezvous" color="blue" />
-        </Menu.Item>
-      </NavLink>
-      {token !== null ? loggedIn : loggedOut}
-    </Menu>
+    <>
+      <Menu borderless text>
+        <NavLink to="/home">
+          <Menu.Item>
+            <Header as="h2" content="Rendezvous" color="blue" />
+          </Menu.Item>
+        </NavLink>
+        {token !== null ? loggedIn : loggedOut}
+      </Menu>
+      <Divider />
+    </>
   );
 }
 

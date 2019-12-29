@@ -45,7 +45,7 @@ class Chat extends Component {
           >
             Send
           </Button>
-          {messages.map((msg) => <Message key={msg}>{msg}</Message>)}
+            {messages.map((msg) => <Message key={msg}>{msg.username}: {msg.message}</Message>)}
         </Form>
       </Segment>
     );
