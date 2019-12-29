@@ -4,10 +4,11 @@ import { useHistory } from 'react-router-dom';
 import Layout from '../components/Layout';
 
 function Index() {
-
   const history = useHistory();
-  
-  if(localStorage.getItem('jwt')) history.push('/home')
+
+  if (localStorage.getItem('jwt')) history.push('/home');
+
+  history.push('/sign-in');
 
   return (
     <Layout>

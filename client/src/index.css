@@ -1,5 +1,6 @@
 @import './calendar.css';
 @import './daygrid.css';
+@import './timegrid.css';
 
 body {
   margin: 0;
@@ -15,4 +16,8 @@ body {
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.fc-widget-content, .fc-event {
+  cursor: pointer;
 }

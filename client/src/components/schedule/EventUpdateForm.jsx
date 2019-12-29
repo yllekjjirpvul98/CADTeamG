@@ -10,7 +10,6 @@ class EventUpdateForm extends React.Component {
     this.state = {
       title: '',
       location: '',
-      starttime: '',
       endtime: '',
     };
     this.handleChange = this.handleChange.bind(this);
@@ -28,9 +27,8 @@ class EventUpdateForm extends React.Component {
   }
 
   async handleUpdate() {
-    const starttime = this.state.starttime ? new Date(`${this.props.event.start.toDateString()} ${this.state.starttime}`) : '';
     const endtime = this.state.endtime ? new Date(`${this.props.event.end.toDateString()} ${this.state.endtime}`) : '';
-    const event = { ...this.state, starttime, endtime };
+    const event = { ...this.state, starttime: this.props.event.start, endtime };
     const { payload } = await this.props.updateEvent(event, this.props.event.id);
     const { id } = payload;
     if (id) this.props.closeModal();
@@ -42,7 +40,7 @@ class EventUpdateForm extends React.Component {
   }
 
   render() {
-    const { title, location, starttime, endtime } = this.state;
+    const { title, location, endtime } = this.state;
     const { event, loader } = this.props;
 
     return (
@@ -68,19 +66,6 @@ class EventUpdateForm extends React.Component {
           type="text"
           onChange={this.handleChange}
           value={location}
-        />
-        <br />
-        <TimeInput
-          fluid
-          closable
-          autoComplete="off"
-          hideMobileKeyboard
-          name="starttime"
-          iconPosition="left"
-          placeholder={event.start.toUTCString()}
-          type="text"
-          onChange={this.handleTimeChange}
-          value={starttime}
         />
         <br />
         <TimeInput

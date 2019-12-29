@@ -1,6 +1,5 @@
 from google.cloud import datastore
 
-builtinlist = list
 secret = 'somethinghere'
 
 def get_client():
@@ -40,6 +39,10 @@ def update(data, kind, id=None):
     ds.put(entity)
     return from_datastore(entity)
 
+def update_entity(entity):
+    ds = get_client()
+    ds.put(entity)
+
 def delete(kind, id):
     ds = get_client()
     key = ds.key(kind, id_as_key(id))
@@ -51,7 +54,7 @@ def getbyname(kind, username):
     query.add_filter('username', '=', username) 
     return list(query.fetch())
 
-def getEventsByUserId(kind, userid):
+def getEventsByUserId(userid):
     ds = get_client()
     query = ds.query(kind='event')
     query.add_filter('userid', '=', userid)

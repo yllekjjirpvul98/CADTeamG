@@ -14,7 +14,6 @@ class Timetable extends Component {
 
   async componentDidMount() {
     const { payload } = await this.props.getSessionEvents(this.props.room);
-    console.log(payload);
   }
 
   render() {
@@ -28,7 +27,7 @@ class Timetable extends Component {
     return (
       <>
         <FullCalendar
-          defaultView="dayGridMonth"
+          defaultView="timeGridWeek"
           events={events}
           header={false}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

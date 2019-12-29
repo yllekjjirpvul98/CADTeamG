@@ -23,3 +23,7 @@ export const CLEAR_LOADER = 'CLEAR_LOADER';
 
 // Websocket stuff
 export const ADD_MESSAGE = 'ADD_MESSAGE';
+export const SET_TIMER = 'SET_TIMER';
+export const DECREMENT_TIMER = 'DECREMENT_TIMER';
+export const JOIN_ROOM = 'JOIN_ROOM';
+export const LEAVE_ROOM = 'LEAVE_ROOM';

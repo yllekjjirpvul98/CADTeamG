@@ -37,9 +37,9 @@ class SignInComponent extends React.Component {
 
     return (
       <Layout>
-        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable>
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ marginTop: '7%' }}>
           <Grid.Column>
-            <Segment secondary>
+            <Segment secondary textAlign="center">
               <Header as="h1" textAlign="center">Login to Account</Header>
               <br />
               <Input
@@ -51,6 +51,7 @@ class SignInComponent extends React.Component {
                 type="text"
                 onChange={this.handleChange}
                 value={username}
+                error={Boolean(errors.username)}
               />
               <br />
               <Input
@@ -62,13 +63,13 @@ class SignInComponent extends React.Component {
                 type="password"
                 onChange={this.handleChange}
                 value={password}
+                error={Boolean(errors.password)}
               />
               <br />
               <Button
                 onClick={this.handleSubmit}
                 color="blue"
                 loading={loader.SIGN_IN}
-                fluid
               >
                 Sign In
               </Button>

@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
-import { Menu, Icon, Header } from 'semantic-ui-react';
-import Logo from '../images/logo-small.png';
+import { Menu, Icon, Header, Divider } from 'semantic-ui-react';
 
 const activeStyle = { color: '#0e0e0e' };
 
@@ -15,12 +14,8 @@ function Navbar({ username }) {
     history.push('/sign-in');
   }
 
-  const loggedIn =
-  (
+  const loggedIn = (
     <Menu.Menu position="right">
-      <Menu.Item>
-        {username.charAt(0).toUpperCase() + username.slice(1)}
-      </Menu.Item>
       <Menu.Item>
         <NavLink to="/home" activeStyle={activeStyle}>
           Home
@@ -32,7 +27,10 @@ function Navbar({ username }) {
         </NavLink>
       </Menu.Item>
       <Menu.Item>
-        <Icon onClick={logout} name="power off" size="large" />
+        {username.charAt(0).toUpperCase() + username.slice(1)}
+      </Menu.Item>
+      <Menu.Item>
+        <Icon onClick={logout} name="sign out" size="large" link />
       </Menu.Item>
     </Menu.Menu>
   );
@@ -53,17 +51,17 @@ function Navbar({ username }) {
   );
 
   return (
-    <Menu borderless text style={{ margin: '0px' }}>
-      <NavLink to="/home">
-        <Menu.Item>
-          <img src={Logo} alt="logo" />
-        </Menu.Item>
-      </NavLink>
-      <Menu.Item>
-        <Header content="Rendezvous" color="blue" />
-      </Menu.Item>
-      {token !== null ? loggedIn : loggedOut}
-    </Menu>
+    <>
+      <Menu borderless text>
+        <NavLink to="/home">
+          <Menu.Item>
+            <Header as="h2" content="Rendezvous" color="blue" />
+          </Menu.Item>
+        </NavLink>
+        {token !== null ? loggedIn : loggedOut}
+      </Menu>
+      <Divider />
+    </>
   );
 }
 

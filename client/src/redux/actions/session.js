@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify';
 import axios from '../../utils/axios';
 import { JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER,
-  GET_SESSION, CLEAR_ERRORS, CLOSE_SESSION, START_SESSION, GET_SESSION_EVENTS } from '../types';
+  GET_SESSION, CLEAR_ERRORS, CLOSE_SESSION, GET_SESSION_EVENTS } from '../types';
 import { validateJoinSession, validateHostSession } from '../validation/session';
 
 const joinSession = (data) => (dispatch) => {
@@ -20,8 +20,12 @@ const joinSession = (data) => (dispatch) => {
 };
 
 const hostSession = (data) => (dispatch) => {
-    data.starttime = new Date(`${data.date} ${data.starttime}`);
-    data.endtime = new Date(`${data.date} ${data.endtime}`);
+    const date = data.date.split('-');
+    const year = date[2];
+    const month = date[1];
+    const day = date[0];
+    data.starttime = new Date(`${year}-${month}-${day}T${data.starttime}:00`);
+    data.endtime = new Date(`${year}-${month}-${day}T${data.endtime}:00`);
 
     const { validated, errors } = validateHostSession(data);
 
@@ -55,15 +59,6 @@ const getSessionEvents = (id) => (dispatch) => {
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: GET_SESSION_EVENTS }));
 };
 
-const startSession = (id) => (dispatch) => {
-  dispatch({ type: SET_LOADER, payload: START_SESSION });
-  return axios.get(`/session/${id}`)
-              .then((res) => dispatch({ type: START_SESSION, payload: res.data }))
-              .then(dispatch({ type: CLEAR_ERRORS }))
-              .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
-              .finally(() => dispatch({ type: CLEAR_LOADER, payload: START_SESSION }));
-};
-
 const closeSession = (id) => (dispatch) => {
   dispatch({ type: SET_LOADER, payload: CLOSE_SESSION });
   return axios.delete(`/session/${id}`)
@@ -73,4 +68,4 @@ const closeSession = (id) => (dispatch) => {
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: CLOSE_SESSION }));
 };
 
-export { joinSession, hostSession, getSession, getSessionEvents, startSession, closeSession };
+export { joinSession, hostSession, getSession, getSessionEvents, closeSession };
