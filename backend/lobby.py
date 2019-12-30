@@ -116,10 +116,9 @@ def hostSess():
 @sio.on('startVote')
 def startVote(sid):
     # TODO: Validate whether initiator = host
-    # TODO：Client on beginVote => move to voting page
-    sio.emit('beginVote', room=sio.get_session(sid)['room'], skip_sid=sid)
-    
+    # TODO：Client on beginVote => move to voting page    
     # Run algorithm and store the generated available timeslots to session
+    # TODO: availableSlots has to be JSONStringify
     availableSlots = None
 
     # Add available slots to session
@@ -128,24 +127,12 @@ def startVote(sid):
     if room.get('availableSlots') == {}:
         room['availableSlots'] = availableSlots
         update_entity(room)
+    sio.emit('beginVote', data=availableSlots, room=sio.get_session(sid)['room'], skip_sid=sid)
+
     # start the timer here???? 
     global timer
     timer = Countdown(room.get('votingTime'), room_code)
     timer.start()
-
-# TODO: Client invokes REST API
-# TODO: There should be a better way to do this...
-@lobby.route('/<int:id>/getAvailableTimeslots')
-def getTimeslots(id):
-    room = sio.get_session(id)['room']
-    room = getSessionByCode(room)
-    room = from_datastore(room[0])
-    while(room.get('availableSlots') == {}):
-       print ("Generating slots...")
-       room = sio.get_session(id)['room']
-       room = getSessionByCode(room)
-       room = from_datastore(room[0])
-    return room.get('availableSlots')
 
 @sio.on('vote')
 def vote(sid, timeslot):
