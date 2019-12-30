@@ -28,8 +28,6 @@ def join(sid, data, username):
 
 @sio.event
 def connect(sid, environ):
-    # TODO Update datastore participants
-    # TODO emit update event when there is new participants
     print('Connected', sid)
 
 @sio.event
@@ -126,7 +124,7 @@ def startVote(sid):
     room = getSessionByCode(room_code)[0]
     if room.get('availableSlots') == {}:
         room['availableSlots'] = availableSlots
-        update_entity(room)
+        update(room, 'session', id=room.get('id'))
     sio.emit('beginVote', data=availableSlots, room=sio.get_session(sid)['room'], skip_sid=sid)
 
     # start the timer here???? 
@@ -149,7 +147,7 @@ def vote(sid, timeslot):
         votelist = dict()
         votelist[timeslot] = 1
     dictionary['vote'] = votelist
-    update_entity(dictionary)
+    update(dictionary, 'session', id=dictionary.get('id'))
     # get number of participant in the room
     total = len(dictionary['participants'])
     # check if every participant has already voted
