@@ -1,6 +1,7 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
-import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, SET_VOTES } from '../types';
+import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, 
+  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, SET_VOTES, GET_ERRORS, ADD_VOTE, CLOSE_SESSION } from '../types';
 
 // Message
 const ioMsg = (socket, message) => (dispatch) => {
@@ -53,8 +54,14 @@ const ioVote = (socket, timeslot) => (dispatch) => {
   socket.emit('vote', timeslot);
 }
 
+const ioOnEnter = (props) => (dispatch) => {
+  toast('New participant has joined')
+  props.getSession(props.match.params.id);
+  props.getSessionEvents(props.match.params.id)
+}
+
 // Join
-const ioOnJoin = (username) => (dispatch) => {
+const ioOnJoin = (username, props) => (dispatch) => {
   toast(`${username} has joined the room`)
 };
 
@@ -67,12 +74,24 @@ const ioOnLeave = (username) => (dispatch) => {
 
 // Close
 const ioClose = (socket, id) => (dispatch) => {
-  socket.emit('close', id)
+  socket.emit('close', id);
+  dispatch({ type: CLOSE_SESSION })
 };
 
-const ioOnClose = (roomid) => (dispatch) => {
-  toast(`Room ${roomid} was closed by the host`)
+const ioOnClose = (props) => (dispatch) => {
+  toast.error(`Room was closed by the host`, { className: 'ui error message'});
+  props.history.push('/home')
 };
 
+const ioOnVote = (data) => (dispatch) => {
+  const { timeslot, username } = JSON.parse(data)
+  
+  dispatch({ type: ADD_VOTE, payload: { timeslot, username }});
+}
 
-export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose };
+const ioOnError = (data) => (dispatch) => {
+  toast.error(data, { className: 'ui error message' })
+  dispatch({ type: GET_ERRORS, payload: { data: { socket: data } } })
+}
+
+export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter };

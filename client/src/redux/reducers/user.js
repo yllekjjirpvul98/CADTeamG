@@ -1,7 +1,7 @@
 import { SIGN_IN, SIGN_UP, AUTH, JOIN_SESSION, HOST_SESSION, GET_SESSION } from '../types';
 
 const initialState = {
-  id: '',
+  id: null,
   username: '',
   session: {},
 };

@@ -41,12 +41,16 @@ def joinSession():
     if len(errors.keys()) == 0:
         room = getSessionByCode(code)
         if len(room) == 0:
-            return make_response(jsonify(username='Room does not exist'), 400)
+            return make_response(jsonify(id='Room does not exist'), 400)
         else:
             room = from_datastore(room[0])
-            if not request.id in room['participants']:
-                room['participants'].append(request.id)
-                update(room, 'session', room.get('id'))
+            if request.id in room['participants']:
+                return make_response(jsonify(id='You have already joined this room'))
+
+            room['participants'].append(request.id)
+            update(room, 'session', room.get('id'))
+            sio.emit('enter', room=str(room.get('id')))
+            
             return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
             weekends=room.get('weekends'), participants=room.get('participants')), 200)
@@ -156,23 +160,28 @@ def start(sid, roomid):
     user = sio.get_session(sid)
     room = get(roomid, 'session')
 
+    if room is None:
+        sio.emit('error', 'Room does not exist', room=sid)
+        return
+
+    if room.get('votingend') is not None:
+        sio.emit('error', 'Voting has been already started', room=sid)
+        return
+
     event_list = []
-    if room is not None:
-        for participant in room.get('participants'):
-            events = getEventsByUserId(participant)
-            if len(events) != 0: 
-                for event in events:   
-                    event['id'] = event.id 
-                    event_list.append(event)
+    for participant in room.get('participants'):
+        events = getEventsByUserId(participant)
+        if len(events) != 0: 
+            for event in events:   
+                event['id'] = event.id 
+                event_list.append(event)
 
     timeslots = generateTimeslots(room, event_list)
 
-    # if room is not None and room.get('votingend') is None:
-    if room is not None:
-        room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
-        room['timeslots'] = timeslots
-        updated = update(room, 'session', user.get('room'))
-        sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
+    room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
+    room['timeslots'] = timeslots
+    updated = update(room, 'session', user.get('room'))
+    sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
 
 def generateTimeslots(room, events):
     # ROOM [object] use @starttime (earliest), @endtime (latest), @weekends, @duration
@@ -183,26 +192,35 @@ def generateTimeslots(room, events):
 
 @sio.on('vote')
 def vote(sid, timeslot):
-    print(timeslot)
-    room = sio.get_session(sid)['room']
-    dictionary = getSessionByCode(room)[0]
-    if dictionary['vote'] != {}:
-        votelist = dictionary['vote']
-        if timeslot in votelist:
-            votelist[timeslot] = votelist[timeslot] + 1
-        else:
-            votelist[timeslot] = 1
-    else:
-        votelist = dict()
-        votelist[timeslot] = 1
-    dictionary['vote'] = votelist
-    update_entity(dictionary)
-    # get number of participant in the room
-    total = len(dictionary['participants'])
-    # check if every participant has already voted
-    num_of_votes = sum(list(votelist.values()))
-    if (total == num_of_votes):
-        timer.cancel()
-        result = majorityVote(votelist)
-        sio.emit('result', result, room=room)
-    # onResult needed in client side
+    user = sio.get_session(sid)
+    room = get(user.get('room'), 'session')
+    username = user['username']
+    
+    if username is None:
+        sio.emit('error', 'You have been disconnected from the server for no fucking reason. Fuck websockets and your connection.', room=sid)
+        return
+    
+    # Add vote to database
+    try:
+        for timeslot, username_list in room['votes'].items():
+            if username in username_list:
+                sio.emit('error', 'You have already voted', room=sid)
+                return
+        room['votes'][timeslot] = room['votes'][timeslot] + [username]
+    except KeyError:
+        room['votes'][timeslot] = [username]
+
+    updated = update(room, 'session', user.get('room'))
+    sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=sid)
+
+    # Calculate number of votes
+    votes = 0
+    for timeslot, username_list in updated['votes'].items():
+        votes += len(username_list)
+
+    # Determine winner
+    if votes >= len(updated.get('participants')):
+        for timeslot, username_list in updated['votes'].items():
+            # Determine the winner
+            sio.emit('result', updated['votes'][timeslot] ,room=user['room'])
+            break

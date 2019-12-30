@@ -20,11 +20,8 @@ const joinSession = (data) => (dispatch) => {
 };
 
 const hostSession = (data) => (dispatch) => {
-
-  console.log(data.starttime)
     data.starttime = parseDate(data.starttime)
     data.endtime = parseDate(data.endtime)
- console.log(data.starttime)
 
     const { validated, errors } = validateHostSession(data);
 

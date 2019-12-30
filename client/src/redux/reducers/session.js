@@ -1,8 +1,21 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLOSE_SESSION } from '../types';
 
 const initialState = {
   messages: [],
   timeslots: [],
+  participants: [],
+  votes: {},
+  code: '',
+  endtime: '',
+  location: '',
+  starttime: '',
+  title: '',
+  votingend: '',
+  votingtime: 0,
+  duration: 0,
+  hostId: 0,
+  id: 0,
+  weekends: false,
 };
 
 export default function (state = initialState, action) {
@@ -21,6 +34,9 @@ export default function (state = initialState, action) {
       const { payload } = action;
 
       return { ...state, ...payload };
+    }
+    case CLOSE_SESSION: {
+      return initialState;
     }
     case ADD_MESSAGE: {
       const { payload } = action;
@@ -51,6 +67,14 @@ export default function (state = initialState, action) {
       const { payload } = action;
 
       return { ...state, votes: payload };
+    }
+    case ADD_VOTE: {
+      const { payload: { timeslot, username } } = action;
+      const votes = state.votes
+      if (votes[timeslot]) votes[timeslot].push(username)
+      else votes[timeslot] = [username]
+
+      return { ...state, votes }
     }
     default:
       return state;
