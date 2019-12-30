@@ -25,7 +25,8 @@ def getSession(id):
 
     return make_response(jsonify(id=id, code=room.get('code'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
-            weekends=room.get('weekends'), votingend=room.get('votingend') or None, participants=room.get('participants')), 200)
+            weekends=room.get('weekends'), timeslots=room.get('timeslots'), votes=room.get('votes'), 
+            votingend=room.get('votingend') or None, participants=room.get('participants')), 200)
 
 @lobby.route('/join', methods=['POST'])
 @auth_required
@@ -63,6 +64,7 @@ def hostSess():
     location = data.get('location')
     starttime = data.get('starttime')
     endtime = data.get('endtime')
+    duration = data.get('duration')
     votingtime = data.get('votingtime')
     weekends = data.get('weekends')
 
@@ -72,19 +74,20 @@ def hostSess():
     if(location is None): errors['location'] = 'Location is empty'
     if(starttime is None): errors['starttime'] = 'Start time is empty'
     if(endtime is None): errors['endtime'] = 'End time is empty'
+    if(duration is None): errors['duration'] = 'Duration is empty'
     if(votingtime is None): errors['votingtime'] = 'Voting time is empty'
     if(weekends is None): errors['weekends'] = 'Weekends is empty'
 
     if len(errors.keys()) == 0:
         # TODO Sessions cannot generate the same code
 
-        room = Session(hostId, title, location, starttime, endtime, votingtime, weekends)
+        room = Session(hostId, title, location, starttime, endtime, duration, votingtime, weekends)
 
         update(room.__dict__, 'session')
         room = getSessionByCode(room.code) ## TODO Find a better way to extract session id than fetching it from db
         room = from_datastore(room[0])
         return make_response(jsonify(id=room.get('id'), code=room.get('code'), hostId=hostId, title=title, location=location, starttime=starttime,
-                endtime=endtime, votingtime=votingtime, weekends=weekends, participants=room.get('participants')), 200)
+                endtime=endtime, duration=duration, votingtime=votingtime, weekends=weekends, participants=room.get('participants')), 200)
     else:
         return make_response(jsonify(errors=errors), 400)
 
@@ -148,22 +151,39 @@ def message(sid, msg):
     print(user.get('username') + ' sends message "' + msg + '" to room ' + user.get('room'))
 
 @sio.on('start')
-def start(sid):    
+def start(sid, roomid):    
     time = datetime.datetime.now()
     user = sio.get_session(sid)
-    room = get(user.get('room'), 'session')
+    room = get(roomid, 'session')
 
-    # Generate possible timeslots here
+    event_list = []
+    if room is not None:
+        for participant in room.get('participants'):
+            events = getEventsByUserId(participant)
+            if len(events) != 0: 
+                for event in events:   
+                    event['id'] = event.id 
+                    event_list.append(event)
+
+    timeslots = generateTimeslots(room, event_list)
 
     # if room is not None and room.get('votingend') is None:
     if room is not None:
         room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
+        room['timeslots'] = timeslots
         updated = update(room, 'session', user.get('room'))
-        sio.emit('start', str(updated.get('votingend')), room=sio.get_session(sid)['room'])
+        sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
+
+def generateTimeslots(room, events):
+    # ROOM [object] use @starttime (earliest), @endtime (latest), @weekends, @duration
+    # EVENTS [array] use @starttime, @endtime
+    
+    # Example output
+    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
 @sio.on('vote')
 def vote(sid, timeslot):
-    # add vote of each participant to session
+    print(timeslot)
     room = sio.get_session(sid)['room']
     dictionary = getSessionByCode(room)[0]
     if dictionary['vote'] != {}:

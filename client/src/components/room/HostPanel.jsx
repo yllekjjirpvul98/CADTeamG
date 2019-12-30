@@ -9,7 +9,7 @@ function HostPanel(props) {
   const history = useHistory();
 
   async function handleStart() {
-    props.ioStart(props.socket);
+    props.ioStart(props.socket, props.session.id);
   }
 
   async function handleClose() {

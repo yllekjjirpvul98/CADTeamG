@@ -1,7 +1,8 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
-import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, JOIN_ROOM, LEAVE_ROOM, START_SESSION, CLEAR_LOADER, SET_LOADER } from '../types';
+import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, SET_VOTES } from '../types';
 
+// Message
 const ioMsg = (socket, message) => (dispatch) => {
   socket.emit('message', message);
 };
@@ -10,23 +11,35 @@ const ioOnMsg = (message) => (dispatch) => {
   dispatch({ type: ADD_MESSAGE, payload: JSON.parse(message) });
 };
 
-const ioOnJoin = (username) => (dispatch) => {
-  toast(`${username} has joined the room`)
-  dispatch({ type: JOIN_ROOM, payload: username });
+// Start
+const ioStart = (socket, id) => (dispatch) => {
+  dispatch({ type: SET_LOADER, payload: START_SESSION })
+  socket.emit('start', id);
 };
 
-const ioOnStart = (endtime) => (dispatch) => {
-
+const ioOnStart = (data) => (dispatch) => {
+  
+  let { votingend, timeslots, votes } = data;
+  
+  if (!votingend) {
+    data = JSON.parse(data);
+    votingend = new Date(data.votingend);
+    timeslots = data.timeslots;
+    votes = data.votes;
+  } else {
+    votingend = new Date(votingend);
+    votingend.setHours(votingend.getHours() - 1);
+  }
+  
+  dispatch({ type: SET_TIMESLOTS, payload: timeslots });
+  dispatch({ type: SET_VOTES, payload: votes })
   dispatch({ type: CLEAR_LOADER })
-
-  if (typeof endtime === 'object') endtime.setHours(endtime.getHours() - 1);
-  else endtime = new Date(endtime);
 
   const now = new Date();
 
-  if (endtime < now) return;
+  if (votingend < now) return;
 
-  const seconds = Math.ceil(Math.abs((now.getTime() - endtime.getTime()) / 1000));
+  const seconds = Math.ceil(Math.abs((now.getTime() - votingend.getTime()) / 1000));
 
   toast(`Voting has started, you have ${seconds} seconds to vote`)
 
@@ -35,23 +48,31 @@ const ioOnStart = (endtime) => (dispatch) => {
   const timer = setInterval(() => dispatch({ type: DECREMENT_TIMER, payload: timer }), 1000);
 };
 
-const ioStart = (socket) => (dispatch) => {
-  dispatch({ type: SET_LOADER, payload: START_SESSION })
-  socket.emit('start');
+// Vote
+const ioVote = (socket, timeslot) => (dispatch) => {
+  socket.emit('vote', timeslot);
+}
+
+// Join
+const ioOnJoin = (username) => (dispatch) => {
+  toast(`${username} has joined the room`)
 };
 
 const ioOnLeave = (username) => (dispatch) => {
+
+  if (!username) return;
+
   toast(`${username} has left the room`)
-  dispatch({ type: LEAVE_ROOM, payload: username });
 };
 
+// Close
 const ioClose = (socket, id) => (dispatch) => {
   socket.emit('close', id)
 };
 
-const ioOnClose = (data) => (dispatch) => {
-  toast(`Room was closed by the host`)
+const ioOnClose = (roomid) => (dispatch) => {
+  toast(`Room ${roomid} was closed by the host`)
 };
 
 
-export { ioMsg, ioOnMsg, ioOnJoin, ioStart, ioOnLeave, ioClose, ioOnStart, ioOnClose };
+export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose };

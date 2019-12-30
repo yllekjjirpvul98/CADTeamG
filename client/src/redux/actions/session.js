@@ -20,12 +20,11 @@ const joinSession = (data) => (dispatch) => {
 };
 
 const hostSession = (data) => (dispatch) => {
-    const date = data.date.split('-');
-    const year = date[2];
-    const month = date[1];
-    const day = date[0];
-    data.starttime = new Date(`${year}-${month}-${day}T${data.starttime}:00`);
-    data.endtime = new Date(`${year}-${month}-${day}T${data.endtime}:00`);
+
+  console.log(data.starttime)
+    data.starttime = parseDate(data.starttime)
+    data.endtime = parseDate(data.endtime)
+ console.log(data.starttime)
 
     const { validated, errors } = validateHostSession(data);
 
@@ -67,5 +66,20 @@ const closeSession = (id) => (dispatch) => {
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: CLOSE_SESSION }));
 };
+
+const parseDate = (data) => {
+
+  data = data.split(' ');
+
+  const date = data[0].split('-');
+  const time = data[1];
+
+  const day = date[0];
+  const month = date[1];
+  const year = date[2];
+
+  return new Date(`${year}-${month}-${day}T${time}:00`)
+  
+}
 
 export { joinSession, hostSession, getSession, getSessionEvents, closeSession };

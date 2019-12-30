@@ -37,8 +37,8 @@ class Room extends Component {
     socket.emit('join', this.props.match.params.id, this.props.user.username);
 
     if (!this.props.session.id) {
-      const { payload: { votingend, status } } = await this.props.getSession(this.props.match.params.id);
-      if (votingend) this.props.ioOnStart(new Date(votingend));
+      const { payload: { votingend, votes, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
+      if (votingend) this.props.ioOnStart({ votingend, timeslots, votes});
       if (status === 400 || status === 404) return;
     }
     const { user, session } = this.props;
@@ -62,7 +62,7 @@ class Room extends Component {
             <Chat room={match.params.id} socket={socket} />
           </Grid.Column>
           <GridColumn width={10}>
-            <Calendar room={match.params.id} />
+            <Calendar socket={socket} session={session} room={match.params.id} />
             {session.timer}
           </GridColumn>
         </Grid>

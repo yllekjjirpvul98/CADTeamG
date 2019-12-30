@@ -1,8 +1,8 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, JOIN_ROOM, LEAVE_ROOM } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES } from '../types';
 
 const initialState = {
   messages: [],
-  users: [],
+  timeslots: [],
 };
 
 export default function (state = initialState, action) {
@@ -27,29 +27,30 @@ export default function (state = initialState, action) {
 
       return { ...state, messages: state.messages.concat(payload) };
     }
-    case JOIN_ROOM: {
-      const { payload } = action;
-
-      return { ...state, users: state.users.concat(payload) }
-    }
-    case LEAVE_ROOM: {
-      const { payload } = action;
-
-      return { ...state, users: state.users.filter(user => user !== payload) };
-    }
     case SET_TIMER: {
       const { payload } = action;
+
       return { ...state, timer: payload };
     }
     case DECREMENT_TIMER: {
       const { payload } = action;
 
-      if (state.timer <= 50) {
+      if (state.timer <= 0) {
         clearInterval(payload);
         return { ...state, timer: null };
       }
 
       return { ...state, timer: state.timer - 1 };
+    }
+    case SET_TIMESLOTS: {
+      const { payload } = action;
+
+      return { ...state, timeslots: payload };
+    }
+    case SET_VOTES: {
+      const { payload } = action;
+
+      return { ...state, votes: payload };
     }
     default:
       return state;
