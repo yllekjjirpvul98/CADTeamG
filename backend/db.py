@@ -50,7 +50,7 @@ def getbyname(kind, username):
     query.add_filter('username', '=', username) 
     return list(query.fetch())
 
-def getEventsByUserId(kind, userid):
+def getEventsByUserId(userid):
     ds = get_client()
     query = ds.query(kind='event')
     query.add_filter('userid', '=', userid)
@@ -66,9 +66,4 @@ def getSessionByCode(code):
     ds = get_client()
     query = ds.query(kind='session')
     query.add_filter('code', '=', code)
-    return list(query.fetch())
-
-def getAllSession():
-    ds = get_client()
-    query = ds.query(kind='session')
     return list(query.fetch())

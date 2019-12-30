@@ -11,7 +11,7 @@ event = Blueprint('event', __name__)
 @event.route('/', methods=['GET'])
 @auth_required
 def getEvents():
-    events = getEventsByUserId('event', request.id)
+    events = getEventsByUserId(request.id)
     for event in events:
         event['id'] = event.id # THIS ACTUALLY WORKS LOL
     if len(events) != 0:
@@ -30,7 +30,7 @@ def postEvent():
     title = data.get('title')
     location = data.get('location')
     starttime = data.get('starttime') 
-    endtime = data.get('endtime')   
+    endtime = data.get('endtime')   # TODO END CANNOT OCCUR BEFORE START
 
     errors = {}
     if(title is None): errors['title'] = 'Title is empty'
@@ -91,6 +91,8 @@ def putEvent(id):
 @event.route('/<id>', methods=['DELETE'])
 @auth_required
 def deleteEvent(id):
+    data = request.get_json()
+
     event = get(id, 'event')
    
     if event is not None:

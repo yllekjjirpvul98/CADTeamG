@@ -1,7 +1,7 @@
 import socketio
 from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
-from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, update_entity
+from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId, update_entity
 from JSONObject.user import User
 from jose import jwt
 from functools import wraps
@@ -9,31 +9,11 @@ from auth import auth_required
 from JSONObject.session import Session
 import json
 import threading
-from time import sleep
+import datetime
 
 lobby = Blueprint('session', __name__)
 
 sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins='*')
-
-@sio.on('message')
-def message(sid, data):
-    sio.emit('message', data, room=sio.get_session(sid)['room'], skip_sid=sid)
-    pass
-
-@sio.on('join')
-def join(sid, data, username):
-    sio.enter_room(sid, data, username)
-    sio.save_session(sid, {'username': username, 'room': data})
-    sio.emit('connect', username, room=data, skip_sid=sid)
-
-@sio.event
-def connect(sid, environ):
-    print('Connected', sid)
-
-@sio.event
-def disconnect(sid):
-    sio.emit('disconnect', sio.get_session(sid)['username'], room=sio.get_session(sid)['room'], skip_sid=sid)
-    sio.save_session(sid, { })
 
 @lobby.route('/<int:id>')
 @auth_required
@@ -43,9 +23,10 @@ def getSession(id):
     if not request.id in room.get('participants'):
         return make_response(jsonify(code='You need to enter the code to access this room'), 400)
 
-    return make_response(jsonify(id=id, hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
+    return make_response(jsonify(id=id, code=room.get('code'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
-            weekends=room.get('weekends'), participants=room.get('participants')), 200)
+            weekends=room.get('weekends'), timeslots=room.get('timeslots'), votes=room.get('votes'), 
+            votingend=room.get('votingend') or None, participants=room.get('participants')), 200)
 
 @lobby.route('/join', methods=['POST'])
 @auth_required
@@ -53,7 +34,7 @@ def joinSession():
     data = request.get_json()
     
     code = data.get('code')
-   
+
     errors = {}
     if(code is None): errors['code'] = 'Code is empty'
 
@@ -81,9 +62,9 @@ def hostSess():
     hostId = request.id
     title = data.get('title')
     location = data.get('location')
-    duration = data.get('duration')
     starttime = data.get('starttime')
     endtime = data.get('endtime')
+    duration = data.get('duration')
     votingtime = data.get('votingtime')
     weekends = data.get('weekends')
 
@@ -91,50 +72,118 @@ def hostSess():
     errors = {}
     if(title is None): errors['title'] = 'Title is empty'
     if(location is None): errors['location'] = 'Location is empty'
-    if(duration is None): errors['duration'] = 'Duration is empty'
     if(starttime is None): errors['starttime'] = 'Start time is empty'
     if(endtime is None): errors['endtime'] = 'End time is empty'
+    if(duration is None): errors['duration'] = 'Duration is empty'
     if(votingtime is None): errors['votingtime'] = 'Voting time is empty'
     if(weekends is None): errors['weekends'] = 'Weekends is empty'
 
     if len(errors.keys()) == 0:
         # TODO Sessions cannot generate the same code
 
-        room = Session(hostId, title, location, duration, starttime, endtime, votingtime, weekends)
+        room = Session(hostId, title, location, starttime, endtime, duration, votingtime, weekends)
+
         update(room.__dict__, 'session')
         room = getSessionByCode(room.code) ## TODO Find a better way to extract session id than fetching it from db
         room = from_datastore(room[0])
-        return make_response(jsonify(id=room.get('id'), hostId=hostId, title=title, location=location, duration=duration, starttime=starttime,
-                endtime=endtime, votingtime=votingtime, weekends=weekends, participants=room.get('paprticipants')), 200)
+        return make_response(jsonify(id=room.get('id'), code=room.get('code'), hostId=hostId, title=title, location=location, starttime=starttime,
+                endtime=endtime, duration=duration, votingtime=votingtime, weekends=weekends, participants=room.get('participants')), 200)
     else:
         return make_response(jsonify(errors=errors), 400)
 
-############### Voting.py ###############
+@lobby.route('/<int:id>/events')
+@auth_required
+def getSessionEvents(id):
+    room = get(id, 'session')
+    if room is None:
+        return make_response(jsonify(id='Room does not exist'), 404)
+    if not request.id in room.get('participants'):
+        return make_response(jsonify(id='You need to enter the code to access this room'), 400)
 
-@sio.on('startVote')
-def startVote(sid):
-    # TODO: Validate whether initiator = host
-    # TODO：Client on beginVote => move to voting page    
-    # Run algorithm and store the generated available timeslots to session
-    # TODO: availableSlots has to be JSONStringify
-    availableSlots = None
+    event_list = []
+    for participant in room.get('participants'):
+        events = getEventsByUserId(participant)
+        if len(events) != 0: 
+            for event in events:   
+                event['id'] = event.id 
+                event_list.append(event)
 
-    # Add available slots to session
-    room_code = sio.get_session(sid)['room']
-    room = getSessionByCode(room_code)[0]
-    if room.get('availableSlots') == {}:
-        room['availableSlots'] = availableSlots
-        update(room, 'session', id=room.get('id'))
-    sio.emit('beginVote', data=availableSlots, room=sio.get_session(sid)['room'], skip_sid=sid)
+    return make_response(jsonify(events=event_list), 200)
 
-    # start the timer here???? 
-    global timer
-    timer = Countdown(room.get('votingTime'), room_code)
-    timer.start()
+@lobby.route('/<int:id>', methods=['DELETE'])
+@auth_required
+def deleteSession(id):
+    room = get(id, 'session')
+    if request.id == room.get('hostId'):
+        delete('session', id)
+        id=str(id)
+        sio.emit('close', room=id)
+        return make_response(jsonify(id=id), 200)     
+    return make_response(jsonify(code='You need host permission to delete this room'), 400)
+
+@sio.event
+def connect(sid, environ):
+    print(sid + ' connects')
+
+@sio.event
+def disconnect(sid):
+    try:
+        user = sio.get_session(sid)
+        sio.emit('leave', sio.get_session(sid).get('username'), room=user.get('room'), skip_sid=sid)
+        print(user.get('username') + ' disconnects from room ' + user.get('room'))
+    except TypeError:
+        pass
+    except KeyError:
+        pass
+    sio.save_session(sid, None)
+
+@sio.on('join')
+def join(sid, room, username):
+    sio.enter_room(sid, room)
+    sio.save_session(sid, {'username': username, 'room': room})
+    sio.emit('join', username, room=room, skip_sid=sid)
+    print(username + ' joins ' + room)
+
+@sio.on('message')
+def message(sid, msg):
+    user = sio.get_session(sid)
+    sio.emit('message', json.dumps({'message': msg, 'username': user.get('username') }), room=user.get('room'))
+    print(user.get('username') + ' sends message "' + msg + '" to room ' + user.get('room'))
+
+@sio.on('start')
+def start(sid, roomid):    
+    time = datetime.datetime.now()
+    user = sio.get_session(sid)
+    room = get(roomid, 'session')
+
+    event_list = []
+    if room is not None:
+        for participant in room.get('participants'):
+            events = getEventsByUserId(participant)
+            if len(events) != 0: 
+                for event in events:   
+                    event['id'] = event.id 
+                    event_list.append(event)
+
+    timeslots = generateTimeslots(room, event_list)
+
+    # if room is not None and room.get('votingend') is None:
+    if room is not None:
+        room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
+        room['timeslots'] = timeslots
+        updated = update(room, 'session', user.get('room'))
+        sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
+
+def generateTimeslots(room, events):
+    # ROOM [object] use @starttime (earliest), @endtime (latest), @weekends, @duration
+    # EVENTS [array] use @starttime, @endtime
+    
+    # Example output
+    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
 @sio.on('vote')
 def vote(sid, timeslot):
-    # add vote of each participant to session
+    print(timeslot)
     room = sio.get_session(sid)['room']
     dictionary = getSessionByCode(room)[0]
     if dictionary['vote'] != {}:
@@ -157,36 +206,3 @@ def vote(sid, timeslot):
         result = majorityVote(votelist)
         sio.emit('result', result, room=room)
     # onResult needed in client side
-
-# Countdown Timer
-class Countdown(threading.Thread):
-    def __init__(self, sec, room):
-        threading.Thread.__init__(self)
-        self.sec = sec
-        self.room = room
-        self.stopFlag = False
-
-    def run(self):
-        while not self.stopFlag:
-            for secs in range(self.sec, 0, -1):
-                # emit countdown time to client
-                sio.emit('countdown', secs, room=self.room)
-                sleep(1)
-            sio.emit('countdown', 0, room=self.room)
-            # perform majority voting when timeout
-            dictionary = getSessionByCode(self.room)
-            dictionary = from_datastore(dictionary[0])
-            votelist = dictionary['vote']
-            result = majorityVote(votelist)
-            sio.emit('result', result, room=self.room)
-    
-    def cancel(self):
-        self.stopFlag = True
-        
-
-    
-def majorityVote(votelist):
-    return max(votelist, key=votelist.get)
-
-
-
