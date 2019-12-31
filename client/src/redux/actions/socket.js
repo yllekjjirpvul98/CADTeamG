@@ -5,6 +5,9 @@ import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION,
 
 // Message
 const ioMsg = (socket, message) => (dispatch) => {
+
+  if (!message) return
+
   socket.emit('message', message);
 };
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
-import { Menu, Icon, Header, Divider } from 'semantic-ui-react';
+import { Menu, Icon, Header } from 'semantic-ui-react';
 
-const activeStyle = { color: '#0e0e0e' };
+const activeStyle = { background: "rgba(0,0,0,.05" };
 
 function Navbar({ username }) {
   const token = localStorage.getItem('jwt');
@@ -16,52 +16,59 @@ function Navbar({ username }) {
 
   const loggedIn = (
     <Menu.Menu position="right">
-      <Menu.Item>
-        <NavLink to="/home" activeStyle={activeStyle}>
+
+      <Header as="p" content={username} color="blue" className="username" style={{margin: "auto 1rem"}} />
+
+      <NavLink to="/home" activeStyle={activeStyle}>
+        <Menu.Item>
+          <Icon name="home" />
           Home
-        </NavLink>
-      </Menu.Item>
-      <Menu.Item>
-        <NavLink to="/schedule" activeStyle={activeStyle}>
+        </Menu.Item>
+      </NavLink>
+
+      <NavLink to="/schedule" activeStyle={activeStyle}>
+        <Menu.Item>
+          <Icon name="calendar" />
           Schedule
-        </NavLink>
-      </Menu.Item>
-      <Menu.Item>
-        {username.charAt(0).toUpperCase() + username.slice(1)}
-      </Menu.Item>
+        </Menu.Item>
+      </NavLink>
+
       <Menu.Item>
         <Icon onClick={logout} name="sign out" size="large" link />
+        Sign Out
       </Menu.Item>
     </Menu.Menu>
   );
   const loggedOut =
   (
     <Menu.Menu position="right">
-      <Menu.Item>
-        <NavLink to="/sign-up" activeStyle={activeStyle}>
+
+      <NavLink to="/sign-up" activeStyle={activeStyle}>
+        <Menu.Item>
+          <Icon name="signup" />
           Sign Up
-        </NavLink>
-      </Menu.Item>
-      <Menu.Item>
-        <NavLink to="/sign-in" activeStyle={activeStyle}>
+        </Menu.Item>
+      </NavLink>
+
+      <NavLink to="/sign-in" activeStyle={activeStyle}>
+        <Menu.Item>
+          <Icon name="sign-in" />
           Sign In
-        </NavLink>
-      </Menu.Item>
+        </Menu.Item>
+      </NavLink>
+
     </Menu.Menu>
   );
 
   return (
-    <>
-      <Menu borderless text>
-        <NavLink to="/home">
-          <Menu.Item>
-            <Header as="h2" content="Rendezvous" color="blue" />
-          </Menu.Item>
+    <Menu icon="labeled" className="navbar">
+      <div style={{margin: "auto 1rem"}}>
+        <NavLink to="/home" activeStyle={activeStyle}>
+          <Header as="h1" content="Rendezvous" color="blue" />
         </NavLink>
-        {token !== null ? loggedIn : loggedOut}
-      </Menu>
-      <Divider />
-    </>
+      </div>
+      {token !== null ? loggedIn : loggedOut}
+    </Menu>
   );
 }
 

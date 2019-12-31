@@ -10,6 +10,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
+  background: #f7f7f7;
 }
 #root {
   height: 100%;
@@ -20,4 +21,27 @@ code {
 
 .fc-widget-content, .fc-event {
   cursor: pointer;
+}
+
+.navbar > .right .item:hover {
+  cursor: pointer;
+  background: rgba(0,0,0,.05);
+}
+
+.navbar a, .navar a:hover {
+  color: inherit;
+}
+
+.navbar .username {
+  margin: "auto";
+  font-weight: lighter;
+  font-size: 1.1em !important;
+  font-weight: bold;
+}
+
+.navbar .username::before {
+  content: "Logged in as ";
+  color: black;
+  font-size: 1rem;
+  font-weight: lighter;
 }

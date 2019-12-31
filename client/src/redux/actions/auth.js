@@ -13,7 +13,6 @@ const signIn = (data) => (dispatch) => {
   return axios.post('/auth/login', data)
               .then((res) => dispatch({ type: SIGN_IN, payload: res.data }))
               .then(dispatch({ type: CLEAR_ERRORS }))
-              .then(toast('Signed in successfully'))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: SIGN_IN }));
 };

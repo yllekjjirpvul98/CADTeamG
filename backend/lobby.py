@@ -10,6 +10,7 @@ from JSONObject.session import Session
 import json
 import threading
 import datetime
+from time import gmtime, strftime
 
 lobby = Blueprint('session', __name__)
 
@@ -151,7 +152,8 @@ def join(sid, room, username):
 @sio.on('message')
 def message(sid, msg):
     user = sio.get_session(sid)
-    sio.emit('message', json.dumps({'message': msg, 'username': user.get('username') }), room=user.get('room'))
+    timestamp = strftime("%H:%M", gmtime())
+    sio.emit('message', json.dumps({'message': msg, 'username': user.get('username'), 'time': timestamp }), room=user.get('room'))
     print(user.get('username') + ' sends message "' + msg + '" to room ' + user.get('room'))
 
 @sio.on('start')

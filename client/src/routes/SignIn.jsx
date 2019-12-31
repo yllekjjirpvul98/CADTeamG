@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Button, Input, Segment, Header, Grid } from 'semantic-ui-react';
+import { Button, Form, Segment, Header, Grid, Message, Icon } from 'semantic-ui-react';
 import { signIn } from '../redux/actions/auth';
 import Layout from '../components/Layout';
 import ErrorList from '../components/ErrorList';
@@ -39,42 +39,55 @@ class SignInComponent extends React.Component {
       <Layout>
         <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ marginTop: '7%' }}>
           <Grid.Column>
-            <Segment secondary textAlign="center">
-              <Header as="h1" textAlign="center">Login to Account</Header>
-              <br />
-              <Input
-                name="username"
-                icon="user"
-                fluid
-                iconPosition="left"
-                placeholder="Username"
-                type="text"
-                onChange={this.handleChange}
-                value={username}
-                error={Boolean(errors.username)}
-              />
-              <br />
-              <Input
-                name="password"
-                icon="lock"
-                fluid
-                iconPosition="left"
-                placeholder="Password"
-                type="password"
-                onChange={this.handleChange}
-                value={password}
-                error={Boolean(errors.password)}
-              />
-              <br />
-              <Button
-                onClick={this.handleSubmit}
-                color="blue"
-                loading={loader.SIGN_IN}
-              >
-                Sign In
-              </Button>
+
+            <Header as="h1" textAlign="center">
+              Login to Account
+            </Header>
+
+            <Segment primary textAlign="center">
+
+              <Form>
+                <Form.Input
+                  name="username"
+                  icon="user"
+                  fluid
+                  iconPosition="left"
+                  placeholder="Username"
+                  type="text"
+                  onChange={this.handleChange}
+                  value={username}
+                  error={Boolean(errors.username)}
+                />
+                <Form.Input
+                  name="password"
+                  icon="lock"
+                  fluid
+                  iconPosition="left"
+                  placeholder="Password"
+                  type="password"
+                  onChange={this.handleChange}
+                  value={password}
+                  error={Boolean(errors.password)}
+                />
+                <Button
+                  primary
+                  fluid
+                  onClick={this.handleSubmit}
+                  loading={loader.SIGN_IN}
+                >
+                  Sign In
+                </Button>
+              </Form>
+              
               <ErrorList data={errors} />
+            
             </Segment>
+          
+            <Message warning>
+              <Icon name='help' />
+              Not yet signed up?&nbsp;<a href='/sign-up'>Register here</a>&nbsp;
+            </Message>
+
           </Grid.Column>
         </Grid>
       </Layout>

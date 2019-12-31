@@ -1,4 +1,5 @@
 import { SIGN_IN, SIGN_UP, AUTH, JOIN_SESSION, HOST_SESSION, GET_SESSION } from '../types';
+import { toast } from 'react-toastify';
 
 const initialState = {
   id: null,
@@ -11,6 +12,7 @@ export default function (state = initialState, action) {
     case SIGN_IN: {
       const { token } = action.payload;
       localStorage.setItem('jwt', token);
+      toast('Signed in successfully')
 
       return {
         ...state,
