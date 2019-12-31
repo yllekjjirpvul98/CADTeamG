@@ -44,7 +44,7 @@ class SignInComponent extends React.Component {
               Login to Account
             </Header>
 
-            <Segment primary textAlign="center">
+            <Segment textAlign="center">
 
               <Form>
                 <Form.Input

@@ -1,4 +1,4 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLOSE_SESSION } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLEAR_SESSION } from '../types';
 
 const initialState = {
   messages: [],
@@ -35,7 +35,7 @@ export default function (state = initialState, action) {
 
       return { ...state, ...payload };
     }
-    case CLOSE_SESSION: {
+    case CLEAR_SESSION: {
       return initialState;
     }
     case ADD_MESSAGE: {

@@ -27,7 +27,7 @@ class SignUpComponent extends React.Component {
 
     const { payload } = await this.props.signUp({ username, password, password2 });
 
-    if (payload.message) this.props.history.push('/sign-in');
+    if (payload.username) this.props.history.push('/sign-in');
   }
 
   render() {
@@ -43,7 +43,7 @@ class SignUpComponent extends React.Component {
               Register an Account
             </Header>
 
-            <Segment primary textAlign="center">
+            <Segment textAlign="center">
 
               <Form>
                 <Form.Input

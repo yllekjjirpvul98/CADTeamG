@@ -2,22 +2,23 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
 import { Menu, Icon, Header } from 'semantic-ui-react';
+import { signOut } from '../redux/actions/auth';
 
 const activeStyle = { background: "rgba(0,0,0,.05" };
 
-function Navbar({ username }) {
+function Navbar(props) {
   const token = localStorage.getItem('jwt');
   const history = useHistory();
 
   function logout() {
-    localStorage.removeItem('jwt');
+    props.signOut();
     history.push('/sign-in');
   }
 
   const loggedIn = (
     <Menu.Menu position="right">
 
-      <Header as="p" content={username} color="blue" className="username" style={{margin: "auto 1rem"}} />
+      <Header as="p" content={props.username} color="blue" className="username" style={{margin: "auto 1rem"}} />
 
       <NavLink to="/home" activeStyle={activeStyle}>
         <Menu.Item>
@@ -33,8 +34,8 @@ function Navbar({ username }) {
         </Menu.Item>
       </NavLink>
 
-      <Menu.Item>
-        <Icon onClick={logout} name="sign out" size="large" link />
+      <Menu.Item onClick={logout}>
+        <Icon name="sign out" size="large" link />
         Sign Out
       </Menu.Item>
     </Menu.Menu>
@@ -63,7 +64,7 @@ function Navbar({ username }) {
   return (
     <Menu icon="labeled" className="navbar">
       <div style={{margin: "auto 1rem"}}>
-        <NavLink to="/home" activeStyle={activeStyle}>
+        <NavLink to="/home">
           <Header as="h1" content="Rendezvous" color="blue" />
         </NavLink>
       </div>
@@ -78,4 +79,4 @@ const mapStateToProps = (state) => {
   return { username };
 };
 
-export default connect(mapStateToProps)(Navbar);
+export default connect(mapStateToProps, { signOut })(Navbar);

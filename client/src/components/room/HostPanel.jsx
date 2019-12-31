@@ -38,7 +38,7 @@ function HostPanel(props) {
       <Button
         onClick={handleClose}
         fluid
-        loading={props.loader.CLOSE_SESSION}
+        loading={props.loader.CLEAR_SESSION}
       >
           Close
       </Button>
