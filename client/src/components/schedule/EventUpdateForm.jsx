@@ -45,7 +45,11 @@ class EventUpdateForm extends React.Component {
 
     return (
       <Form>
-        <Header block textAlign="center">Update Event</Header>
+
+        <Header textAlign="center">
+          Update Event
+        </Header>
+
         <Form.Input
           fluid
           name="title"
@@ -56,7 +60,6 @@ class EventUpdateForm extends React.Component {
           onChange={this.handleChange}
           value={title}
         />
-        <br />
         <Form.Input
           fluid
           name="location"
@@ -67,7 +70,6 @@ class EventUpdateForm extends React.Component {
           onChange={this.handleChange}
           value={location}
         />
-        <br />
         <TimeInput
           fluid
           closable
@@ -80,8 +82,8 @@ class EventUpdateForm extends React.Component {
           onChange={this.handleTimeChange}
           value={endtime}
         />
-        <br />
         <Button
+          primary
           onClick={this.handleUpdate}
           fluid
           loading={loader.PUT_EVENT}
@@ -92,9 +94,11 @@ class EventUpdateForm extends React.Component {
         <Button
           onClick={this.handleDelete}
           fluid
+          color="red"
           loading={loader.DELETE_EVENT}
-          icon="trash"
-        />
+        >
+          Delete
+        </Button>
       </Form>
     );
   }

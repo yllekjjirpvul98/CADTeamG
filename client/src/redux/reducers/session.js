@@ -1,8 +1,21 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, JOIN_ROOM, LEAVE_ROOM } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLEAR_SESSION } from '../types';
 
 const initialState = {
   messages: [],
-  users: [],
+  timeslots: [],
+  participants: [],
+  votes: {},
+  code: '',
+  endtime: '',
+  location: '',
+  starttime: '',
+  title: '',
+  votingend: '',
+  votingtime: 0,
+  duration: 0,
+  hostId: 0,
+  id: 0,
+  weekends: false,
 };
 
 export default function (state = initialState, action) {
@@ -22,34 +35,46 @@ export default function (state = initialState, action) {
 
       return { ...state, ...payload };
     }
+    case CLEAR_SESSION: {
+      return initialState;
+    }
     case ADD_MESSAGE: {
       const { payload } = action;
 
       return { ...state, messages: state.messages.concat(payload) };
     }
-    case JOIN_ROOM: {
-      const { payload } = action;
-
-      return { ...state, users: state.users.concat(payload) }
-    }
-    case LEAVE_ROOM: {
-      const { payload } = action;
-
-      return { ...state, users: state.users.filter(user => user !== payload) };
-    }
     case SET_TIMER: {
       const { payload } = action;
+
       return { ...state, timer: payload };
     }
     case DECREMENT_TIMER: {
       const { payload } = action;
 
-      if (state.timer <= 50) {
+      if (state.timer <= 0) {
         clearInterval(payload);
         return { ...state, timer: null };
       }
 
       return { ...state, timer: state.timer - 1 };
+    }
+    case SET_TIMESLOTS: {
+      const { payload } = action;
+
+      return { ...state, timeslots: payload };
+    }
+    case SET_VOTES: {
+      const { payload } = action;
+
+      return { ...state, votes: payload };
+    }
+    case ADD_VOTE: {
+      const { payload: { timeslot, username } } = action;
+      const votes = state.votes
+      if (votes[timeslot]) votes[timeslot].push(username)
+      else votes[timeslot] = [username]
+
+      return { ...state, votes }
     }
     default:
       return state;

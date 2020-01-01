@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify';
 import axios from '../../utils/axios';
 import { JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER,
-  GET_SESSION, CLEAR_ERRORS, CLOSE_SESSION, GET_SESSION_EVENTS } from '../types';
+  GET_SESSION, CLEAR_ERRORS, CLEAR_SESSION, GET_SESSION_EVENTS } from '../types';
 import { validateJoinSession, validateHostSession } from '../validation/session';
 
 const joinSession = (data) => (dispatch) => {
@@ -20,12 +20,8 @@ const joinSession = (data) => (dispatch) => {
 };
 
 const hostSession = (data) => (dispatch) => {
-    const date = data.date.split('-');
-    const year = date[2];
-    const month = date[1];
-    const day = date[0];
-    data.starttime = new Date(`${year}-${month}-${day}T${data.starttime}:00`);
-    data.endtime = new Date(`${year}-${month}-${day}T${data.endtime}:00`);
+    data.starttime = parseDate(data.starttime)
+    data.endtime = parseDate(data.endtime)
 
     const { validated, errors } = validateHostSession(data);
 
@@ -60,12 +56,27 @@ const getSessionEvents = (id) => (dispatch) => {
 };
 
 const closeSession = (id) => (dispatch) => {
-  dispatch({ type: SET_LOADER, payload: CLOSE_SESSION });
+  dispatch({ type: SET_LOADER, payload: CLEAR_SESSION });
   return axios.delete(`/session/${id}`)
-              .then((res) => dispatch({ type: CLOSE_SESSION, payload: res.data }))
+              .then((res) => dispatch({ type: CLEAR_SESSION, payload: res.data }))
               .then(dispatch({ type: CLEAR_ERRORS }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
-              .finally(() => dispatch({ type: CLEAR_LOADER, payload: CLOSE_SESSION }));
+              .finally(() => dispatch({ type: CLEAR_LOADER, payload: CLEAR_SESSION }));
 };
+
+const parseDate = (data) => {
+
+  data = data.split(' ');
+
+  const date = data[0].split('-');
+  const time = data[1];
+
+  const day = date[0];
+  const month = date[1];
+  const year = date[2];
+
+  return new Date(`${year}-${month}-${day}T${time}:00`)
+  
+}
 
 export { joinSession, hostSession, getSession, getSessionEvents, closeSession };

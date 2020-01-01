@@ -8,7 +8,7 @@ export default function ErrorList({ data }) {
         <Message
           error
           header="Error"
-          list={Object.values(data).map((err) => <p key={err}>{err}</p>)}
+          list={Object.values(data).map((err) => <li key={err}>{err}</li>)}
         />
       ) : <></>}
     </>

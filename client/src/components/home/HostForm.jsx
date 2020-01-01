@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Input, Button, Checkbox } from 'semantic-ui-react';
-import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
+import { DateTimeInput } from 'semantic-ui-calendar-react';
 import { hostSession } from '../../redux/actions/session';
 import ErrorList from '../ErrorList';
 
@@ -12,10 +12,10 @@ class HostFormComponent extends React.Component {
     this.state = {
       title: '',
       location: '',
-      date: '',
       starttime: '',
       endtime: '',
       votingtime: '',
+      duration: '',
       weekends: false,
     };
     this.handleChange = this.handleChange.bind(this);
@@ -37,7 +37,7 @@ class HostFormComponent extends React.Component {
   }
 
   render() {
-    const { title, location, date, starttime, endtime, votingtime, weekends } = this.state;
+    const { title, location, starttime, endtime, duration, votingtime, weekends } = this.state;
     const { loader, errors } = this.props;
 
     return (
@@ -66,22 +66,7 @@ class HostFormComponent extends React.Component {
           error={Boolean(errors.location)}
         />
         <br />
-        <DateInput
-          fluid
-          closable
-          autoComplete="off"
-          hideMobileKeyboard
-          name="date"
-          iconPosition="left"
-          placeholder="Date"
-          type="text"
-          popupPosition="bottom center"
-          onChange={this.handleTimeChange}
-          value={date}
-          error={Boolean(errors.date)}
-        />
-        <br />
-        <TimeInput
+        <DateTimeInput
           fluid
           closable
           autoComplete="off"
@@ -96,7 +81,7 @@ class HostFormComponent extends React.Component {
           error={Boolean(errors.starttime)}
         />
         <br />
-        <TimeInput
+        <DateTimeInput
           fluid
           closable
           autoComplete="off"
@@ -112,11 +97,23 @@ class HostFormComponent extends React.Component {
         />
         <br />
         <Input
+          name="duration"
+          iconPosition="left"
+          icon="hourglass outline"
+          placeholder="Enter duration"
+          type="number"
+          fluid
+          onChange={this.handleChange}
+          value={duration}
+          error={Boolean(errors.duration)}
+        />
+        <br />
+        <Input
           name="votingtime"
           iconPosition="left"
           icon="hourglass outline"
           placeholder="Enter voting time"
-          type="text"
+          type="number"
           fluid
           onChange={this.handleChange}
           value={votingtime}

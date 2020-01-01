@@ -73,7 +73,7 @@ def register():
             return make_response(jsonify(username='User already exists'), 400)
         else:
             user = User(username, hashed)
-            update(user.__dict__, 'user')
-            return make_response(jsonify(message='Registration successful'))
+            updated = update(user.__dict__, 'user')
+            return make_response(jsonify(username=updated.get('username')))
     else:
         return make_response(jsonify(errors=errors), 400)

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { useHistory } from 'react-router-dom'
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
 import { Grid, GridColumn } from 'semantic-ui-react';
@@ -9,10 +10,10 @@ import ParticipantPanel from '../components/room/ParticipantPanel';
 import RoomInfo from '../components/room/RoomInfo';
 import Calendar from '../components/room/Calendar';
 import { authenticate } from '../redux/actions/auth';
-import { getSession } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart } from '../redux/actions/socket';
+import { getSession, getSessionEvents } from '../redux/actions/session';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
 
-class Room extends Component {
+class RoomComponent extends Component {
   constructor(props) {
     super(props);
 
@@ -21,8 +22,11 @@ class Room extends Component {
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data));
     socket.on('leave', (data) => this.props.ioOnLeave(data));
-    socket.on('close', (data) => this.props.ioOnClose(data));
     socket.on('start', (data) => this.props.ioOnStart(data));
+    socket.on('vote', (data) => this.props.ioOnVote(data));
+    socket.on('error', (data) => this.props.ioOnError(data));
+    socket.on('close', () => this.props.ioOnClose(props));
+    socket.on('enter', () => this.props.ioOnEnter(props));
 
     this.state = {
       socket,
@@ -37,8 +41,8 @@ class Room extends Component {
     socket.emit('join', this.props.match.params.id, this.props.user.username);
 
     if (!this.props.session.id) {
-      const { payload: { votingend, status } } = await this.props.getSession(this.props.match.params.id);
-      if (votingend) this.props.ioOnStart(new Date(votingend));
+      const { payload: { votingend, votes, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
+      if (votingend) this.props.ioOnStart({ votingend, timeslots, votes});
       if (status === 400 || status === 404) return;
     }
     const { user, session } = this.props;
@@ -62,7 +66,7 @@ class Room extends Component {
             <Chat room={match.params.id} socket={socket} />
           </Grid.Column>
           <GridColumn width={10}>
-            <Calendar room={match.params.id} />
+            <Calendar socket={socket} room={match.params.id} />
             {session.timer}
           </GridColumn>
         </Grid>
@@ -71,11 +75,21 @@ class Room extends Component {
   }
 }
 
+function Room(props) {
+
+  const history = useHistory();
+
+  return (
+    <RoomComponent history={history} {...props} />
+  )
+}
+
+
 const mapStateToProps = (state) => {
   const { user, session, loader, errors } = state;
   return { user, session, loader, errors };
 };
 
 export default connect(mapStateToProps, {
-  authenticate, getSession, ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart,
+  authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter
 })(Room);

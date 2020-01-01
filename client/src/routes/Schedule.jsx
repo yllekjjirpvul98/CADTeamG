@@ -2,11 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Layout from '../components/Layout';
 import Calendar from '../components/schedule/Calendar';
+import { authenticate } from '../redux/actions/auth';
 
 class Schedule extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+
+  componentDidMount() {
+    if (!this.props.user.id) this.props.authenticate();
   }
 
   render() {
@@ -21,9 +26,9 @@ class Schedule extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { loader } = state;
+  const { user, loader } = state;
 
-  return { loader };
+  return { user, loader };
 };
 
-export default connect(mapStateToProps)(Schedule);
+export default connect(mapStateToProps, { authenticate })(Schedule);
