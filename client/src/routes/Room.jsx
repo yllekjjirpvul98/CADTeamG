@@ -47,7 +47,8 @@ class RoomComponent extends Component {
       if (status === 400 || status === 404) return;
     }
     const { user, session } = this.props;
-    this.setState({ panel: user.id === session.hostId ? <HostPanel socket={socket} /> : <ParticipantPanel socket={socket} /> });
+    const panel = user.id === session.hostId ? <HostPanel socket={socket} /> : <ParticipantPanel socket={socket} />;
+    this.setState({ panel });
   }
 
   componentWillUnmount() {
@@ -56,21 +57,25 @@ class RoomComponent extends Component {
 
   render() {
     const { socket, panel } = this.state;
-    const { session, errors, loader, match } = this.props;
+    const { errors, loader, match } = this.props;
 
     return (
       <Layout protected error={errors.id} loader={loader.AUTH || loader.GET_SESSION}>
+
         <Grid columns={2} stackable>
+
           <Grid.Column width={6}>
-            <RoomInfo session={session} />
+            <RoomInfo />
             {panel}
             <Chat room={match.params.id} socket={socket} />
           </Grid.Column>
+
           <GridColumn width={10}>
-            <Calendar socket={socket} room={match.params.id} />
-            {session.timer}
+            <Calendar room={match.params.id} socket={socket} />
           </GridColumn>
+
         </Grid>
+
       </Layout>
     );
   }

@@ -11,6 +11,7 @@ import json
 import threading
 import datetime
 from time import gmtime, strftime
+from utils import generateTimeslots
 
 lobby = Blueprint('session', __name__)
 
@@ -185,12 +186,6 @@ def start(sid, roomid):
     updated = update(room, 'session', user.get('room'))
     sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
 
-def generateTimeslots(room, events):
-    # ROOM [object] use @starttime (earliest), @endtime (latest), @weekends, @duration
-    # EVENTS [array] use @starttime, @endtime
-    
-    # Example output
-    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
 @sio.on('vote')
 def vote(sid, timeslot):
@@ -213,7 +208,7 @@ def vote(sid, timeslot):
         room['votes'][timeslot] = [username]
 
     updated = update(room, 'session', user.get('room'))
-    sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=sid)
+    sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=user.get('room'))
 
     # Calculate number of votes
     votes = 0

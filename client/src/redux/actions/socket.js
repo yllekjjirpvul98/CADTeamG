@@ -23,20 +23,18 @@ const ioStart = (socket, id) => (dispatch) => {
 
 const ioOnStart = (data) => (dispatch) => {
   
-  let { votingend, timeslots, votes } = data;
-  
+  let { votingend, timeslots } = data;
+
   if (!votingend) {
     data = JSON.parse(data);
     votingend = new Date(data.votingend);
     timeslots = data.timeslots;
-    votes = data.votes;
   } else {
     votingend = new Date(votingend);
     votingend.setHours(votingend.getHours() - 1);
   }
-  
+
   dispatch({ type: SET_TIMESLOTS, payload: timeslots });
-  dispatch({ type: SET_VOTES, payload: votes })
   dispatch({ type: CLEAR_LOADER })
 
   const now = new Date();
@@ -78,23 +76,26 @@ const ioOnLeave = (username) => (dispatch) => {
 // Close
 const ioClose = (socket, id) => (dispatch) => {
   socket.emit('close', id);
-  dispatch({ type: CLEAR_SESSION })
+  dispatch({ type: CLEAR_SESSION });
 };
 
 const ioOnClose = (props) => (dispatch) => {
   toast.error(`Room was closed by the host`, { className: 'ui error message'});
-  props.history.push('/home')
+  props.history.push('/home');
 };
 
 const ioOnVote = (data) => (dispatch) => {
+
   const { timeslot, username } = JSON.parse(data)
   
   dispatch({ type: ADD_VOTE, payload: { timeslot, username }});
+  toast(`${username} has just voted ${timeslot}`)
 }
 
 const ioOnError = (data) => (dispatch) => {
   toast.error(data, { className: 'ui error message' })
-  dispatch({ type: GET_ERRORS, payload: { data: { socket: data } } })
+  dispatch({ type: GET_ERRORS, payload: { data: { socket: data } } });
+  dispatch({ type: CLEAR_LOADER, payload: START_SESSION });
 }
 
 export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter };

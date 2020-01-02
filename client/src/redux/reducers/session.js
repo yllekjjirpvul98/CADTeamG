@@ -1,4 +1,5 @@
 import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLEAR_SESSION } from '../types';
+import { toast } from 'react-toastify';
 
 const initialState = {
   messages: [],
@@ -52,6 +53,7 @@ export default function (state = initialState, action) {
       const { payload } = action;
 
       if (state.timer <= 0) {
+        toast("Voting is over")
         clearInterval(payload);
         return { ...state, timer: null };
       }

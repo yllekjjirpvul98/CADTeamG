@@ -29,7 +29,7 @@ class Chat extends Component {
     return (
       <Comment.Group>
 
-        <Header as='h3' textAlign="center" dividing>
+        <Header as="h3" textAlign="center" dividing>
           Chat
         </Header>
 

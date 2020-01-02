@@ -25,7 +25,7 @@ class TimetableEdit extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.events.length) this.props.getEvents();
+    this.props.getEvents();
   }
 
   handleDateClick(arg) {
