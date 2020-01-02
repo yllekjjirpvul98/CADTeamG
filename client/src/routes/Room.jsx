@@ -1,23 +1,24 @@
 import React, { Component } from 'react';
+import io from 'socket.io-client';
+import { baseURL } from '../utils/axios';
 import { useHistory } from 'react-router-dom'
 import { connect } from 'react-redux';
-import io from 'socket.io-client';
 import { Grid, GridColumn } from 'semantic-ui-react';
+import { authenticate } from '../redux/actions/auth';
+import { getSession, getSessionEvents } from '../redux/actions/session';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
 import HostPanel from '../components/room/HostPanel';
 import ParticipantPanel from '../components/room/ParticipantPanel';
 import RoomInfo from '../components/room/RoomInfo';
 import Calendar from '../components/room/Calendar';
-import { authenticate } from '../redux/actions/auth';
-import { getSession, getSessionEvents } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
 
 class RoomComponent extends Component {
   constructor(props) {
     super(props);
-
-    const socket = io('http://localhost:8080');
+    
+    const socket = io(baseURL);
 
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data));

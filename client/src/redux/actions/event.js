@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import axios from '../../utils/axios';
+import { axios } from '../../utils/axios';
 import { GET_EVENTS, POST_EVENT, PUT_EVENT, DELETE_EVENT, GET_ERRORS, SET_LOADER, CLEAR_LOADER, CLEAR_ERRORS } from '../types';
 import { validateEvent, validateUpdateEvent } from '../validation/event';
 
