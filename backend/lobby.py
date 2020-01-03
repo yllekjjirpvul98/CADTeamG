@@ -11,7 +11,11 @@ import json
 import threading
 import datetime
 from time import gmtime, strftime
+<<<<<<< HEAD
 from utils import generateTimeslots
+=======
+import maya
+>>>>>>> 9339739c94dc208ecb2668d6503dbf81f62d32b6
 
 lobby = Blueprint('session', __name__)
 
@@ -46,6 +50,7 @@ def joinSession():
             return make_response(jsonify(id='Room does not exist'), 400)
         else:
             room = from_datastore(room[0])
+
             if request.id in room['participants']:
                 return make_response(jsonify(id='You have already joined this room'))
 
