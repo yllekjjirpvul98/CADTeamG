@@ -186,7 +186,6 @@ def start(sid, roomid):
     updated = update(room, 'session', user.get('room'))
     sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
 
-
 @sio.on('vote')
 def vote(sid, timeslot):
     user = sio.get_session(sid)
