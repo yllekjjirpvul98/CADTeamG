@@ -47,11 +47,11 @@ def joinSession():
         else:
             room = from_datastore(room[0])
             if request.id in room['participants']:
-                return make_response(jsonify(id='You have already joined this room'))
-
-            room['participants'].append(request.id)
-            update(room, 'session', room.get('id'))
-            sio.emit('enter', room=str(room.get('id')))
+                sio.emit('enter', room=str(room.get('id')))
+            else:
+                room['participants'].append(request.id)
+                update(room, 'session', room.get('id'))
+                sio.emit('enter', room=str(room.get('id')))
             
             return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
