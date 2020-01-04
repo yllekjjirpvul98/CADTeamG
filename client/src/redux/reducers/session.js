@@ -1,4 +1,4 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLEAR_SESSION } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
 import { toast } from 'react-toastify';
 
 const initialState = {
@@ -77,6 +77,11 @@ export default function (state = initialState, action) {
       else votes[timeslot] = [username]
 
       return { ...state, votes }
+    }
+    case LEAVE_SESSION: {
+      const { id } = action.payload
+      
+      return { ...state, participants: state.participants.filter(e => e !== id) }
     }
     default:
       return state;

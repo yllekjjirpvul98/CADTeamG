@@ -9,6 +9,7 @@ export const GET_SESSION = 'GET_SESSION';
 export const GET_SESSION_EVENTS = 'GET_SESSION_EVENTS';
 export const START_SESSION = 'START_SESSION';
 export const CLEAR_SESSION = 'CLEAR_SESSION';
+export const LEAVE_SESSION = 'LEAVE_SESSION';
 
 export const GET_EVENTS = 'GET_EVENTS';
 export const GET_EVENT = 'GET_EVENT';

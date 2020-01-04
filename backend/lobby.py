@@ -121,6 +121,28 @@ def deleteSession(id):
         return make_response(jsonify(id=id), 200)     
     return make_response(jsonify(code='You need host permission to delete this room'), 400)
 
+@lobby.route('/<int:id>', methods=['PUT'])
+@auth_required
+def leaveSession(id):
+    data = request.get_json()
+    userid = data.get('userid')
+    
+    if userid is None:
+        return make_response(jsonify(id='No id was provided'), 400)
+
+    room = get(id, 'session')
+    user = get(userid, 'user')
+    if room is None or user is None:
+       return make_response(jsonify(id='Room does not exist'), 400)
+
+    if userid not in room['participants']:
+        return make_response(jsonify(id='You must be in the room before you leave it'), 400)
+
+    room['participants'].remove(userid)
+    updated = update(room, 'session', id)
+    sio.emit('leaveLobby', json.dumps({ 'username': user.get('username'), 'id': userid }), room=str(id))
+    return make_response(updated, 200)
+
 @sio.event
 def connect(sid, environ):
     print(sid + ' connects')

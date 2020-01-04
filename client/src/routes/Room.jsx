@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Grid, GridColumn } from 'semantic-ui-react';
 import { authenticate } from '../redux/actions/auth';
 import { getSession, getSessionEvents } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
 import RoomInfo from '../components/room/RoomInfo';
@@ -21,6 +21,7 @@ class RoomComponent extends Component {
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data));
     socket.on('leave', (data) => this.props.ioOnLeave(data));
+    socket.on('leaveLobby', (data) => this.props.ioOnLeaveLobby(data));
     socket.on('start', (data) => this.props.ioOnStart(data));
     socket.on('vote', (data) => this.props.ioOnVote(data));
     socket.on('error', (data) => this.props.ioOnError(data));
@@ -89,5 +90,5 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {
-  authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter
+  authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby
 })(Room);
