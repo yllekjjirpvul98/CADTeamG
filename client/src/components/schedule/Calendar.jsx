@@ -25,7 +25,7 @@ class TimetableEdit extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.events.length) this.props.getEvents();
+    this.props.getEvents();
   }
 
   handleDateClick(arg) {
@@ -49,7 +49,6 @@ class TimetableEdit extends Component {
       <>
         <FullCalendar
           defaultView="timeGridWeek"
-          height="auto"
           events={events}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           dateClick={this.handleDateClick}

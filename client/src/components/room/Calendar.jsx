@@ -36,7 +36,8 @@ class Timetable extends Component {
       const start = new Date(timeslot)
       const end = new Date(timeslot)
       end.setMinutes(end.getMinutes() + duration)
-      return { title: `Votes ${votes[timeslot] ? votes[timeslot].length : 0}`, start, end, timeslot } 
+      const votecount = votes[timeslot] !== undefined ? votes[timeslot].length : 0;
+      return { title: `Votes ${votecount}`, start, end, timeslot } 
     })
 
     const map = [...new Set(events.map((e) => e.userid))].reduce((acc, id, i) => acc.set(id, colors[i]), new Map());
@@ -49,7 +50,6 @@ class Timetable extends Component {
         <FullCalendar
           defaultView="timeGridWeek"
           events={events}
-          header={false}
           height="auto"
           eventClick={this.handleEventClick}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

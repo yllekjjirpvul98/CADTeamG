@@ -1,23 +1,24 @@
 import React, { Component } from 'react';
+import io from 'socket.io-client';
+import { baseURL } from '../utils/axios';
 import { useHistory } from 'react-router-dom'
 import { connect } from 'react-redux';
-import io from 'socket.io-client';
 import { Grid, GridColumn } from 'semantic-ui-react';
+import { authenticate } from '../redux/actions/auth';
+import { getSession, getSessionEvents } from '../redux/actions/session';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
 import HostPanel from '../components/room/HostPanel';
 import ParticipantPanel from '../components/room/ParticipantPanel';
 import RoomInfo from '../components/room/RoomInfo';
 import Calendar from '../components/room/Calendar';
-import { authenticate } from '../redux/actions/auth';
-import { getSession, getSessionEvents } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
 
 class RoomComponent extends Component {
   constructor(props) {
     super(props);
-
-    const socket = io('http://localhost:8080');
+    
+    const socket = io(baseURL);
 
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data));
@@ -46,7 +47,8 @@ class RoomComponent extends Component {
       if (status === 400 || status === 404) return;
     }
     const { user, session } = this.props;
-    this.setState({ panel: user.id === session.hostId ? <HostPanel socket={socket} /> : <ParticipantPanel socket={socket} /> });
+    const panel = user.id === session.hostId ? <HostPanel socket={socket} /> : <ParticipantPanel socket={socket} />;
+    this.setState({ panel });
   }
 
   componentWillUnmount() {
@@ -55,21 +57,25 @@ class RoomComponent extends Component {
 
   render() {
     const { socket, panel } = this.state;
-    const { session, errors, loader, match } = this.props;
+    const { errors, loader, match } = this.props;
 
     return (
       <Layout protected error={errors.id} loader={loader.AUTH || loader.GET_SESSION}>
+
         <Grid columns={2} stackable>
+
           <Grid.Column width={6}>
-            <RoomInfo session={session} />
+            <RoomInfo />
             {panel}
             <Chat room={match.params.id} socket={socket} />
           </Grid.Column>
+
           <GridColumn width={10}>
-            <Calendar socket={socket} room={match.params.id} />
-            {session.timer}
+            <Calendar room={match.params.id} socket={socket} />
           </GridColumn>
+
         </Grid>
+
       </Layout>
     );
   }

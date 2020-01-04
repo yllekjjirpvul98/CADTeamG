@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import axios from '../../utils/axios';
+import { axios } from '../../utils/axios';
 import { toast } from 'react-toastify';
 import { SIGN_IN, SIGN_UP, AUTH, GET_ERRORS, SET_LOADER, CLEAR_USER, CLEAR_SESSION, CLEAR_EVENTS, CLEAR_LOADER, CLEAR_ERRORS } from '../types';
 import { validateSignIn, validateSignUp } from '../validation/user';

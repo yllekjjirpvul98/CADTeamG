@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
-import axios from '../../utils/axios';
+import { axios } from '../../utils/axios';
 import { JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER,
   GET_SESSION, CLEAR_ERRORS, CLEAR_SESSION, GET_SESSION_EVENTS } from '../types';
 import { validateJoinSession, validateHostSession } from '../validation/session';

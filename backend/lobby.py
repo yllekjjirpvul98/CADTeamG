@@ -11,7 +11,8 @@ import json
 import threading
 import datetime
 from time import gmtime, strftime
-import maya
+from utils import generateTimeslots
+from validation.lobby import validate_join_session, validate_host_session
 
 lobby = Blueprint('session', __name__)
 
@@ -37,8 +38,7 @@ def joinSession():
     
     code = data.get('code')
 
-    errors = {}
-    if(code is None): errors['code'] = 'Code is empty'
+    errors = validate_join_session(code)
 
     if len(errors.keys()) == 0:
         room = getSessionByCode(code)
@@ -46,12 +46,13 @@ def joinSession():
             return make_response(jsonify(id='Room does not exist'), 400)
         else:
             room = from_datastore(room[0])
+
             if request.id in room['participants']:
-                sio.emit('enter', room=str(room.get('id')))
-            else:
-                room['participants'].append(request.id)
-                update(room, 'session', room.get('id'))
-                sio.emit('enter', room=str(room.get('id')))
+                return make_response(jsonify(id='You have already joined this room'))
+
+            room['participants'].append(request.id)
+            update(room, 'session', room.get('id'))
+            sio.emit('enter', room=str(room.get('id')))
             
             return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
@@ -74,15 +75,7 @@ def hostSess():
     votingtime = data.get('votingtime')
     weekends = data.get('weekends')
 
-    # TODO Validation 
-    errors = {}
-    if(title is None): errors['title'] = 'Title is empty'
-    if(location is None): errors['location'] = 'Location is empty'
-    if(starttime is None): errors['starttime'] = 'Start time is empty'
-    if(endtime is None): errors['endtime'] = 'End time is empty'
-    if(duration is None): errors['duration'] = 'Duration is empty'
-    if(votingtime is None): errors['votingtime'] = 'Voting time is empty'
-    if(weekends is None): errors['weekends'] = 'Weekends is empty'
+    errors = validate_host_session(title, location, starttime, endtime, duration, votingtime, weekends)
 
     if len(errors.keys()) == 0:
         # TODO Sessions cannot generate the same code
@@ -136,7 +129,6 @@ def disconnect(sid):
     try:
         user = sio.get_session(sid)
         sio.emit('leave', sio.get_session(sid).get('username'), room=user.get('room'), skip_sid=sid)
-        print(user.get('username') + ' disconnects from room ' + user.get('room'))
     except TypeError:
         pass
     except KeyError:
@@ -148,21 +140,19 @@ def join(sid, room, username):
     sio.enter_room(sid, room)
     sio.save_session(sid, {'username': username, 'room': room})
     sio.emit('join', username, room=room, skip_sid=sid)
-    print(username + ' joins ' + room)
 
 @sio.on('message')
 def message(sid, msg):
     user = sio.get_session(sid)
     timestamp = strftime("%H:%M", gmtime())
     sio.emit('message', json.dumps({'message': msg, 'username': user.get('username'), 'time': timestamp }), room=user.get('room'))
-    print(user.get('username') + ' sends message "' + msg + '" to room ' + user.get('room'))
 
 @sio.on('start')
 def start(sid, roomid):    
     time = datetime.datetime.now()
     user = sio.get_session(sid)
     room = get(roomid, 'session')
-
+    
     if room is None:
         sio.emit('error', 'Room does not exist', room=sid)
         return
@@ -186,63 +176,6 @@ def start(sid, roomid):
     updated = update(room, 'session', user.get('room'))
     sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
 
-def generateTimeslots(room, events):
-    # ROOM [object] use @starttime (earliest), @endtime (latest), @weekends, @duration
-    # EVENTS [array] use @starttime, @endtime
-    timeslot_list = []
-    for event in events:
-        starttime = maya.parse(event['starttime']).datetime().timestamp()
-        endtime =  maya.parse(event['endtime']).datetime().timestamp()
-        timetuple = (starttime, endtime)
-        timeslot_list.append(timetuple)
-    # quick sort events by its starttime
-    sorted_timeslot = sortslots(timeslot_list)
-
-    starttime = maya.parse(room.get['starttime']).datetime().timestamp()
-    endtime =  maya.parse(room.get['endtime']).datetime().timestamp()
-    duration = maya.parse(room.get['duration']).datetime().timestamp()
-
-    avaliable_list = []
-    newtuple = sorted_timeslot[0]
-    for x in range(len(sorted_timeslot)-1):
-        if (newtuple[0] < sorted_timeslot[x+1][0]) and (newtuple[1] > sorted_timeslot[x+1][1]):
-            newtuple = newtuple
-        elif newtuple[1] > sorted_timeslot[x+1][0] :
-            newtuple = (newtuple[0], sorted_timeslot[x+1][1])
-        else:
-            a1 = (newtuple[1],sorted_timeslot[x+1][0])
-            print (a1)
-            if a1[0] < starttime:
-                a1 = (starttime, sorted_timeslot[x+1][0])
-            if a1[1] > endtime:
-                a1 = (newtuple[1],endtime)
-            if (a1[0] >= starttime) and (a1[1] <= endtime) and ((a1[1]-a1[0]) >= duration):
-                avaliable_list.append(a1)
-            newtuple = sorted_timeslot[x+1]
-
-    # which type of date is needed to be returned 
-    # return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
-    return avaliable_list
-
-def sortslots(timeslot_list):
-    less = []
-    equal = []
-    greater = []
-
-    if len(timeslot_list) > 1:
-        pivot = timeslot_list[0]
-        for x in timeslot_list:
-            if x[0] < pivot[0]:
-                less.append(x)
-            elif x[0] == pivot[0]:
-                equal.append(x)
-            elif x[0] > pivot[0]:
-                greater.append(x)
-        return (sortslots(less)+equal+sortslots(greater))  
-    else: 
-        return (timeslot_list)
-
-
 @sio.on('vote')
 def vote(sid, timeslot):
     user = sio.get_session(sid)
@@ -264,7 +197,7 @@ def vote(sid, timeslot):
         room['votes'][timeslot] = [username]
 
     updated = update(room, 'session', user.get('room'))
-    sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=sid)
+    sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=user.get('room'))
 
     # Calculate number of votes
     votes = 0

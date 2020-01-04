@@ -27,7 +27,7 @@ class EventUpdateForm extends React.Component {
   }
 
   async handleUpdate() {
-    const endtime = this.state.endtime ? new Date(`${this.props.event.end.toDateString()} ${this.state.endtime}`) : '';
+    const endtime = this.state.endtime ? new Date(`${new Date(this.props.event.extendedProps.endtime).toDateString()} ${this.state.endtime}`) : '';
     const event = { ...this.state, starttime: this.props.event.start, endtime };
     const { payload } = await this.props.updateEvent(event, this.props.event.id);
     const { id } = payload;
@@ -77,7 +77,7 @@ class EventUpdateForm extends React.Component {
           hideMobileKeyboard
           name="endtime"
           iconPosition="left"
-          placeholder={event.end.toUTCString()}
+          placeholder={new Date(event.extendedProps.endtime).toUTCString()}
           type="text"
           onChange={this.handleTimeChange}
           value={endtime}

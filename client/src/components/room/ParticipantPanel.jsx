@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Header, Button } from 'semantic-ui-react';
 
 export default function ParticipantPanel() {
   function handleLeave() {
@@ -8,6 +8,9 @@ export default function ParticipantPanel() {
 
   return (
     <>
+      <Header as="h3" textAlign="center" dividing>
+        Participant Panel
+      </Header>
       <Button
         onClick={handleLeave}
         fluid
