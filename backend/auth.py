@@ -7,6 +7,7 @@ from jose import jwt
 from functools import wraps
 import json
 import bcrypt
+from validation.user import validate_login
 
 auth = Blueprint('auth', __name__)
 
@@ -39,9 +40,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    errors = {}
-    if(username is None): errors['username'] = 'Username is empty'
-    if(password is None): errors['password'] = 'Password is empty'
+    errors = validate_login(username, password)
 
     if len(errors.keys()) == 0:
         user = getbyname('user', username)

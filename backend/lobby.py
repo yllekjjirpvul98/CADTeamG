@@ -11,11 +11,7 @@ import json
 import threading
 import datetime
 from time import gmtime, strftime
-<<<<<<< HEAD
 from utils import generateTimeslots
-=======
-import maya
->>>>>>> 9339739c94dc208ecb2668d6503dbf81f62d32b6
 
 lobby = Blueprint('session', __name__)
 
@@ -167,7 +163,7 @@ def start(sid, roomid):
     time = datetime.datetime.now()
     user = sio.get_session(sid)
     room = get(roomid, 'session')
-
+    
     if room is None:
         sio.emit('error', 'Room does not exist', room=sid)
         return
@@ -190,7 +186,6 @@ def start(sid, roomid):
     room['timeslots'] = timeslots
     updated = update(room, 'session', user.get('room'))
     sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
-
 
 @sio.on('vote')
 def vote(sid, timeslot):
