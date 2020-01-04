@@ -22,7 +22,7 @@ def generateList(timeslot_list):
     sorted_timeslot = sortslots(timeslot_list)
 
     starttime = 1
-    endtime = 10
+    endtime = 3
     duration = 1
 
     avaliable_list = []
@@ -49,9 +49,9 @@ def test2():
     return dt
 
 if __name__ == "__main__":
-    # list = [(4,5),(1,2),(8,9),(10,12)]
+    list = [(4,5)]
     # print(sortslots(list))
-    # print(generateList(list))
-    print (test2())
+    print(generateList(list))
+    # print (test2())
     
 
