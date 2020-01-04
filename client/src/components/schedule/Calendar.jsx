@@ -46,13 +46,14 @@ class TimetableEdit extends Component {
     const events = this.props.events.map((e) => ({ ...e, start: e.starttime, end: e.endtime }));
 
     return (
-      <>
+      <div>
         <FullCalendar
           defaultView="timeGridWeek"
           events={events}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           dateClick={this.handleDateClick}
           eventClick={this.handleEventClick}
+          height={600}
         />
         <Modal
           open={modalNew}
@@ -74,7 +75,7 @@ class TimetableEdit extends Component {
             <ErrorList data={errors} />
           </Modal.Content>
         </Modal>
-      </>
+      </div>
     );
   }
 }

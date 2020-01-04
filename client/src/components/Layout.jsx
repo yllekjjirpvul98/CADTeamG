@@ -46,8 +46,8 @@ class Layout extends Component {
 
     return (
       <div style={{ height: '100%' }}>
-        <Navbar />
-        <div style={{height: '100%', marginLeft: '10%', marginRight: '10%' }}>
+        <Navbar/>
+        <div style={{height: '90%', marginLeft: '10%', marginRight: '10%'}}>
           <Dimmer inverted active={loader}>
             <Loader inverted size="huge" inline="centered" />
           </Dimmer>
