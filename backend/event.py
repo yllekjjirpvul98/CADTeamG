@@ -5,6 +5,7 @@ from JSONObject.event import Event
 import json
 import uuid
 from auth import getUser, auth_required
+from validation.event import validate_post_event, validate_put_event
 
 event = Blueprint('event', __name__)
 
@@ -32,11 +33,7 @@ def postEvent():
     starttime = data.get('starttime') 
     endtime = data.get('endtime')   # TODO END CANNOT OCCUR BEFORE START
 
-    errors = {}
-    if(title is None): errors['title'] = 'Title is empty'
-    if(location is None): errors['location'] = 'Location is empty'
-    if(starttime is None): errors['starttime'] = 'Start time is empty'
-    if(endtime is None): errors['endtime'] = 'End time is empty'
+    errors = validate_post_event(title, location, starttime, endtime)
 
     if len(errors.keys()) == 0:
         event = Event(userid, username, title, location, starttime, endtime)
@@ -68,11 +65,7 @@ def putEvent(id):
     if(id is None): 
         return make_response(jsonify(id='Event id is empty'), 400)
 
-    errors = {}
-    if(title is None): errors['title'] = 'Title is empty'
-    if(location is None): errors['location'] = 'Location is empty'
-    if(starttime is None): errors['starttime'] = 'Start time is empty'
-    if(endtime is None): errors['endtime'] = 'End time is empty'
+    errors = validate_put_event(title, location, starttime, endtime)
 
     if len(errors.keys()) < 4: # User has to update minimum one property TODO find a better way to do this  
         event = get(id, 'event')
@@ -91,8 +84,6 @@ def putEvent(id):
 @event.route('/<id>', methods=['DELETE'])
 @auth_required
 def deleteEvent(id):
-    data = request.get_json()
-
     event = get(id, 'event')
    
     if event is not None:
