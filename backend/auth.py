@@ -59,9 +59,11 @@ def login():
 def register():
     data = request.get_json()
     username = data.get('username')
-    password = data.get('password').encode('UTF-8')
+    password = data.get('password')
 
     errors = validate_register(username, password)
+
+    password = password.encode('UTF-8')
 
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
