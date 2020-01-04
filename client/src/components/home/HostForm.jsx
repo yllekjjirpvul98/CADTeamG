@@ -73,7 +73,7 @@ class HostFormComponent extends React.Component {
           hideMobileKeyboard
           name="starttime"
           iconPosition="left"
-          placeholder="Enter start time"
+          placeholder="Enter earliest start time"
           popupPosition="bottom center"
           type="text"
           onChange={this.handleTimeChange}
@@ -88,7 +88,7 @@ class HostFormComponent extends React.Component {
           hideMobileKeyboard
           name="endtime"
           iconPosition="left"
-          placeholder="Enter end time"
+          placeholder="Enter lastest finish time"
           popupPosition="bottom center"
           type="text"
           onChange={this.handleTimeChange}
@@ -100,7 +100,9 @@ class HostFormComponent extends React.Component {
           name="duration"
           iconPosition="left"
           icon="hourglass outline"
-          placeholder="Enter duration"
+          placeholder="Enter meeting duration"
+          label={{ basic: true, content: 'mins'}}
+          labelPosition='right'
           type="number"
           fluid
           onChange={this.handleChange}
@@ -112,7 +114,9 @@ class HostFormComponent extends React.Component {
           name="votingtime"
           iconPosition="left"
           icon="hourglass outline"
-          placeholder="Enter voting time"
+          placeholder="Enter voting duration"
+          label={{ basic: true, content: 'secs'}}
+          labelPosition='right'
           type="number"
           fluid
           onChange={this.handleChange}
@@ -121,7 +125,7 @@ class HostFormComponent extends React.Component {
         />
         <br />
         <Checkbox
-          label="Weekends"
+          label="Include weekends"
           onChange={() => this.setState({ weekends: !weekends })}
           checked={weekends}
         />

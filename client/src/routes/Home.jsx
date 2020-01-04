@@ -51,7 +51,7 @@ class Home extends React.Component {
 
     return (
       <Layout protected loader={loader.AUTH}>
-        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ height: '75%' }}>
+        <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ height: '80%' }}>
           <Grid.Column>
             {currentState}
             {back}

@@ -53,7 +53,7 @@ class TimetableEdit extends Component {
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           dateClick={this.handleDateClick}
           eventClick={this.handleEventClick}
-          height={600}
+          height={625}
         />
         <Modal
           open={modalNew}
