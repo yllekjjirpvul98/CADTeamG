@@ -22,6 +22,7 @@ sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins
 @auth_required
 def getSession(id):
     room = get(id, 'session')
+    host = get(room.get('hostId'), 'user')
 
     if not request.id in room.get('participants'):
         return make_response(jsonify(code='You need to enter the code to access this room'), 400)
@@ -29,7 +30,7 @@ def getSession(id):
     return make_response(jsonify(id=id, code=room.get('code'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
             weekends=room.get('weekends'), timeslots=room.get('timeslots'), votes=room.get('votes'), 
-            votingend=room.get('votingend') or None, participants=room.get('participants')), 200)
+            votingend=room.get('votingend') or None, participants=room.get('participants'), hostUsername=host.get('username')), 200)
 
 @lobby.route('/join', methods=['POST'])
 @auth_required

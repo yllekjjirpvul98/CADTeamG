@@ -36,7 +36,7 @@ def generateTimeslots(room, events):
     #         newtuple = sorted_timeslot[x+1]
 
     # which type of date is needed to be returned 
-    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    return ['2019-12-29T06:50:00.000Z', '2019-12-30T11:00:00.000Z']
     # print(available_list)
     # return available_list
 
