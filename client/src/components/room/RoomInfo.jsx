@@ -9,7 +9,7 @@ class RoomInfo extends Component {
   }
 
   render() {
-    const { title, location, hostId, starttime, endtime, duration, votingtime, participants, weekends, timer } = this.props.session;
+    const { title, location, hostId, starttime, endtime, duration, votingtime, participants, weekends, timer, hostUsername } = this.props.session;
 
     return (
       <>
@@ -35,7 +35,7 @@ class RoomInfo extends Component {
           <List.Item>
             <List.Icon name="user secret" size="large" verticalAlign="middle" />
             <List.Content>
-              <List.Header>{hostId}</List.Header>
+              <List.Header>{hostUsername}</List.Header>
               <List.Description>Host</List.Description>
             </List.Content>
           </List.Item>
