@@ -23,7 +23,7 @@ class Layout extends Component {
     if (!this.state.token && this.props.protected) this.setState({ redirect: this.handleNotLoggedIn() })
 
   }
-  componentWillUpdate({ error }) {
+  UNSAFE_componentWillUpdate({ error }) {
     if (error) this.setState({redirect: this.handleNotFound(error) })
   }
 

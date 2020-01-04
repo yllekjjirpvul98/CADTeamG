@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
 import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, 
-  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, SET_VOTES, GET_ERRORS, ADD_VOTE, CLEAR_SESSION } from '../types';
+  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION } from '../types';
 
 // Message
 const ioMsg = (socket, message) => (dispatch) => {
@@ -52,6 +52,7 @@ const ioOnStart = (data) => (dispatch) => {
 
 // Vote
 const ioVote = (socket, timeslot) => (dispatch) => {
+  console.log(socket, timeslot)
   socket.emit('vote', timeslot);
 }
 

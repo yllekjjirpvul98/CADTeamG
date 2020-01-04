@@ -9,10 +9,8 @@ import { getSession, getSessionEvents } from '../redux/actions/session';
 import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
-import HostPanel from '../components/room/HostPanel';
-import ParticipantPanel from '../components/room/ParticipantPanel';
 import RoomInfo from '../components/room/RoomInfo';
-import Calendar from '../components/room/Calendar';
+import VoteList from '../components/room/VoteList';
 
 class RoomComponent extends Component {
   constructor(props) {
@@ -31,7 +29,6 @@ class RoomComponent extends Component {
 
     this.state = {
       socket,
-      panel: (<></>),
     };
   }
 
@@ -43,12 +40,9 @@ class RoomComponent extends Component {
 
     if (!this.props.session.id) {
       const { payload: { votingend, votes, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
-      if (votingend) this.props.ioOnStart({ votingend, timeslots, votes});
       if (status === 400 || status === 404) return;
+      if (votingend) this.props.ioOnStart({ votingend, timeslots, votes});
     }
-    const { user, session } = this.props;
-    const panel = user.id === session.hostId ? <HostPanel socket={socket} /> : <ParticipantPanel socket={socket} />;
-    this.setState({ panel });
   }
 
   componentWillUnmount() {
@@ -56,22 +50,20 @@ class RoomComponent extends Component {
   }
 
   render() {
-    const { socket, panel } = this.state;
-    const { errors, loader, match } = this.props;
+    const { socket } = this.state;
+    const { session, errors, loader, match } = this.props;
 
     return (
-      <Layout protected error={errors.id} loader={loader.AUTH || loader.GET_SESSION}>
+      <Layout protected error={errors.id || errors.connection} loader={loader.AUTH || loader.GET_SESSION}>
 
         <Grid columns={2} stackable>
 
           <Grid.Column width={6}>
-            <RoomInfo />
-            {panel}
-            <Chat room={match.params.id} socket={socket} />
+            <RoomInfo socket={socket}/>
           </Grid.Column>
 
           <GridColumn width={10}>
-            <Calendar room={match.params.id} socket={socket} />
+            {session.timer ? <VoteList room={match.params.id} socket={socket} /> : <Chat room={match.params.id} socket={socket} />}
           </GridColumn>
 
         </Grid>
