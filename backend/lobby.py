@@ -45,19 +45,22 @@ def joinSession():
         room = getSessionByCode(code)
         if len(room) == 0:
             return make_response(jsonify(id='Room does not exist'), 400)
-        else:
-            room = from_datastore(room[0])
+        
+        room = from_datastore(room[0])
 
-            if request.id in room['participants']:
-                return make_response(jsonify(id='You have already joined this room'))
+        if room.get('votingend') is not None:
+            return make_response(jsonify(id='Voting has already started in this room'))
 
-            room['participants'].append(request.id)
-            update(room, 'session', room.get('id'))
-            sio.emit('enter', room=str(room.get('id')))
-            
-            return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
-            duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
-            weekends=room.get('weekends'), participants=room.get('participants')), 200)
+        if request.id in room['participants']:
+            return make_response(jsonify(id='You have already joined this room'))
+
+        room['participants'].append(request.id)
+        update(room, 'session', room.get('id'))
+        sio.emit('enter', room=str(room.get('id')))
+        
+        return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
+        duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
+        weekends=room.get('weekends'), participants=room.get('participants')), 200)
     else: 
         return make_response(jsonify(errors=errors), 400)
 
@@ -202,23 +205,28 @@ def start(sid, roomid):
     updated = update(room, 'session', user.get('room'))
     sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': room['timeslots'] }), room=sio.get_session(sid)['room'])
 
+
 @sio.on('vote')
 def vote(sid, timeslot):
     user = sio.get_session(sid)
+    username = user.get('username')
+
+    if user is None:
+        return sio.emit('error', 'Refresh the page', room=sid)
+
     room = get(user.get('room'), 'session')
     
     # Add vote to database
     try:
-        for timeslot, id_list in room['timeslots'].items():
-            if request.id in id_list:
-                sio.emit('error', 'You have already voted', room=sid)
-                return
-        room['timeslots'][timeslot] = room['timeslots'][timeslot] + [request.id]
+        for key, id_list in room['timeslots'].items():
+            if username in id_list:
+                return sio.emit('error', 'You have already voted', room=sid)
+        room['timeslots'][timeslot] = room['timeslots'][timeslot] + [username]
     except KeyError:
-        room['timeslots'][timeslot] = [request.id]
+        room['timeslots'][timeslot] = [username]
 
     updated = update(room, 'session', user.get('room'))
-    sio.emit('vote', json.dumps({ 'id': request.id, 'timeslot': timeslot }), room=user.get('room'))
+    sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=user.get('room'))
 
     # Calculate number of votes
     votes = 0
