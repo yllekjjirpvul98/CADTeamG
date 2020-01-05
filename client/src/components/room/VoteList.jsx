@@ -50,7 +50,7 @@ class VoteList extends Component {
                     </Card.Header>
     
                     <Card.Description>
-                      Votes 0
+                      {session.timeslots[slot]}
                     </Card.Description>
     
                   </Card.Content>

@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
 import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, 
-  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION } from '../types';
+  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
 
 // Message
 const ioMsg = (socket, message) => (dispatch) => {
@@ -9,10 +9,12 @@ const ioMsg = (socket, message) => (dispatch) => {
   if (!message) return
 
   socket.emit('message', message);
+  dispatch({ type: SET_LOADER, payload: ADD_MESSAGE })
 };
 
 const ioOnMsg = (message) => (dispatch) => {
   dispatch({ type: ADD_MESSAGE, payload: JSON.parse(message) });
+  dispatch({ type: CLEAR_LOADER, payload: ADD_MESSAGE })
 };
 
 // Start
@@ -22,7 +24,6 @@ const ioStart = (socket, id) => (dispatch) => {
 };
 
 const ioOnStart = (data) => (dispatch) => {
-  
   let { votingend, timeslots } = data;
 
   if (!votingend) {
@@ -52,7 +53,6 @@ const ioOnStart = (data) => (dispatch) => {
 
 // Vote
 const ioVote = (socket, timeslot) => (dispatch) => {
-  console.log(socket, timeslot)
   socket.emit('vote', timeslot);
 }
 
@@ -93,10 +93,17 @@ const ioOnVote = (data) => (dispatch) => {
   toast(`${username} has just voted ${timeslot}`)
 }
 
+const ioOnLeaveLobby = (data) => (dispatch) => {
+  const { username, id } = JSON.parse(data);
+
+  dispatch({ type: LEAVE_SESSION, payload: { id } });
+  toast.error(`${username} has left the lobby`, { className: 'ui error message'});
+}
+
 const ioOnError = (data) => (dispatch) => {
   toast.error(data, { className: 'ui error message' })
   dispatch({ type: GET_ERRORS, payload: { data: { socket: data } } });
   dispatch({ type: CLEAR_LOADER, payload: START_SESSION });
 }
 
-export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter };
+export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter, ioOnLeaveLobby };
