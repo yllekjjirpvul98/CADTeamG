@@ -1,7 +1,7 @@
 import socketio
 from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
-from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId, update_entity
+from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId
 from JSONObject.user import User
 from jose import jwt
 from functools import wraps

@@ -1,22 +1,13 @@
-runtime: python27
-api_version: 1
-threadsafe: true
+# [START runtime]
+runtime: nodejs
+env: flex
+# [END runtime]
 
+# [START handlers]
 handlers:
-- url: /
-  static_files: build/index.html
-  upload: build/index.html
-
-- url: /(.*)
-  static_files: build/\1
-  upload: build/(.*)
-
-- url: /.*
-  secure: always
-  redirect_http_response_code: 301
-  static_files: build/index.html
-  upload: build/index.html
-  http_headers:
-    Access-Control-Allow-Origin: https://cadcw2-teamg.appspot.com
-    Strict-Transport-Security: max-age=31536000; includeSubDomains
-    X-Frame-Options: DENY
+  - url: /
+    static_files: build/index.html
+    upload: build/index.html
+  - url: /
+    static_dir: build
+  # [END handlers]
