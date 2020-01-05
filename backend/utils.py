@@ -41,9 +41,10 @@ def generateTimeslots(room, events):
     print ("start to sort")
     avaliable_list = []
     newtuple = sorted_timeslot[0]
-    if len(sorted_timeslot) == 0 :
+    if len(sorted_timeslot) == 0:
         a1 = (starttime, endtime)
         avaliable_list.append(a1)
+        print(avaliable_list)
     elif len(sorted_timeslot) == 1:
         if(starttime != newtuple[0]):
             a1 = (starttime, newtuple[0])
@@ -80,18 +81,19 @@ def generateTimeslots(room, events):
         p = left
         while ( p + d <= right):
             p_list.append(p)
-            p = p + d            
+            p = p + d
+    print ("slide", p_list)
 
     # remove weekend if weekend flag = true
-        print ("start to check weekend")
-        for p in p_list:
-            if not room.get('weekend'):
-                if datetime.datetime.fromtimestamp(p).weekday() > 5:
-                    p_list.remove(p) 
+    print ("start to check weekend")
+    for p in p_list:
+        if not room.get('weekend'):
+            if datetime.datetime.fromtimestamp(p).weekday() > 5:
+                p_list.remove(p)
 
-        print (p_list)
-        p_list = map(lambda x: from_timestamp_to_string(x), p_list)
-        print (p_list)
+    print (p_list)
+    p_list = map(lambda x: from_timestamp_to_string(x), p_list)
+    print (p_list)
     # which type of date is needed to be returned 
     return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
     # return list(p_list)
