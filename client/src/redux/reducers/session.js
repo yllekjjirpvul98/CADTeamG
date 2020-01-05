@@ -1,11 +1,10 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
 import { toast } from 'react-toastify';
 
 const initialState = {
   messages: [],
-  timeslots: [],
   participants: [],
-  votes: {},
+  timeslots: {},
   code: '',
   endtime: '',
   location: '',
@@ -65,18 +64,14 @@ export default function (state = initialState, action) {
 
       return { ...state, timeslots: payload };
     }
-    case SET_VOTES: {
-      const { payload } = action;
-
-      return { ...state, votes: payload };
-    }
     case ADD_VOTE: {
       const { payload: { timeslot, username } } = action;
-      const votes = state.votes
-      if (votes[timeslot]) votes[timeslot].push(username)
-      else votes[timeslot] = [username]
 
-      return { ...state, votes }
+      const timeslots = state.timeslots
+      if (timeslots[timeslot]) timeslots[timeslot].push(username)
+      else timeslots[timeslot] = [username]
+
+      return { ...state, timeslots }
     }
     case LEAVE_SESSION: {
       const { id } = action.payload

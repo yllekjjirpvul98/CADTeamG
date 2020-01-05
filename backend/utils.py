@@ -93,8 +93,8 @@ def generateTimeslots(room, events):
         p_list = map(lambda x: from_timestamp_to_string(x), p_list)
         print (p_list)
     # which type of date is needed to be returned 
-    # return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
-    return list(p_list)
+    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    # return list(p_list)
 
 def from_timestamp_to_string(p):
     return datetime.datetime.fromtimestamp(p).isoformat()

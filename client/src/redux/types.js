@@ -28,6 +28,5 @@ export const CLEAR_LOADER = 'CLEAR_LOADER';
 export const ADD_VOTE = 'ADD_VOTE';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const SET_TIMESLOTS = 'SET_TIMESLOTS';
-export const SET_VOTES = 'SET_VOTES';
 export const SET_TIMER = 'SET_TIMER';
 export const DECREMENT_TIMER = 'DECREMENT_TIMER';

@@ -24,7 +24,6 @@ const ioStart = (socket, id) => (dispatch) => {
 };
 
 const ioOnStart = (data) => (dispatch) => {
-  
   let { votingend, timeslots } = data;
 
   if (!votingend) {
@@ -54,7 +53,6 @@ const ioOnStart = (data) => (dispatch) => {
 
 // Vote
 const ioVote = (socket, timeslot) => (dispatch) => {
-  console.log(socket, timeslot)
   socket.emit('vote', timeslot);
 }
 

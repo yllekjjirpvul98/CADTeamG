@@ -40,9 +40,9 @@ class RoomComponent extends Component {
     socket.emit('join', this.props.match.params.id, this.props.user.username);
 
     if (!this.props.session.id) {
-      const { payload: { votingend, votes, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
+      const { payload: { votingend, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
       if (status === 400 || status === 404) return;
-      if (votingend) this.props.ioOnStart({ votingend, timeslots, votes});
+      if (votingend) this.props.ioOnStart({ votingend, timeslots });
     }
   }
 
