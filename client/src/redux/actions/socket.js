@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
-import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, 
+import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, SET_WINNER,
   CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
 
 // Message
@@ -32,24 +32,26 @@ const ioOnStart = (data) => (dispatch) => {
     timeslots = data.timeslots;
   } else {
     votingend = new Date(votingend);
-    votingend.setHours(votingend.getHours() - 1);
+    votingend.setHours(votingend.getHours());
   }
-
-  dispatch({ type: SET_TIMESLOTS, payload: timeslots });
-  dispatch({ type: CLEAR_LOADER })
 
   const now = new Date();
 
   if (votingend < now) return;
 
-  const seconds = Math.ceil(Math.abs((now.getTime() - votingend.getTime()) / 1000));
+  dispatch({ type: SET_TIMESLOTS, payload: timeslots });
+  dispatch({ type: CLEAR_LOADER })
 
+  const seconds = Math.ceil(Math.abs((now.getTime() - votingend.getTime()) / 1000));
+  
   toast(`Voting has started, you have ${seconds} seconds to vote`)
 
   dispatch({ type: SET_TIMER, payload: seconds });
 
   const timer = setInterval(() => dispatch({ type: DECREMENT_TIMER, payload: timer }), 1000);
 };
+
+
 
 // Vote
 const ioVote = (socket, timeslot) => (dispatch) => {
@@ -63,7 +65,7 @@ const ioOnEnter = (props) => (dispatch) => {
 }
 
 // Join
-const ioOnJoin = (username, props) => (dispatch) => {
+const ioOnJoin = (username,) => (dispatch) => {
   toast(`${username} has joined the room`)
 };
 
@@ -106,4 +108,10 @@ const ioOnError = (data) => (dispatch) => {
   dispatch({ type: CLEAR_LOADER, payload: START_SESSION });
 }
 
-export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter, ioOnLeaveLobby };
+const ioOnResult = (winner) => (dispatch) => {
+  toast.success(`${winner} has won`, { className: 'ui success message' })
+  dispatch({ type: SET_WINNER, payload: { winner }})
+}
+
+export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnResult,
+  ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter, ioOnLeaveLobby };

@@ -30,3 +30,4 @@ export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const SET_TIMESLOTS = 'SET_TIMESLOTS';
 export const SET_TIMER = 'SET_TIMER';
 export const DECREMENT_TIMER = 'DECREMENT_TIMER';
+export const SET_WINNER = 'SET_WINNER';
