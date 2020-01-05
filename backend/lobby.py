@@ -87,7 +87,7 @@ def hostSess():
         room = getSessionByCode(room.code) ## TODO Find a better way to extract session id than fetching it from db
         room = from_datastore(room[0])
         return make_response(jsonify(id=room.get('id'), code=room.get('code'), hostId=hostId, title=title, location=location, starttime=starttime,
-                endtime=endtime, duration=duration, votingtime=votingtime, weekends=weekends, participants=room.get('participants')), 200)
+                endtime=endtime, hostUsername=room.get('hostUsername'), duration=duration, votingtime=votingtime, weekends=weekends, participants=room.get('participants')), 200)
     else:
         return make_response(jsonify(errors=errors), 400)
 

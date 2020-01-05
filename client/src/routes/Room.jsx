@@ -65,7 +65,6 @@ class RoomComponent extends Component {
 
           <GridColumn width={10}>
             {session.timer ? <VoteList room={match.params.id} socket={socket} /> : <Chat room={match.params.id} socket={socket} />}
-            <VoteList room={match.params.id} socket={socket} /> 
           </GridColumn>
 
         </Grid>
