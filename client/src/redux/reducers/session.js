@@ -1,4 +1,4 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_WINNER, SET_TIMESLOTS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
 import { toast } from 'react-toastify';
 
 const initialState = {
@@ -16,6 +16,7 @@ const initialState = {
   hostId: 0,
   id: 0,
   weekends: false,
+  winner: '',
 };
 
 export default function (state = initialState, action) {
@@ -77,6 +78,11 @@ export default function (state = initialState, action) {
       const { id } = action.payload
       
       return { ...state, participants: state.participants.filter(e => e !== id) }
+    }
+    case SET_WINNER: {
+      const { winner } = action.payload;
+
+      return { ...state, winner, timer: 0 }
     }
     default:
       return state;

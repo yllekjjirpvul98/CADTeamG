@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Grid, GridColumn } from 'semantic-ui-react';
 import { authenticate } from '../redux/actions/auth';
 import { getSession, getSessionEvents } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby } from '../redux/actions/socket';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby, ioOnResult } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
 import RoomInfo from '../components/room/RoomInfo';
@@ -25,6 +25,7 @@ class RoomComponent extends Component {
     socket.on('start', (data) => this.props.ioOnStart(data));
     socket.on('vote', (data) => this.props.ioOnVote(data));
     socket.on('error', (data) => this.props.ioOnError(data));
+    socket.on('result', (data) => this.props.ioOnResult(data));
     socket.on('close', () => this.props.ioOnClose(props));
     socket.on('enter', () => this.props.ioOnEnter(props));
 
@@ -37,12 +38,12 @@ class RoomComponent extends Component {
     const { socket } = this.state;
 
     if (!this.props.user.id) await this.props.authenticate();
-    socket.emit('join', this.props.match.params.id, this.props.user.username);
+    socket.emit('join', this.props.match.params.id, this.props.user.username, this.props.user.id);
 
     if (!this.props.session.id) {
       const { payload: { votingend, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
       if (status === 400 || status === 404) return;
-      if (votingend) this.props.ioOnStart({ votingend, timeslots });
+      if (votingend && timeslots) this.props.ioOnStart({ votingend, timeslots });
     }
   }
 
@@ -59,12 +60,12 @@ class RoomComponent extends Component {
 
         <Grid columns={2} stackable>
 
-          <Grid.Column width={6}>
+          <Grid.Column width={4}>
             <RoomInfo socket={socket}/>
           </Grid.Column>
 
-          <GridColumn width={10}>
-            {session.timer ? <VoteList room={match.params.id} socket={socket} /> : <Chat room={match.params.id} socket={socket} />}
+          <GridColumn width={12}>
+            {session.timer || session.winner ? <VoteList room={match.params.id} socket={socket} /> : <Chat room={match.params.id} socket={socket} />}
           </GridColumn>
 
         </Grid>
@@ -90,5 +91,6 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {
-  authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby
+  authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioOnResult,
+  ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby
 })(Room);
