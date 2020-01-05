@@ -193,16 +193,14 @@ def start(sid, roomid):
                 event_list.append(event)
 
     timeslots = generateTimeslots(room, event_list)
-    print("TIMESLOTS HERE")
     print(timeslots)
 
     room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
     for timeslot in timeslots:
         room['timeslots'][timeslot] = []
 
-    print(room)
     updated = update(room, 'session', user.get('room'))
-    sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
+    sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': room['timeslots'] }), room=sio.get_session(sid)['room'])
 
 @sio.on('vote')
 def vote(sid, timeslot):

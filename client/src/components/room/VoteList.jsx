@@ -22,14 +22,13 @@ class VoteList extends Component {
   render() {
     const { session } = this.props;
 
-    const dates = session.timeslots.reduce((acc, e) => acc.set(days[new Date(e).getDay()], [...(days[acc.get(new Date(e).getDay())] || []), e]), new Map());
+    const dates = Object.keys(session.timeslots).reduce((acc, e) => acc.set(days[new Date(e).getDay()], [...(days[acc.get(new Date(e).getDay())] || []), e]), new Map());
 
     return (    
-      <Grid columns={dates.size} stackable>
+      <Grid columns={dates.size || 7} stackable>
         {[...dates.entries()].map((e) => {
 
-          const day = e[0];
-          const slots = e[1];
+          const [day, slots] = e;
 
           return (
 
@@ -40,6 +39,8 @@ class VoteList extends Component {
             </Header>
 
             {slots.map((slot) => {
+              
+              const numberOfVotes = session.timeslots[slot].length;
 
               return (
                 <Card key={slot} fluid centered>
@@ -50,7 +51,7 @@ class VoteList extends Component {
                     </Card.Header>
     
                     <Card.Description>
-                      {session.timeslots[slot]}
+                      {numberOfVotes}
                     </Card.Description>
     
                   </Card.Content>
