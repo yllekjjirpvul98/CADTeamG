@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Grid, Header, Card, Button } from 'semantic-ui-react';
+import { Grid, Header, Card } from 'semantic-ui-react';
 import { ioVote } from '../../redux/actions/socket';
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -14,15 +14,16 @@ class VoteList extends Component {
 
   handleClick(timeslot) {
 
-    this.props.ioVote(this.props.socket, timeslot.target.value)
+    this.props.ioVote(this.props.socket, timeslot)
 
   }
 
 
   render() {
-    const { session } = this.props;
+    const { user, session } = this.props;
 
-    const dates = Object.keys(session.timeslots).reduce((acc, e) => acc.set(days[new Date(e).getDay()], [...(days[acc.get(new Date(e).getDay())] || []), e]), new Map());
+    const dates = session.winner ? new Map([[days[new Date(session.winner).getDay()], [session.winner]]]) : Object.keys(session.timeslots).reduce((acc, e) => acc.set(days[new Date(e).getDay()], (acc.get(days[new Date(e).getDay()]) || []).concat(e) ), new Map());
+
 
     return (    
       <Grid columns={dates.size || 7} stackable>
@@ -41,30 +42,22 @@ class VoteList extends Component {
             {slots.map((slot) => {
               
               const numberOfVotes = session.timeslots[slot].length;
+              const voted = session.timeslots[slot].includes(user.username)
+              const winner = slot === session.winner;
+              const color = winner ? "green" : voted ? "blue" : null;
 
               return (
-                <Card key={slot} fluid centered>
+                <Card color={color} key={slot} id={slot} fluid centered onClick={() => this.handleClick(slot)}>
                   <Card.Content>
     
-                    <Card.Header>
-                      {new Date(e[1]).toUTCString()}
-                    </Card.Header>
-    
-                    <Card.Description>
-                      {numberOfVotes}
+                    <Card.Meta textAlign="center">
+                      {new Date(slot).toLocaleString("en-GB")}  
+                    </Card.Meta>
+
+                    <Card.Description textAlign="center">
+                      {winner ? "Winner" : `Votes ${numberOfVotes}`}
                     </Card.Description>
-    
-                  </Card.Content>
-    
-                  <Card.Content extra>
-                    <Button
-                      primary
-                      onClick={this.handleClick}
-                      fluid
-                      value={slot}
-                    >
-                      Vote
-                    </Button>
+
                   </Card.Content>
     
                 </Card>
@@ -81,8 +74,8 @@ class VoteList extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { session } = state;
-  return { session };
+  const { user, session } = state;
+  return { user, session };
 };
 
 export default connect(mapStateToProps, { ioVote })(VoteList);

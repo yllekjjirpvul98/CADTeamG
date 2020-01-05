@@ -12,7 +12,7 @@ class RoomInfo extends Component {
 
   render() {
     const { user, session } = this.props;
-    const { title, location, starttime, endtime, duration, votingtime, participants, weekends, timer, hostUsername, code } = this.props.session;
+    const { title, location, starttime, endtime, duration, votingtime, participants, weekends, timer, hostUsername, code, winner } = this.props.session;
 
     return (
       <>
@@ -45,14 +45,14 @@ class RoomInfo extends Component {
           <List.Item>
             <List.Icon name="hourglass start" size="large" verticalAlign="middle" />
             <List.Content>
-              <List.Header>{new Date(starttime).toUTCString()}</List.Header>
+              <List.Header>{new Date(starttime).toLocaleString("en-GB")}</List.Header>
               <List.Description>Start</List.Description>
             </List.Content>
           </List.Item>
           <List.Item>
             <List.Icon name="hourglass end" size="large" verticalAlign="middle" />
             <List.Content>
-              <List.Header>{new Date(endtime).toUTCString()}</List.Header>
+              <List.Header>{new Date(endtime).toLocaleString("en-GB")}</List.Header>
               <List.Description>End</List.Description>
             </List.Content>
           </List.Item>
@@ -66,7 +66,7 @@ class RoomInfo extends Component {
           <List.Item>
             <List.Icon className={timer ? "red" : ""} name="time" size="large" verticalAlign="middle" />
             <List.Content>
-              <List.Header>{timer || votingtime}s</List.Header>
+              <List.Header>{winner ? 0 : timer || votingtime}s</List.Header>
               <List.Description>Time to vote</List.Description>
             </List.Content>
           </List.Item>
