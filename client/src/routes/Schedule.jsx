@@ -18,7 +18,7 @@ class Schedule extends Component {
     const { loader } = this.props;
 
     return (
-      <Layout protected loader={loader.GET_EVENTS}>
+      <Layout protected loader={loader.GET_EVENTS} >
         <Calendar />
       </Layout>
     );

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Header, List } from 'semantic-ui-react';
+import HostPanel from './HostPanel';
+import ParticipantPanel from './ParticipantPanel';
 
 class RoomInfo extends Component {
   constructor(props) {
@@ -9,7 +11,8 @@ class RoomInfo extends Component {
   }
 
   render() {
-    const { title, location, hostId, starttime, endtime, duration, votingtime, participants, weekends, timer, hostUsername } = this.props.session;
+    const { user, session } = this.props;
+    const { title, location, starttime, endtime, duration, votingtime, participants, weekends, timer, hostUsername, code } = this.props.session;
 
     return (
       <>
@@ -81,15 +84,25 @@ class RoomInfo extends Component {
               <List.Description>Incude weekends</List.Description>
             </List.Content>
           </List.Item>
+          <List.Item>
+            <List.Icon name="hashtag" size="large" verticalAlign="middle" />
+            <List.Content>
+              <List.Header>{code}</List.Header>
+              <List.Description>Code</List.Description>
+            </List.Content>
+          </List.Item>
         </List>
+
+        {user.id === session.hostId ? <HostPanel socket={this.props.socket} /> : <ParticipantPanel socket={this.props.socket} />}
+
       </>
     );
   }
 }
 
 const mapStateToProps = (state) => {
-  const { session } = state;
-  return { session };
+  const { user, session } = state;
+  return { user, session };
 };
 
 export default connect(mapStateToProps)(RoomInfo);

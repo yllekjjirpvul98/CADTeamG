@@ -62,7 +62,7 @@ function Navbar(props) {
   );
 
   return (
-    <Menu icon="labeled" className="navbar">
+    <Menu icon="labeled" className="navbar" style={{margin: '0px'}}>
       <div style={{margin: "auto 1rem"}}>
         <NavLink to="/home">
           <Header as="h1" content="Rendezvous" color="blue" />

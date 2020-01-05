@@ -577,7 +577,7 @@ TODO: more distinction between this file and common.css
 }
 
 .fc-unthemed td.fc-today {
-  background: #fcf8e3;
+  background: rgba(32, 123, 192, 0.096);;
 }
 
 .fc-unthemed .fc-disabled-day {
@@ -714,38 +714,38 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 /* "primary" coloring */
 .fc-button-primary {
   color: #fff;
-  background-color: #2C3E50;
-  border-color: #2C3E50;
+  background-color: #2185D0;
+  border-color: #2185D0;
 }
 
 .fc-button-primary:hover {
   color: #fff;
-  background-color: #1e2b37;
-  border-color: #1a252f;
+  background-color: rgb(32, 123, 192);
+  border-color: rgb(32, 123, 192);
 }
 
 .fc-button-primary:focus {
-  -webkit-box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
-  box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+  -webkit-box-shadow: 0 0 0 0rem rgb(32, 123, 192);  
+  box-shadow: 0 0 0 0rem rgb(32, 123, 192);
 }
-
+  
 .fc-button-primary:disabled {
   color: #fff;
-  background-color: #2C3E50;
-  border-color: #2C3E50;
+  background-color: rgba(33, 132, 208, 0.6);
+  border-color: rgba(33, 132, 208, 0.6);
 }
 
 .fc-button-primary:not(:disabled):active,
 .fc-button-primary:not(:disabled).fc-button-active {
   color: #fff;
-  background-color: #1a252f;
-  border-color: #151e27;
+  background-color: rgb(32, 123, 192);
+  border-color: rgb(32, 123, 192);
 }
 
 .fc-button-primary:not(:disabled):active:focus,
 .fc-button-primary:not(:disabled).fc-button-active:focus {
-  -webkit-box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
-  box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+  -webkit-box-shadow: 0 0 0 0.2rem rgb(32, 123, 192);
+  box-shadow: 0 0 0 0.2rem rgb(32, 123, 192);
 }
 
 /* icons within buttons */

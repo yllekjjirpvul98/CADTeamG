@@ -23,7 +23,7 @@ class Layout extends Component {
     if (!this.state.token && this.props.protected) this.setState({ redirect: this.handleNotLoggedIn() })
 
   }
-  componentWillUpdate({ error }) {
+  UNSAFE_componentWillUpdate({ error }) {
     if (error) this.setState({redirect: this.handleNotFound(error) })
   }
 
@@ -46,8 +46,8 @@ class Layout extends Component {
 
     return (
       <div style={{ height: '100%' }}>
-        <Navbar />
-        <div style={{height: '100%', marginLeft: '10%', marginRight: '10%' }}>
+        <Navbar/>
+        <div style={{height: '90%', marginLeft: '10%', marginRight: '10%'}}>
           <Dimmer inverted active={loader}>
             <Loader inverted size="huge" inline="centered" />
           </Dimmer>

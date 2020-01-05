@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify';
 import { axios } from '../../utils/axios';
 import { JOIN_SESSION, HOST_SESSION, GET_ERRORS, SET_LOADER, CLEAR_LOADER,
-  GET_SESSION, CLEAR_ERRORS, CLEAR_SESSION, GET_SESSION_EVENTS } from '../types';
+  GET_SESSION, CLEAR_ERRORS, CLEAR_SESSION, GET_SESSION_EVENTS, LEAVE_SESSION } from '../types';
 import { validateJoinSession, validateHostSession } from '../validation/session';
 
 const joinSession = (data) => (dispatch) => {
@@ -64,6 +64,15 @@ const closeSession = (id) => (dispatch) => {
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: CLEAR_SESSION }));
 };
 
+const leaveSession = (id, userid) => (dispatch) => {
+  dispatch({ type: SET_LOADER, payload: LEAVE_SESSION });
+  return axios.put(`/session/${id}`, { userid })
+              .then((res) => dispatch({ type: LEAVE_SESSION, payload: res.data }))
+              .then(dispatch({ type: CLEAR_ERRORS }))
+              .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))
+              .finally(() => dispatch({ type: CLEAR_LOADER, payload: LEAVE_SESSION }));
+}
+
 const parseDate = (data) => {
 
   data = data.split(' ');
@@ -79,4 +88,4 @@ const parseDate = (data) => {
   
 }
 
-export { joinSession, hostSession, getSession, getSessionEvents, closeSession };
+export { joinSession, hostSession, getSession, getSessionEvents, closeSession, leaveSession };
