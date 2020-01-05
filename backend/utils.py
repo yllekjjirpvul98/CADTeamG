@@ -24,28 +24,39 @@ def generateTimeslots(room, events):
     # EVENTS [array] use @starttime, @endtime
     #TODO: Weekend/EVENTS=OCCURANCE?
     timeslot_list = []
-    for event in events:
-        starttime = maya.parse(event['starttime']).datetime().timestamp()
-        endtime =  maya.parse(event['endtime']).datetime().timestamp()
-        timetuple = (starttime, endtime)
-        timeslot_list.append(timetuple)
-    # quick sort events by its starttime
-    sorted_timeslot = sortslots(timeslot_list)
-    print (timeslot_list)
-
     starttime = maya.parse(room.get('starttime')).datetime().timestamp()
-    endtime =  maya.parse(room.get('endtime')).datetime().timestamp()
+    endtime = maya.parse(room.get('endtime')).datetime().timestamp()
+
+    for event in events:
+        event_starttime = maya.parse(event['starttime']).datetime().timestamp()
+        event_endtime = maya.parse(event['endtime']).datetime().timestamp()
+
+        timetuple = (event_starttime, event_endtime)
+        if (timetuple[0] < endtime) and (timetuple[1] > starttime):
+            if timetuple[0] < starttime:
+                timetuple = (starttime, timetuple[1])
+            if timetuple[1] > endtime:
+                timetuple = (timetuple[0], endtime)
+            timeslot_list.append(timetuple)
+
+
+    # quick sort events by its starttime
+    if len(timeslot_list) == 0:
+        sorted_timeslot = []
+    else:
+        sorted_timeslot = sortslots(timeslot_list)
+
     duration =room.get('duration') * 60
     print (starttime, endtime, duration)
 
     print ("start to sort")
     avaliable_list = []
-    newtuple = sorted_timeslot[0]
     if len(sorted_timeslot) == 0:
         a1 = (starttime, endtime)
         avaliable_list.append(a1)
         print(avaliable_list)
     elif len(sorted_timeslot) == 1:
+        newtuple = sorted_timeslot[0]
         if(starttime != newtuple[0]):
             a1 = (starttime, newtuple[0])
             avaliable_list.append(a1)
@@ -54,6 +65,7 @@ def generateTimeslots(room, events):
             a2 = (newtuple[1], endtime)
             avaliable_list.append(a2)
     else:
+        newtuple = sorted_timeslot[0]
         for x in range(len(sorted_timeslot)-1):
             if (newtuple[0] < sorted_timeslot[x+1][0]) and (newtuple[1] > sorted_timeslot[x+1][1]):
                 newtuple = newtuple
@@ -61,12 +73,8 @@ def generateTimeslots(room, events):
                 newtuple = (newtuple[0], sorted_timeslot[x+1][1])
             else:
                 a1 = (newtuple[1],sorted_timeslot[x+1][0])
-                print (a1)
-                if a1[0] < starttime:
-                    a1 = (starttime, sorted_timeslot[x+1][0])
-                if a1[1] > endtime:
-                    a1 = (newtuple[1],endtime)
-                if (a1[0] >= starttime) and (a1[1] <= endtime) and ((a1[1]-a1[0]) >= duration):
+                print(a1)
+                if (a1[1]-a1[0]) >= duration:
                     avaliable_list.append(a1)
                 newtuple = sorted_timeslot[x+1]
     
@@ -86,17 +94,17 @@ def generateTimeslots(room, events):
 
     # remove weekend if weekend flag = true
     print ("start to check weekend")
-    for p in p_list:
-        if not room.get('weekend'):
-            if datetime.datetime.fromtimestamp(p).weekday() > 5:
-                p_list.remove(p)
+    print(room.get('weekends'))
+    if not room.get('weekends'):
+        p_list = [x for x in p_list if not datetime.datetime.fromtimestamp(x).weekday() >= 5]
 
     print (p_list)
     p_list = map(lambda x: from_timestamp_to_string(x), p_list)
     print (p_list)
     # which type of date is needed to be returned 
-    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
-    # return list(p_list)
+    # return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    print(list(p_list))
+    return list(p_list)
 
 def from_timestamp_to_string(p):
     return datetime.datetime.fromtimestamp(p).isoformat()

@@ -47,11 +47,13 @@ def generateList(timeslot_list):
 def test2():
     dt = maya.parse('2019-12-29T23:50:00.000Z').datetime().timestamp()
     return dt
+import datetime
+def test():
+    weekend = 1578739800.0
+    print(datetime.datetime.fromtimestamp(weekend).weekday())
 
 if __name__ == "__main__":
-    list = [(4,5)]
-    # print(sortslots(list))
-    print(generateList(list))
+    test()
     # print (test2())
     
 
