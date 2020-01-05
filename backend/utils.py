@@ -86,10 +86,9 @@ def generateTimeslots(room, events):
 
     # remove weekend if weekend flag = true
     print ("start to check weekend")
-    for p in p_list:
-        if not room.get('weekend'):
-            if datetime.datetime.fromtimestamp(p).weekday() > 5:
-                p_list.remove(p)
+    print(room.get('weekends'))
+    if not room.get('weekends'):
+        p_list = [x for x in p_list if not datetime.datetime.fromtimestamp(x).weekday() >= 5]
 
     print (p_list)
     p_list = map(lambda x: from_timestamp_to_string(x), p_list)
