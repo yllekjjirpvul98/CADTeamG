@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Segment, Form, Button, Message } from 'semantic-ui-react';
+import { Comment, Header, Form, Button } from 'semantic-ui-react';
 import { ioMsg } from '../../redux/actions/socket';
 
 class Chat extends Component {
@@ -19,6 +19,7 @@ class Chat extends Component {
 
   handleSubmit() {
     this.props.ioMsg(this.props.socket, this.state.message);
+    this.setState({ message: ''})
   }
 
   render() {
@@ -26,8 +27,24 @@ class Chat extends Component {
     const { messages } = this.props;
 
     return (
-      <Segment secondary style={{ overflow: 'auto', maxHeight: '10em' }}>
-        <Form>
+      <Comment.Group>
+
+        <Header as="h3" textAlign="center" dividing>
+          Chat
+        </Header>
+
+        {messages.map((e, i) => (
+          <Comment key={i}>
+            <Comment.Avatar src='https://react.semantic-ui.com/images/avatar/small/matt.jpg' />
+            <Comment.Content>
+              <Comment.Author as="span">{e.username}</Comment.Author>
+              <Comment.Metadata>{e.time}</Comment.Metadata>
+              <Comment.Text>{e.message}</Comment.Text>
+            </Comment.Content>
+          </Comment>
+        ))}
+
+        <Form reply>
           <Form.Input
             name="message"
             icon="envelope"
@@ -38,16 +55,16 @@ class Chat extends Component {
             onChange={this.handleChange}
             value={message}
           />
-          <br />
           <Button
+            primary
             onClick={this.handleSubmit}
             fluid
           >
             Send
           </Button>
-            {messages.map((msg) => <Message key={msg}>{msg.username}: {msg.message}</Message>)}
         </Form>
-      </Segment>
+
+      </Comment.Group>
     );
   }
 }

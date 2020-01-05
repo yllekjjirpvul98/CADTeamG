@@ -15,8 +15,8 @@ class Session(object):
         self.votingtime = int(votingtime)
         self.weekends = weekends
         self.code = str(uuid.uuid4())[:8].upper()
-        self.votes = []
-        self.timeslots = []
+        self.votingend = None
+        self.timeslots = {}
                     
             
                     

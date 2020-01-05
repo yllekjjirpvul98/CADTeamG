@@ -1,7 +1,7 @@
 import socketio
 from flask import Flask, Blueprint, request, make_response, jsonify
 from google.cloud import datastore
-from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId, update_entity
+from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId
 from JSONObject.user import User
 from jose import jwt
 from functools import wraps
@@ -10,6 +10,9 @@ from JSONObject.session import Session
 import json
 import threading
 import datetime
+from time import gmtime, strftime
+from utils import generateTimeslots
+from validation.lobby import validate_join_session, validate_host_session
 
 lobby = Blueprint('session', __name__)
 
@@ -19,14 +22,15 @@ sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins
 @auth_required
 def getSession(id):
     room = get(id, 'session')
+    host = get(room.get('hostId'), 'user')
 
     if not request.id in room.get('participants'):
         return make_response(jsonify(code='You need to enter the code to access this room'), 400)
 
     return make_response(jsonify(id=id, code=room.get('code'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
-            weekends=room.get('weekends'), timeslots=room.get('timeslots'), votes=room.get('votes'), 
-            votingend=room.get('votingend') or None, participants=room.get('participants')), 200)
+            weekends=room.get('weekends'), timeslots=room.get('timeslots'), 
+            votingend=room.get('votingend') or None, participants=room.get('participants'), hostUsername=host.get('username')), 200)
 
 @lobby.route('/join', methods=['POST'])
 @auth_required
@@ -35,18 +39,22 @@ def joinSession():
     
     code = data.get('code')
 
-    errors = {}
-    if(code is None): errors['code'] = 'Code is empty'
+    errors = validate_join_session(code)
 
     if len(errors.keys()) == 0:
         room = getSessionByCode(code)
         if len(room) == 0:
-            return make_response(jsonify(username='Room does not exist'), 400)
+            return make_response(jsonify(id='Room does not exist'), 400)
         else:
             room = from_datastore(room[0])
-            if not request.id in room['participants']:
-                room['participants'].append(request.id)
-                update(room, 'session', room.get('id'))
+
+            if request.id in room['participants']:
+                return make_response(jsonify(id='You have already joined this room'))
+
+            room['participants'].append(request.id)
+            update(room, 'session', room.get('id'))
+            sio.emit('enter', room=str(room.get('id')))
+            
             return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
             duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
             weekends=room.get('weekends'), participants=room.get('participants')), 200)
@@ -68,15 +76,7 @@ def hostSess():
     votingtime = data.get('votingtime')
     weekends = data.get('weekends')
 
-    # TODO Validation 
-    errors = {}
-    if(title is None): errors['title'] = 'Title is empty'
-    if(location is None): errors['location'] = 'Location is empty'
-    if(starttime is None): errors['starttime'] = 'Start time is empty'
-    if(endtime is None): errors['endtime'] = 'End time is empty'
-    if(duration is None): errors['duration'] = 'Duration is empty'
-    if(votingtime is None): errors['votingtime'] = 'Voting time is empty'
-    if(weekends is None): errors['weekends'] = 'Weekends is empty'
+    errors = validate_host_session(title, location, starttime, endtime, duration, votingtime, weekends)
 
     if len(errors.keys()) == 0:
         # TODO Sessions cannot generate the same code
@@ -121,6 +121,28 @@ def deleteSession(id):
         return make_response(jsonify(id=id), 200)     
     return make_response(jsonify(code='You need host permission to delete this room'), 400)
 
+@lobby.route('/<int:id>', methods=['PUT'])
+@auth_required
+def leaveSession(id):
+    data = request.get_json()
+    userid = data.get('userid')
+    
+    if userid is None:
+        return make_response(jsonify(id='No id was provided'), 400)
+
+    room = get(id, 'session')
+    user = get(userid, 'user')
+    if room is None or user is None:
+       return make_response(jsonify(id='Room does not exist'), 400)
+
+    if userid not in room['participants']:
+        return make_response(jsonify(id='You must be in the room before you leave it'), 400)
+
+    room['participants'].remove(userid)
+    updated = update(room, 'session', id)
+    sio.emit('leaveLobby', json.dumps({ 'username': user.get('username'), 'id': userid }), room=str(id))
+    return make_response(updated, 200)
+
 @sio.event
 def connect(sid, environ):
     print(sid + ' connects')
@@ -130,7 +152,6 @@ def disconnect(sid):
     try:
         user = sio.get_session(sid)
         sio.emit('leave', sio.get_session(sid).get('username'), room=user.get('room'), skip_sid=sid)
-        print(user.get('username') + ' disconnects from room ' + user.get('room'))
     except TypeError:
         pass
     except KeyError:
@@ -142,67 +163,73 @@ def join(sid, room, username):
     sio.enter_room(sid, room)
     sio.save_session(sid, {'username': username, 'room': room})
     sio.emit('join', username, room=room, skip_sid=sid)
-    print(username + ' joins ' + room)
 
 @sio.on('message')
 def message(sid, msg):
     user = sio.get_session(sid)
-    sio.emit('message', json.dumps({'message': msg, 'username': user.get('username') }), room=user.get('room'))
-    print(user.get('username') + ' sends message "' + msg + '" to room ' + user.get('room'))
+    timestamp = strftime("%H:%M", gmtime())
+    sio.emit('message', json.dumps({'message': msg, 'username': user.get('username'), 'time': timestamp }), room=user.get('room'))
 
 @sio.on('start')
 def start(sid, roomid):    
     time = datetime.datetime.now()
     user = sio.get_session(sid)
     room = get(roomid, 'session')
+    
+    if room is None:
+        sio.emit('error', 'Room does not exist', room=sid)
+        return
+
+    if room.get('votingend') is not None:
+        sio.emit('error', 'Voting has been already started', room=sid)
+        return
 
     event_list = []
-    if room is not None:
-        for participant in room.get('participants'):
-            events = getEventsByUserId(participant)
-            if len(events) != 0: 
-                for event in events:   
-                    event['id'] = event.id 
-                    event_list.append(event)
+    for participant in room.get('participants'):
+        events = getEventsByUserId(participant)
+        if len(events) != 0: 
+            for event in events:
+                event['id'] = event.id 
+                event_list.append(event)
 
     timeslots = generateTimeslots(room, event_list)
+    print("TIMESLOTS HERE")
+    print(timeslots)
 
-    # if room is not None and room.get('votingend') is None:
-    if room is not None:
-        room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
-        room['timeslots'] = timeslots
-        updated = update(room, 'session', user.get('room'))
-        sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
+    room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
+    for timeslot in timeslots:
+        room['timeslots'][timeslot] = []
 
-def generateTimeslots(room, events):
-    # ROOM [object] use @starttime (earliest), @endtime (latest), @weekends, @duration
-    # EVENTS [array] use @starttime, @endtime
-    
-    # Example output
-    return ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    print(room)
+    updated = update(room, 'session', user.get('room'))
+    sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': timeslots }), room=sio.get_session(sid)['room'])
 
 @sio.on('vote')
 def vote(sid, timeslot):
-    print(timeslot)
-    room = sio.get_session(sid)['room']
-    dictionary = getSessionByCode(room)[0]
-    if dictionary['vote'] != {}:
-        votelist = dictionary['vote']
-        if timeslot in votelist:
-            votelist[timeslot] = votelist[timeslot] + 1
-        else:
-            votelist[timeslot] = 1
-    else:
-        votelist = dict()
-        votelist[timeslot] = 1
-    dictionary['vote'] = votelist
-    update(dictionary, 'session', id=dictionary.get('id'))
-    # get number of participant in the room
-    total = len(dictionary['participants'])
-    # check if every participant has already voted
-    num_of_votes = sum(list(votelist.values()))
-    if (total == num_of_votes):
-        timer.cancel()
-        result = majorityVote(votelist)
-        sio.emit('result', result, room=room)
-    # onResult needed in client side
+    user = sio.get_session(sid)
+    room = get(user.get('room'), 'session')
+    
+    # Add vote to database
+    try:
+        for timeslot, id_list in room['timeslots'].items():
+            if request.id in id_list:
+                sio.emit('error', 'You have already voted', room=sid)
+                return
+        room['timeslots'][timeslot] = room['timeslots'][timeslot] + [request.id]
+    except KeyError:
+        room['timeslots'][timeslot] = [request.id]
+
+    updated = update(room, 'session', user.get('room'))
+    sio.emit('vote', json.dumps({ 'id': request.id, 'timeslot': timeslot }), room=user.get('room'))
+
+    # Calculate number of votes
+    votes = 0
+    for timeslot, id_list in updated['timeslots'].items():
+        votes += len(id_list)
+
+    # Determine winner
+    if votes >= len(updated.get('participants')):
+        for timeslot, id_list in updated['timeslots'].items():
+            # Determine the winner
+            sio.emit('result', updated['timeslots'][timeslot], room=user['room'])
+            break

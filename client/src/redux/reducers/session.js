@@ -1,8 +1,21 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, SET_VOTES } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_TIMESLOTS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
+import { toast } from 'react-toastify';
 
 const initialState = {
   messages: [],
-  timeslots: [],
+  participants: [],
+  timeslots: {},
+  code: '',
+  endtime: '',
+  location: '',
+  starttime: '',
+  title: '',
+  votingend: '',
+  votingtime: 0,
+  duration: 0,
+  hostId: 0,
+  id: 0,
+  weekends: false,
 };
 
 export default function (state = initialState, action) {
@@ -22,6 +35,9 @@ export default function (state = initialState, action) {
 
       return { ...state, ...payload };
     }
+    case CLEAR_SESSION: {
+      return initialState;
+    }
     case ADD_MESSAGE: {
       const { payload } = action;
 
@@ -36,6 +52,7 @@ export default function (state = initialState, action) {
       const { payload } = action;
 
       if (state.timer <= 0) {
+        toast("Voting is over")
         clearInterval(payload);
         return { ...state, timer: null };
       }
@@ -47,10 +64,19 @@ export default function (state = initialState, action) {
 
       return { ...state, timeslots: payload };
     }
-    case SET_VOTES: {
-      const { payload } = action;
+    case ADD_VOTE: {
+      const { payload: { timeslot, username } } = action;
 
-      return { ...state, votes: payload };
+      const timeslots = state.timeslots
+      if (timeslots[timeslot]) timeslots[timeslot].push(username)
+      else timeslots[timeslot] = [username]
+
+      return { ...state, timeslots }
+    }
+    case LEAVE_SESSION: {
+      const { id } = action.payload
+      
+      return { ...state, participants: state.participants.filter(e => e !== id) }
     }
     default:
       return state;

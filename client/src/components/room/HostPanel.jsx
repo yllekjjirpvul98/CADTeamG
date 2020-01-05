@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Message, Button } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import { closeSession } from '../../redux/actions/session';
 import { ioStart, ioClose } from '../../redux/actions/socket';
 
@@ -23,13 +23,10 @@ function HostPanel(props) {
 
   return (
     <>
-      <Message info>
-        <Message.Header>Code</Message.Header>
-        <Message.Content>Room code is <b>{props.session.code}</b></Message.Content>
-      </Message>
       <Button
         onClick={handleStart}
         fluid
+        primary
         loading={props.loader.START_SESSION}
       >
           Start
@@ -38,7 +35,7 @@ function HostPanel(props) {
       <Button
         onClick={handleClose}
         fluid
-        loading={props.loader.CLOSE_SESSION}
+        loading={props.loader.CLEAR_SESSION}
       >
           Close
       </Button>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Layout from '../components/Layout';
 import Calendar from '../components/schedule/Calendar';
+import { authenticate } from '../redux/actions/auth';
 
 class Schedule extends Component {
   constructor(props) {
@@ -9,11 +10,15 @@ class Schedule extends Component {
     this.state = {};
   }
 
+  componentDidMount() {
+    if (!this.props.user.id) this.props.authenticate();
+  }
+
   render() {
     const { loader } = this.props;
 
     return (
-      <Layout protected loader={loader.GET_EVENTS}>
+      <Layout protected loader={loader.GET_EVENTS} >
         <Calendar />
       </Layout>
     );
@@ -21,9 +26,9 @@ class Schedule extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { loader } = state;
+  const { user, loader } = state;
 
-  return { loader };
+  return { user, loader };
 };
 
-export default connect(mapStateToProps)(Schedule);
+export default connect(mapStateToProps, { authenticate })(Schedule);

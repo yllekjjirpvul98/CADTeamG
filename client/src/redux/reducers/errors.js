@@ -12,14 +12,12 @@ export default function (state = initialState, action) {
           connection: 'ERR_CONNECTION_REFUSED',
         };
       }
-      if (action.payload.data.errors) {
-        return {
-          ...action.payload.data.errors,
-        };
-      }
-      return {
-        ...action.payload.data,
-      };
+
+      const { data, data: { errors } } = action.payload;
+
+      if (errors) return { ...errors }
+
+      return { ...data }
     }
     case CLEAR_ERRORS: {
       return { };

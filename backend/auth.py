@@ -7,6 +7,7 @@ from jose import jwt
 from functools import wraps
 import json
 import bcrypt
+from validation.user import validate_login, validate_register
 
 auth = Blueprint('auth', __name__)
 
@@ -39,9 +40,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    errors = {}
-    if(username is None): errors['username'] = 'Username is empty'
-    if(password is None): errors['password'] = 'Password is empty'
+    errors = validate_login(username, password)
 
     if len(errors.keys()) == 0:
         user = getbyname('user', username)
@@ -60,11 +59,11 @@ def login():
 def register():
     data = request.get_json()
     username = data.get('username')
-    password = data.get('password').encode('UTF-8')
+    password = data.get('password')
 
-    errors = {}
-    if(username is None): errors['username'] = 'Username is empty'
-    if(password is None): errors['password'] = 'Password is empty'
+    errors = validate_register(username, password)
+
+    password = password.encode('UTF-8')
 
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
@@ -73,7 +72,7 @@ def register():
             return make_response(jsonify(username='User already exists'), 400)
         else:
             user = User(username, hashed)
-            update(user.__dict__, 'user')
-            return make_response(jsonify(message='Registration successful'))
+            updated = update(user.__dict__, 'user')
+            return make_response(jsonify(username=updated.get('username')))
     else:
         return make_response(jsonify(errors=errors), 400)

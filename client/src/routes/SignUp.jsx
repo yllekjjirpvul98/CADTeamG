@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Grid, Button, Input, Segment, Header } from 'semantic-ui-react';
+import { Grid, Button, Form, Segment, Header, Message, Icon } from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import { signUp } from '../redux/actions/auth';
 import ErrorList from '../components/ErrorList';
@@ -27,7 +27,7 @@ class SignUpComponent extends React.Component {
 
     const { payload } = await this.props.signUp({ username, password, password2 });
 
-    if (payload.message) this.props.history.push('/sign-in');
+    if (payload.username) this.props.history.push('/sign-in');
   }
 
   render() {
@@ -38,52 +38,64 @@ class SignUpComponent extends React.Component {
       <Layout>
         <Grid centered verticalAlign="middle" columns={2} relaxed="very" stackable style={{ marginTop: '7%' }}>
           <Grid.Column>
-            <Segment secondary textAlign="center">
-              <Header as="h1" textAlign="center">Register an Account</Header>
-              <br />
-              <Input
-                name="username"
-                icon="user"
-                fluid
-                iconPosition="left"
-                placeholder="Username"
-                onChange={this.handleChange}
-                value={username}
-                error={Boolean(errors.username)}
-              />
-              <br />
-              <Input
-                name="password"
-                icon="lock"
-                fluid
-                iconPosition="left"
-                placeholder="Password"
-                type="password"
-                onChange={this.handleChange}
-                value={password}
-                error={Boolean(errors.password)}
-              />
-              <br />
-              <Input
-                name="password2"
-                icon="lock"
-                fluid
-                iconPosition="left"
-                placeholder="Repeat Password"
-                type="password"
-                onChange={this.handleChange}
-                value={password2}
-              />
-              <br />
-              <Button
-                loading={loader.SIGN_UP}
-                onClick={this.handleSubmit}
-                color="blue"
-              >
-                Sign Up
-              </Button>
+
+            <Header as="h1" textAlign="center">
+              Register an Account
+            </Header>
+
+            <Segment textAlign="center">
+
+              <Form>
+                <Form.Input
+                  name="username"
+                  icon="user"
+                  fluid
+                  iconPosition="left"
+                  placeholder="Username"
+                  onChange={this.handleChange}
+                  value={username}
+                  error={Boolean(errors.username)}
+                />
+                <Form.Input
+                  name="password"
+                  icon="lock"
+                  fluid
+                  iconPosition="left"
+                  placeholder="Password"
+                  type="password"
+                  onChange={this.handleChange}
+                  value={password}
+                  error={Boolean(errors.password)}
+                />
+                <Form.Input
+                  name="password2"
+                  icon="lock"
+                  fluid
+                  iconPosition="left"
+                  placeholder="Repeat Password"
+                  type="password"
+                  onChange={this.handleChange}
+                  value={password2}
+                />
+                <Button
+                  primary
+                  fluid
+                  loading={loader.SIGN_UP}
+                  onClick={this.handleSubmit}
+                >
+                  Sign Up
+                </Button>
+              </Form>
+
               <ErrorList data={errors} />
+
             </Segment>
+
+            <Message warning>
+              <Icon name='help' />
+              Already registered?&nbsp;<a href='/sign-in'>Login here</a>&nbsp;
+            </Message>
+
           </Grid.Column>
         </Grid>
       </Layout>
