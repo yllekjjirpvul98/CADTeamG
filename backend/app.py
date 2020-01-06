@@ -15,8 +15,8 @@ app = Flask(__name__)
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(event, url_prefix='/events')
 app.register_blueprint(lobby, url_prefix='/session')
-app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
+# app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
 CORS(app)
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=8080)
+    app.run(threaded=True, port=8000)

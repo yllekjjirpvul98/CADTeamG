@@ -16,7 +16,7 @@ class RoomComponent extends Component {
   constructor(props) {
     super(props);
     
-    const socket = io(baseURL);
+    const socket = io("http://127.0.0.1:8080");
 
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data));
