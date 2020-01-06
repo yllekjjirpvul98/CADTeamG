@@ -54,17 +54,21 @@ def generateTimeslots(room, events):
     if len(sorted_timeslot) == 0:
         a1 = (starttime, endtime)
         avaliable_list.append(a1)
+        print('available_list 0', avaliable_list)
         print(avaliable_list)
     elif len(sorted_timeslot) == 1:
         newtuple = sorted_timeslot[0]
         if(starttime != newtuple[0]):
             a1 = (starttime, newtuple[0])
             avaliable_list.append(a1)
+            print('available_list 1', avaliable_list)
 
         if(endtime != newtuple[1]):
             a2 = (newtuple[1], endtime)
             avaliable_list.append(a2)
+            print('available_list 2', avaliable_list)
     else:
+        print('available_list', avaliable_list)
         newtuple = sorted_timeslot[0]
         for x in range(len(sorted_timeslot)-1):
             if (newtuple[0] < sorted_timeslot[x+1][0]) and (newtuple[1] > sorted_timeslot[x+1][1]):
@@ -77,7 +81,8 @@ def generateTimeslots(room, events):
                 if (a1[1]-a1[0]) >= duration:
                     avaliable_list.append(a1)
                 newtuple = sorted_timeslot[x+1]
-    
+    print('sorted_timeslot', sorted_timeslot)
+    print('available_list', avaliable_list)
     # sliding timeslots by hours
     print ("start to slide")
     print (avaliable_list)

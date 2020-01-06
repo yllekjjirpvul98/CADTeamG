@@ -61,10 +61,11 @@ def joinSession():
         room['participants'].append(request.id)
         update(room, 'session', room.get('id'))
         # sio.emit('enter', room=str(room.get('id')))
-        
+        host = get(room.get('hostId'), 'user')
+
         return make_response(jsonify(id=room.get('id'), hostId=room.get('hostId'), title=room.get('title'), location=room.get('location'), 
         duration=room.get('duration'), starttime=room.get('starttime'), endtime=room.get('endtime'), votingtime=room.get('votingtime'), 
-        weekends=room.get('weekends'), participants=room.get('participants')), 200)
+        weekends=room.get('weekends'), hostUsername=host.get('username'),  participants=room.get('participants')), 200)
     else: 
         return make_response(jsonify(errors=errors), 400)
 

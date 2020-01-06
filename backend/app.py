@@ -7,7 +7,6 @@ from lobby import lobby
 from flask_cors import CORS
 import socketio
 from gevent import pywsgi
-from lobby import sio
 import redis
 import os
 
