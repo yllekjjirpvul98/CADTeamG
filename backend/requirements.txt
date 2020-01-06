@@ -18,6 +18,7 @@ Flask-Cors==3.0.8
 flask-restplus==0.13.0
 Flask-Session==0.3.1
 Flask-SocketIO==4.2.1
+Flask-Sockets==0.2.1
 future==0.18.2
 gevent==1.4.0
 google-api-core==1.14.3

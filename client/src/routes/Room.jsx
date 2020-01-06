@@ -90,6 +90,7 @@ const mapStateToProps = (state) => {
   return { user, session, loader, errors };
 };
 
+
 export default connect(mapStateToProps, {
   authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioOnResult,
   ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby
