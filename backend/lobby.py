@@ -17,7 +17,7 @@ from JSONObject.event import Event
 
 lobby = Blueprint('session', __name__)
 
-sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins='*')
+sio = socketio.Server(logger=False, async_mode='threading', cors_allowed_origins='https://cadcw2-teamg.appspot.com', )
 
 @lobby.route('/<int:id>')
 @auth_required
