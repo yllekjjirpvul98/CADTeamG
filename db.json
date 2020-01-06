@@ -1,7 +1,29 @@
 {
     "users": [
-        { "username": "John"},
-        { "username": "David"},
-        { "username": "Casper"}
-    ]
+        {
+			"username": "John",
+			"password": "nhoj"
+		},
+		{
+			"username": "Dan",
+			"password": "nad"
+		},
+		{
+			"username": "Sam",
+			"password": "mas"
+		}
+    ],
+
+	"events": [
+		{
+			"eventId": "EVENT1",
+			"userId": "John",
+      "hostId": "John",
+			"startTime": "1574206743535",
+			"endTime": "1574216743535",
+			"repeatable": "WEEK",
+      "location": "BUILDING 16",
+      "title": "CAD meeting",
+		},
+	],
 }

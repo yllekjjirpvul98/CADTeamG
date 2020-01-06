@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 client/node_modules
+client/.vscode
+backend/www
 
 # dependencies
 /node_modules
@@ -22,3 +24,13 @@ client/node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+.vscode
+.idea
+
+# Byte-compiled / optimized / DLL files
+backend/__pycache__
+backend/JSONObject/__pycache__
+*.py[cod]
+
+cadcw2-teamg-b00dcdcd8ee1.json
