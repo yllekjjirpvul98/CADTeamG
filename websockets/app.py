@@ -1,19 +1,15 @@
-from aiohttp import web
+import os
+import json
+import datetime
 import socketio
+from aiohttp import web
 from flask import Flask
 from flask_session import Session
-from google.cloud import datastore
-from flask_cors import CORS
-import socketio
-from gevent import pywsgi
-import redis
-import os
-from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId
-import json
-from utils import generateTimeslots
-import datetime
-from JSONObject.event import Event
 from flask_socketio import SocketIO, emit
+from google.cloud import datastore
+from JSONObject.event import Event
+from db import get, update, delete, getbyname, from_datastore, secret, getSessionByCode, getEventsByUserId
+from utils import generateTimeslots
 from time import gmtime, strftime, sleep
 
 sio = socketio.AsyncServer(async_mode='aiohttp', cors_allowed_origins='*')
@@ -21,9 +17,10 @@ app = web.Application()
 sio.attach(app)
 
 async def start_timer(timer, roomid, user):
-    sleep(timer)
-    print('timer heere')
+    await sio.sleep(timer)
     room = get(roomid, 'session')
+
+    if room is None or room.get('winner'): return
 
     votes = 0
     winner_votes = 0
@@ -34,17 +31,15 @@ async def start_timer(timer, roomid, user):
             winner_votes = len(id_list)
             winner_timeslot = key
 
-    if(votes >= len(room.get('participants'))) or votes == 0: return
-
     room['winner'] = winner_timeslot
     updated = update(room, 'session', user.get('room'))
     await sio.emit('result', updated.get('winner'), user.get('room'))
 
-    # starttimeiso = datetime.datetime.strptime(updated.get('starttime'), "%Y-%m-%dT%H:%M:%S.%fZ")
-    # endtimeiso = datetime.datetime.strptime(updated.get('endtime'), "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(seconds=updated.get('votingtime'))
+    starttimeiso = datetime.datetime.strptime(updated.get('starttime'), "%Y-%m-%dT%H:%M:%S.%fZ")
+    endtimeiso = datetime.datetime.strptime(updated.get('endtime'), "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(seconds=updated.get('votingtime'))
+    print(user.get('id'), user.get('username'), updated.get('title'), updated.get('location'), starttimeiso, endtimeiso)
     # event = Event(user.get('id'), user.get('username'), updated.get('title'), updated.get('location'), starttimeiso, endtimeiso)
     # event = update(event.__dict__, 'event')
-    # print(event)
 
 @sio.on('connect')
 async def connect(sid, environ):
@@ -54,8 +49,9 @@ async def connect(sid, environ):
 async def disconnect(sid):
     try:
         user = await sio.get_session(sid)
-        print(user)
-        await sio.emit('leave', user.get('username'), room=user.get('room'), skip_sid=sid)
+        userid = user.get('id')
+        username = user.get('username')
+        await sio.emit('leave', json.dumps({ 'id': userid, 'username': username}) , room=user.get('room'), skip_sid=sid)
     except TypeError:
         pass
     except KeyError:
@@ -63,10 +59,25 @@ async def disconnect(sid):
     await sio.save_session(sid, None)
 
 @sio.on('join')
-async def join(sid, room, username, userid):
-    sio.enter_room(sid, room)
-    await sio.save_session(sid, {'username': username, 'room': room, 'id': userid })
-    await sio.emit('join', username, room=room, skip_sid=sid)
+async def join(sid, roomid, username, userid):
+    
+    sio.enter_room(sid, roomid)
+
+    room = get(roomid, 'session')
+
+    if room is None: return
+
+    winner = room.get('winner')
+
+    if winner is not None:
+        await sio.emit('result', winner, room=roomid)
+    
+    await sio.save_session(sid, {'username': username, 'room': roomid, 'id': userid })
+    await sio.emit('join', json.dumps({ 'username': username, 'id': userid }), room=roomid, skip_sid=sid)
+
+@sio.on('close')
+async def close(sid, roomid):
+    await sio.emit('close', room=str(roomid), skip_sid=sid)
 
 @sio.on('message')
 async def message(sid, msg):
@@ -81,12 +92,10 @@ async def start(sid, roomid):
     room = get(roomid, 'session')
 
     if room is None:
-        await sio.emit('error', 'Room does not exist', room=sid)
-        return
+        return await sio.emit('error', 'Room does not exist', room=sid)
 
-    # if room.get('votingend') is not None:
-        # await sio.emit('error', 'Voting has been already started', room=sid)
-        # return
+    if room.get('votingend') is not None:
+        return await sio.emit('error', 'Voting has been already started', room=sid)
 
     event_list = []
     for participant in room.get('participants'):
@@ -96,9 +105,8 @@ async def start(sid, roomid):
                 event['id'] = event.id 
                 event_list.append(event)
 
-    print(room, event_list)
-    timeslots = generateTimeslots(room, event_list)
-    # timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    # timeslots = generateTimeslots(room, event_list)
+    timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
     room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
     for timeslot in timeslots:

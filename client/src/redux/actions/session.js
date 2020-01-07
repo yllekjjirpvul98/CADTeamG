@@ -64,9 +64,9 @@ const closeSession = (id) => (dispatch) => {
               .finally(() => dispatch({ type: CLEAR_LOADER, payload: CLEAR_SESSION }));
 };
 
-const leaveSession = (id, userid) => (dispatch) => {
+const leaveSession = (id) => (dispatch) => {
   dispatch({ type: SET_LOADER, payload: LEAVE_SESSION });
-  return axios.put(`/session/${id}`, { userid })
+  return axios.put(`/session/${id}`)
               .then((res) => dispatch({ type: LEAVE_SESSION, payload: res.data }))
               .then(dispatch({ type: CLEAR_ERRORS }))
               .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response }))

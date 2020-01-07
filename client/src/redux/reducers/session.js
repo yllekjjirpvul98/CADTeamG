@@ -1,8 +1,7 @@
-import { JOIN_SESSION, HOST_SESSION, GET_SESSION, ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, SET_WINNER, SET_TIMESLOTS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
+import { JOIN_SESSION, HOST_SESSION, GET_SESSION, SET_TIMER, DECREMENT_TIMER, SET_WINNER, SET_TIMESLOTS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
 import { toast } from 'react-toastify';
 
 const initialState = {
-  messages: [],
   participants: [],
   timeslots: {},
   code: '',
@@ -38,11 +37,6 @@ export default function (state = initialState, action) {
     }
     case CLEAR_SESSION: {
       return initialState;
-    }
-    case ADD_MESSAGE: {
-      const { payload } = action;
-
-      return { ...state, messages: state.messages.concat(payload) };
     }
     case SET_TIMER: {
       const { payload } = action;

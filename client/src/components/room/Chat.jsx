@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Comment, Header, Form, Button } from 'semantic-ui-react';
+import { Comment, Header,  Form, Button } from 'semantic-ui-react';
 import { ioMsg } from '../../redux/actions/socket';
 
 class Chat extends Component {
@@ -24,7 +24,7 @@ class Chat extends Component {
 
   render() {
     const { message } = this.state;
-    const { messages } = this.props;
+    const { websocket } = this.props;
 
     return (
       <Comment.Group>
@@ -33,7 +33,7 @@ class Chat extends Component {
           Chat
         </Header>
 
-        {messages.map((e, i) => (
+        {websocket.messages.map((e, i) => (
           <Comment key={i}>
             <Comment.Avatar src='https://react.semantic-ui.com/images/avatar/small/matt.jpg' />
             <Comment.Content>
@@ -70,8 +70,8 @@ class Chat extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { session: { messages } } = state;
-  return { messages };
+  const { websocket } = state;
+  return { websocket };
 };
 
 export default connect(mapStateToProps, { ioMsg })(Chat);

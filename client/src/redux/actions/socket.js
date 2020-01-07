@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
-import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, SET_WINNER,
-  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION, LEAVE_SESSION } from '../types';
+import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, SET_WINNER, ENTER_ROOM,
+  CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION, LEAVE_ROOM } from '../types';
 
 // Message
 const ioMsg = (socket, message) => (dispatch) => {
@@ -51,40 +51,42 @@ const ioOnStart = (data) => (dispatch) => {
   const timer = setInterval(() => dispatch({ type: DECREMENT_TIMER, payload: timer }), 1000);
 };
 
-
-
 // Vote
 const ioVote = (socket, timeslot) => (dispatch) => {
   socket.emit('vote', timeslot);
 }
 
-const ioOnEnter = (props) => (dispatch) => {
-  toast('New participant has joined')
-  props.getSession(props.match.params.id);
-  props.getSessionEvents(props.match.params.id)
-}
-
 // Join
-const ioOnJoin = (username,) => (dispatch) => {
-  toast(`${username} has joined the room`)
+const ioOnJoin = (data, props) => (dispatch) => {
+  const { id, username } = JSON.parse(data);
+
+  dispatch({ type: ENTER_ROOM, payload: { id, username, props }});
+
+  props.getSession(props.match.params.id);
 };
 
-const ioOnLeave = (username) => (dispatch) => {
+const ioOnLeave = (data, props) => (dispatch) => {
+  const { id, username } = JSON.parse(data);
 
-  if (!username) return;
+  if (!id) return;
 
-  toast(`${username} has left the room`)
+  dispatch({ type: LEAVE_ROOM, payload: { id, username }});
+
+  props.getSession(props.match.params.id);
 };
 
 // Close
 const ioClose = (socket, id) => (dispatch) => {
   socket.emit('close', id);
+
   dispatch({ type: CLEAR_SESSION });
 };
 
 const ioOnClose = (props) => (dispatch) => {
   toast.error(`Room was closed by the host`, { className: 'ui error message'});
+
   props.history.push('/home');
+  dispatch({ type: CLEAR_SESSION });
 };
 
 const ioOnVote = (data) => (dispatch) => {
@@ -92,14 +94,7 @@ const ioOnVote = (data) => (dispatch) => {
   const { timeslot, username } = JSON.parse(data)
   
   dispatch({ type: ADD_VOTE, payload: { timeslot, username }});
-  toast(`${username} has just voted ${timeslot}`)
-}
-
-const ioOnLeaveLobby = (data) => (dispatch) => {
-  const { username, id } = JSON.parse(data);
-
-  dispatch({ type: LEAVE_SESSION, payload: { id } });
-  toast.error(`${username} has left the lobby`, { className: 'ui error message'});
+  toast(`${username} has just voted ${new Date(timeslot).toLocaleString("en-GB")}`)
 }
 
 const ioOnError = (data) => (dispatch) => {
@@ -113,5 +108,4 @@ const ioOnResult = (winner) => (dispatch) => {
   dispatch({ type: SET_WINNER, payload: { winner }})
 }
 
-export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnResult,
-  ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, ioOnEnter, ioOnLeaveLobby };
+export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnResult, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError };

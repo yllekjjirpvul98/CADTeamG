@@ -26,8 +26,11 @@ export const CLEAR_LOADER = 'CLEAR_LOADER';
 
 // Websocket stuff
 export const ADD_VOTE = 'ADD_VOTE';
-export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const SET_TIMESLOTS = 'SET_TIMESLOTS';
 export const SET_TIMER = 'SET_TIMER';
 export const DECREMENT_TIMER = 'DECREMENT_TIMER';
 export const SET_WINNER = 'SET_WINNER';
+
+export const ADD_MESSAGE = 'ADD_MESSAGE';
+export const ENTER_ROOM = 'ENTER_ROOM';
+export const LEAVE_ROOM = 'LEAVE_ROOM'; 

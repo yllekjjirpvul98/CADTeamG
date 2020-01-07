@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Grid, GridColumn } from 'semantic-ui-react';
 import { authenticate } from '../redux/actions/auth';
 import { getSession, getSessionEvents } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby, ioOnResult } from '../redux/actions/socket';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnResult } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
 import RoomInfo from '../components/room/RoomInfo';
@@ -19,19 +19,15 @@ class RoomComponent extends Component {
     const socket = io("http://127.0.0.1:8080");
 
     socket.on('message', (data) => this.props.ioOnMsg(data));
-    socket.on('join', (data) => this.props.ioOnJoin(data));
-    socket.on('leave', (data) => this.props.ioOnLeave(data));
-    socket.on('leaveLobby', (data) => this.props.ioOnLeaveLobby(data));
+    socket.on('join', (data) => this.props.ioOnJoin(data, props));
+    socket.on('leave', (data) => this.props.ioOnLeave(data, props));
     socket.on('start', (data) => this.props.ioOnStart(data));
     socket.on('vote', (data) => this.props.ioOnVote(data));
     socket.on('error', (data) => this.props.ioOnError(data));
     socket.on('result', (data) => this.props.ioOnResult(data));
     socket.on('close', () => this.props.ioOnClose(props));
-    socket.on('enter', () => this.props.ioOnEnter(props));
 
-    this.state = {
-      socket,
-    };
+    this.state = { socket };
   }
 
   async componentDidMount() {
@@ -48,7 +44,7 @@ class RoomComponent extends Component {
   }
 
   componentWillUnmount() {
-    this.setState({ socket: null, panel: null })
+    this.state.socket.close();
   }
 
   render() {
@@ -86,12 +82,12 @@ function Room(props) {
 
 
 const mapStateToProps = (state) => {
-  const { user, session, loader, errors } = state;
-  return { user, session, loader, errors };
+  const { user, session, websocket, loader, errors } = state;
+  return { user, session, websocket, loader, errors };
 };
 
 
 export default connect(mapStateToProps, {
   authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioOnResult,
-  ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnEnter, ioOnLeaveLobby
+  ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose,
 })(Room);

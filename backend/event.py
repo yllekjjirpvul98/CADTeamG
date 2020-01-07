@@ -39,7 +39,7 @@ def postEvent():
         event = Event(userid, username, title, location, starttime, endtime)
         event = update(event.__dict__, 'event')
         return make_response(jsonify(id=event.get('id'), userid=userid, username=username, title=title, 
-                                location=location, starttime=starttime, endtime=endtime), 200)
+                                     ocation=location, starttime=starttime, endtime=endtime), 200)
     else:
         return make_response(jsonify(errors), 400)
 
