@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
-import { baseURL } from '../utils/axios';
+import { socketURL } from '../utils/axios';
 import { useHistory } from 'react-router-dom'
 import { connect } from 'react-redux';
 import { Grid, GridColumn } from 'semantic-ui-react';
@@ -16,7 +16,7 @@ class RoomComponent extends Component {
   constructor(props) {
     super(props);
     
-    const socket = io("http://127.0.0.1:8080");
+    const socket = io(socketURL);
 
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data, props));

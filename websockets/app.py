@@ -2,6 +2,8 @@ import os
 import json
 import datetime
 import socketio
+import aiohttp_cors
+import asyncio
 from aiohttp import web
 from flask import Flask
 from flask_session import Session
@@ -14,6 +16,7 @@ from time import gmtime, strftime, sleep
 
 sio = socketio.AsyncServer(async_mode='aiohttp', cors_allowed_origins='*')
 app = web.Application()
+cors = aiohttp_cors.setup(app)
 sio.attach(app)
 
 async def start_timer(timer, roomid, user):

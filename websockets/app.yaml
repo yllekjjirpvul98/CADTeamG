@@ -2,9 +2,16 @@ runtime: python
 entrypoint: gunicorn -b :$PORT app:app
 env: flex
 service: socket
+
 runtime_config:
   python_version: 3
 manual_scaling:
   instances: 1
 network:
  session_affinity: true
+ 
+handlers:
+- url: /.*
+  static_dir: /.*
+  http_headers:
+    Access-Control-Allow-Origin: '*'

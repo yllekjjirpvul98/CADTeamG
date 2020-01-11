@@ -68,3 +68,5 @@ wrapt==1.11.2
 yarl==1.4.2
 zipp==0.6.0
 maya==0.6.1
+aiohttp_cors==0.7.0
+asyncio==3.4.3
