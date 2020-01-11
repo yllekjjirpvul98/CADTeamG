@@ -108,8 +108,8 @@ async def start(sid, roomid):
                 event['id'] = event.id 
                 event_list.append(event)
 
-    # timeslots = generateTimeslots(room, event_list)
-    timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    timeslots = generateTimeslots(room, event_list)
+    # timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
     room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
     for timeslot in timeslots:

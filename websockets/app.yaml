@@ -1,12 +1,16 @@
 runtime: python
-entrypoint: gunicorn -b :$PORT app:app
+entrypoint: gunicorn -b :$PORT --worker-class aiohttp.worker.GunicornWebWorker app:app
 env: flex
 service: socket
 
 runtime_config:
   python_version: 3
-manual_scaling:
-  instances: 1
+liveness_check:
+  path: "/liveness_check"    
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
 network:
  session_affinity: true
  
