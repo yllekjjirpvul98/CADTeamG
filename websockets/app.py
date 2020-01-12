@@ -20,10 +20,13 @@ cors = aiohttp_cors.setup(app)
 sio.attach(app)
 
 async def start_timer(timer, roomid, user):
-    await sio.sleep(timer)
+
+    await sio.sleep(int(timer))
+
     room = get(roomid, 'session')
 
-    if room is None or room.get('winner'): return
+    if room is None or room.get('winner'):
+        return
 
     votes = 0
     winner_votes = 0
@@ -38,11 +41,12 @@ async def start_timer(timer, roomid, user):
     updated = update(room, 'session', user.get('room'))
     await sio.emit('result', updated.get('winner'), user.get('room'))
 
-    starttimeiso = datetime.datetime.strptime(updated.get('starttime'), "%Y-%m-%dT%H:%M:%S.%fZ")
-    endtimeiso = datetime.datetime.strptime(updated.get('endtime'), "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(seconds=updated.get('votingtime'))
-    print(user.get('id'), user.get('username'), updated.get('title'), updated.get('location'), starttimeiso, endtimeiso)
-    # event = Event(user.get('id'), user.get('username'), updated.get('title'), updated.get('location'), starttimeiso, endtimeiso)
-    # event = update(event.__dict__, 'event')
+    endtimeiso = datetime.datetime.strptime(winner_timeslot, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(minutes=int(room.get('duration')))
+    
+    for userid in room.get('participants'):
+        user = get(userid, 'user')
+        event = Event(user.get('id'), user.get('username'), updated.get('title'), updated.get('location'), winner_timeslot, endtimeiso.isoformat())
+        update(event.__dict__, 'event')
 
 @sio.on('connect')
 async def connect(sid, environ):
@@ -54,12 +58,16 @@ async def disconnect(sid):
         user = await sio.get_session(sid)
         userid = user.get('id')
         username = user.get('username')
-        await sio.emit('leave', json.dumps({ 'id': userid, 'username': username}) , room=user.get('room'), skip_sid=sid)
+        await sio.emit('disconnect_room', json.dumps({ 'id': userid, 'username': username}) , room=user.get('room'), skip_sid=sid)
     except TypeError:
         pass
     except KeyError:
         pass
     await sio.save_session(sid, None)
+
+@sio.on('leave')
+async def leaveLobby(sid, username):
+    await sio.emit('leave', username)
 
 @sio.on('join')
 async def join(sid, roomid, username, userid):
@@ -108,8 +116,8 @@ async def start(sid, roomid):
                 event['id'] = event.id 
                 event_list.append(event)
 
-    timeslots = generateTimeslots(room, event_list)
-    # timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    # timeslots = generateTimeslots(room, event_list)
+    timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
     room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
     for timeslot in timeslots:
@@ -119,7 +127,7 @@ async def start(sid, roomid):
 
     await sio.emit('start', json.dumps({ 'votingend': str(updated.get('votingend')), 'timeslots': room.get('timeslots') }), room=str(user.get('room')))
 
-    sio.start_background_task(start_timer, room.get('duration'), roomid, user)
+    sio.start_background_task(start_timer, room.get('votingtime'), roomid, user)
 
 @sio.on('vote')
 async def vote(sid, timeslot):
@@ -132,7 +140,6 @@ async def vote(sid, timeslot):
 
     room = get(user.get('room'), 'session')
     
-    # Add vote to database
     try:
         for key, id_list in room['timeslots'].items():
             if username in id_list:
@@ -144,14 +151,12 @@ async def vote(sid, timeslot):
     updated = update(room, 'session', user.get('room'))
     await sio.emit('vote', json.dumps({ 'username': username, 'timeslot': timeslot }), room=user.get('room'))
 
-    # Calculate number of votes
     votes = 0
     for timeslot, id_list in updated['timeslots'].items():
         votes += len(id_list)
 
     if votes != len(updated.get('participants')): return
 
-    # Determine winner
     winner_votes = 0
     winner_timeslot = ''
     for key, id_list in updated['timeslots'].items():
@@ -164,10 +169,12 @@ async def vote(sid, timeslot):
     updated = update(room, 'session', user.get('room'))
     await sio.emit('result', updated.get('winner'), room=user.get('room'))
 
-    starttimeiso = datetime.datetime.strptime(room.get('starttime'), "%Y-%m-%dT%H:%M:%S.%fZ")
-    endtimeiso = datetime.datetime.strptime(room.get('endtime'), "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(seconds=room.get('votingtime'))
-    event = Event(userid, username, room.get('title'), room.get('location'), starttimeiso, endtimeiso)
-    event = update(event.__dict__, 'event')
+    endtimeiso = datetime.datetime.strptime(winner_timeslot, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(minutes=int(room.get('duration')))
+
+    for userid in updated.get('participants'):
+        user = get(userid, 'user')
+        event = Event(user.get('id'), user.get('username'), room.get('title'), room.get('location'), winner_timeslot, endtimeiso.isoformat())
+        update(event.__dict__, 'event')
 
 if __name__ == '__main__':
     web.run_app(app)

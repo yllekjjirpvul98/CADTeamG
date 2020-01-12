@@ -12,7 +12,9 @@ liveness_check:
   failure_threshold: 2
   success_threshold: 2
 network:
- session_affinity: true
+  session_affinity: true
+manual_scaling:
+  instances: 1
  
 handlers:
 - url: /.*

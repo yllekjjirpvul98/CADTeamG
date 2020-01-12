@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Grid, GridColumn } from 'semantic-ui-react';
 import { authenticate } from '../redux/actions/auth';
 import { getSession, getSessionEvents } from '../redux/actions/session';
-import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnResult } from '../redux/actions/socket';
+import { ioOnMsg, ioOnJoin, ioOnLeave, ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnResult, ioOnDisconnect } from '../redux/actions/socket';
 import Layout from '../components/Layout';
 import Chat from '../components/room/Chat';
 import RoomInfo from '../components/room/RoomInfo';
@@ -20,12 +20,13 @@ class RoomComponent extends Component {
 
     socket.on('message', (data) => this.props.ioOnMsg(data));
     socket.on('join', (data) => this.props.ioOnJoin(data, props));
-    socket.on('leave', (data) => this.props.ioOnLeave(data, props));
+    socket.on('disconnect_room', (data) => this.props.ioOnDisconnect(data));
     socket.on('start', (data) => this.props.ioOnStart(data));
     socket.on('vote', (data) => this.props.ioOnVote(data));
     socket.on('error', (data) => this.props.ioOnError(data));
     socket.on('result', (data) => this.props.ioOnResult(data));
     socket.on('close', () => this.props.ioOnClose(props));
+    socket.on('leave', () => this.props.ioOnLeave(props));
 
     this.state = { socket };
   }
@@ -37,7 +38,7 @@ class RoomComponent extends Component {
     socket.emit('join', this.props.match.params.id, this.props.user.username, this.props.user.id);
 
     if (!this.props.session.id) {
-      const { payload: { votingend, timeslots, status } } = await this.props.getSession(this.props.match.params.id);
+      const { payload: { votingend, timeslots, status } = {}} = await this.props.getSession(this.props.match.params.id) || {};
       if (status === 400 || status === 404) return;
       if (votingend && timeslots) this.props.ioOnStart({ votingend, timeslots });
     }
@@ -89,5 +90,5 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   authenticate, getSession, getSessionEvents, ioOnMsg, ioOnJoin, ioOnLeave, ioOnResult,
-  ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose,
+  ioClose, ioOnStart, ioOnVote, ioOnError, ioOnClose, ioOnDisconnect
 })(Room);

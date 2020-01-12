@@ -24,7 +24,7 @@ class SignInComponent extends React.Component {
   async handleSubmit() {
     const { username, password } = this.state;
 
-    const { payload: { token } } = await this.props.signIn({ username, password });
+    const { payload: { token } = {}} = await this.props.signIn({ username, password }) || {};
 
     if (token) return this.props.history.push('/home');
 

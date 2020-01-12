@@ -34,3 +34,4 @@ export const SET_WINNER = 'SET_WINNER';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const ENTER_ROOM = 'ENTER_ROOM';
 export const LEAVE_ROOM = 'LEAVE_ROOM'; 
+export const CLEAR_WEBSOCKET = 'CLEAR_WEBSOCKET';

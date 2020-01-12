@@ -3,6 +3,7 @@ import { withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import { toast } from 'react-toastify';
+import { clearWebsocket } from '../redux/actions/socket';
 import { clearErrors } from '../redux/actions/errors';
 import Navbar from './Navbar';
 
@@ -15,14 +16,21 @@ class Layout extends Component {
     }
     this.handleNotFound = this.handleNotFound.bind(this);
     this.handleNotLoggedIn = this.handleNotLoggedIn.bind(this);
+    this.handleRouteChange = this.handleRouteChange.bind(this);
   }
 
   componentDidMount() {
-    this.unlisten = this.props.history.listen(this.props.clearErrors);
+    this.unlisten = this.props.history.listen(this.handleRouteChange);
 
     if (!this.state.token && this.props.protected) this.setState({ redirect: this.handleNotLoggedIn() })
 
   }
+
+  handleRouteChange() {
+    this.props.clearWebsocket()
+    this.props.clearErrors()
+  }
+
   UNSAFE_componentWillUpdate({ error }) {
     if (error) this.setState({redirect: this.handleNotFound(error) })
   }
@@ -60,4 +68,4 @@ class Layout extends Component {
   }
 }
 
-export default connect(null, { clearErrors })(withRouter(Layout));
+export default connect(null, { clearWebsocket, clearErrors })(withRouter(Layout));

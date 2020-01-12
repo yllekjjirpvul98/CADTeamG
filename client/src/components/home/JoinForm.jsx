@@ -20,8 +20,7 @@ class JoinFormComponent extends React.Component {
   }
 
   async handleJoin() {
-    // TODO Check if the input can be converted to number in the first place
-    const { payload: { id } } = await this.props.joinSession({ code: this.state.code });
+    const { payload: { id } = {}} = await this.props.joinSession({ code: this.state.code }) || {};
 
     if (id) this.props.history.push(`/rooms/${id}`);
   }

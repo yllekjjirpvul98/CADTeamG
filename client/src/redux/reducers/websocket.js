@@ -1,4 +1,4 @@
-import { ADD_MESSAGE, ENTER_ROOM, LEAVE_ROOM } from '../types';
+import { ADD_MESSAGE, ENTER_ROOM, LEAVE_ROOM, CLEAR_WEBSOCKET } from '../types';
 import { toast } from 'react-toastify';
 
 const initialState = {
@@ -26,6 +26,9 @@ export default function (state = initialState, action) {
       toast(`${username} has left the room`)
 
       return { ...state, users: state.users.filter((user) => user.id !== id) }
+    }
+    case CLEAR_WEBSOCKET: {
+      return initialState;
     }
     default:
       return state;

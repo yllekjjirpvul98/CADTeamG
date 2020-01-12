@@ -35,7 +35,7 @@ class EventUpdateForm extends React.Component {
   }
 
   async handleDelete() {
-    const { payload: { id } } = await this.props.deleteEvent(this.props.event.id);
+    const { payload: { id } = {}} = await this.props.deleteEvent(this.props.event.id) || {};
     if (id) this.props.closeModal();
   }
 

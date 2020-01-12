@@ -31,7 +31,7 @@ class EventPostForm extends React.Component {
     const endtime = this.state.endtime ? new Date(`${new Date(this.props.date).toDateString()} ${this.state.endtime}`) : '';
     const event = { title: this.state.title, location: this.state.location, starttime, endtime };
 
-    const { payload: { id } } = await this.props.postEvent(event);
+    const { payload: { id } = {}} = await this.props.postEvent(event) || {};
     if (id) this.props.closeModal();
   }
 

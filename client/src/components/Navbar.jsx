@@ -18,7 +18,7 @@ function Navbar(props) {
   const loggedIn = (
     <Menu.Menu position="right">
 
-      <Header as="p" content={props.username} color="blue" className="username" style={{margin: "auto 1rem"}} />
+      {props.username ? <Header as="p" content={props.username} color="blue" className="username" style={{margin: "auto 1rem"}} /> : <></>}
 
       <NavLink to="/home" activeStyle={activeStyle}>
         <Menu.Item>

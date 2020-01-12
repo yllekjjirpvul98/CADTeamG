@@ -13,7 +13,7 @@ function HostPanel(props) {
   }
 
   async function handleClose() {
-    const { payload: { id } } = await props.closeSession(props.session.id);
+    const { payload: { id } = {}} = await props.closeSession(props.session.id) || {};
 
     if (id) {
       props.ioClose(props.socket, props.session.id);

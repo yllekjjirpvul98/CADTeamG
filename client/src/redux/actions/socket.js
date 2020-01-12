@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import { toast } from 'react-toastify';
-import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, SET_WINNER, ENTER_ROOM,
+import { ADD_MESSAGE, SET_TIMER, DECREMENT_TIMER, START_SESSION, SET_WINNER, ENTER_ROOM, CLEAR_WEBSOCKET,
   CLEAR_LOADER, SET_LOADER, SET_TIMESLOTS, GET_ERRORS, ADD_VOTE, CLEAR_SESSION, LEAVE_ROOM } from '../types';
 
 // Message
@@ -65,14 +65,16 @@ const ioOnJoin = (data, props) => (dispatch) => {
   props.getSession(props.match.params.id);
 };
 
-const ioOnLeave = (data, props) => (dispatch) => {
+const ioOnLeave = (props) => (dispatch) => {
+  props.getSession(props.match.params.id);
+};
+
+const ioOnDisconnect = (data) => (dispatch) => {
   const { id, username } = JSON.parse(data);
 
   if (!id) return;
 
   dispatch({ type: LEAVE_ROOM, payload: { id, username }});
-
-  props.getSession(props.match.params.id);
 };
 
 // Close
@@ -108,4 +110,11 @@ const ioOnResult = (winner) => (dispatch) => {
   dispatch({ type: SET_WINNER, payload: { winner }})
 }
 
-export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnResult, ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError };
+const clearWebsocket = () => (dispatch) => {
+
+  dispatch({ type: CLEAR_WEBSOCKET });
+
+}
+
+export { ioMsg, ioOnMsg, ioStart, ioOnStart, ioVote, ioOnJoin, ioOnResult, ioOnDisconnect,
+  ioOnLeave, ioClose, ioOnClose, ioOnVote, ioOnError, clearWebsocket };

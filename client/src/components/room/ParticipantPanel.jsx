@@ -9,6 +9,7 @@ function ParticipantPanel(props) {
 
   async function handleLeave() {
     await props.leaveSession(props.session.id, props.user.id);
+    props.socket.emit('leave', props.user.username);
     history.push('/home')
   }
 
