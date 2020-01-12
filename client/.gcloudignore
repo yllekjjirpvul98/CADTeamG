@@ -5,3 +5,5 @@
 __pycache__/
 /setup.cfg
 /node_modules
+/.vscode
+.eslintrc

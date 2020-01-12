@@ -4,6 +4,15 @@ def validate_put_event(title, location, starttime, endtime):
     errors = {}
 
     present = datetime.datetime.now()
+
+    if(starttime is None): 
+      errors['starttime'] = 'Start time is empty'
+      return errors
+
+    if(endtime is None):
+       errors['endtime'] = 'End time is empty'
+       return errors
+
     starttimeiso = datetime.datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%fZ")
     endtimeiso = datetime.datetime.strptime(endtime, "%Y-%m-%dT%H:%M:%S.%fZ")
 
@@ -13,8 +22,6 @@ def validate_put_event(title, location, starttime, endtime):
 
     if(title is None): errors['title'] = 'Title is empty'
     if(location is None): errors['location'] = 'Location is empty'
-    if(starttime is None): errors['starttime'] = 'Start time is empty'
-    if(endtime is None): errors['endtime'] = 'End time is empty'
 
     return errors
 

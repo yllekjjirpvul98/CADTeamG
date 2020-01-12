@@ -37,11 +37,15 @@ async def start_timer(timer, roomid, user):
             winner_votes = len(id_list)
             winner_timeslot = key
 
+    if winner_timeslot == '':
+        await sio.emit('error', 'There must be atleast one vote', room=user.get('room'));
+        return
+
     room['winner'] = winner_timeslot
     updated = update(room, 'session', user.get('room'))
     await sio.emit('result', updated.get('winner'), user.get('room'))
 
-    endtimeiso = datetime.datetime.strptime(winner_timeslot, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(minutes=int(room.get('duration')))
+    endtimeiso = datetime.datetime.strptime(winner_timeslot + ".000Z", "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(minutes=int(room.get('duration')))
     
     for userid in room.get('participants'):
         user = get(userid, 'user')
@@ -116,8 +120,8 @@ async def start(sid, roomid):
                 event['id'] = event.id 
                 event_list.append(event)
 
-    # timeslots = generateTimeslots(room, event_list)
-    timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
+    timeslots = generateTimeslots(room, event_list)
+    # timeslots = ['2019-12-29T23:50:00.000Z', '2019-12-30T12:00:00.000Z']
 
     room['votingend'] = time + datetime.timedelta(seconds=room.get('votingtime'))
     for timeslot in timeslots:
@@ -165,11 +169,15 @@ async def vote(sid, timeslot):
             winner_votes = len(id_list)
             winner_timeslot = key
 
+    if winner_timeslot == '':
+        await sio.emit('error', 'There must be atleast one vote', room=user.get('room'));
+        return
+
     room['winner'] = winner_timeslot
     updated = update(room, 'session', user.get('room'))
     await sio.emit('result', updated.get('winner'), room=user.get('room'))
 
-    endtimeiso = datetime.datetime.strptime(winner_timeslot, "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(minutes=int(room.get('duration')))
+    endtimeiso = datetime.datetime.strptime(winner_timeslot + ".000Z", "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(minutes=int(room.get('duration')))
 
     for userid in updated.get('participants'):
         user = get(userid, 'user')

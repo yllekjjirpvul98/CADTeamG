@@ -24,7 +24,9 @@
     "typeface-roboto": "0.0.75"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "prestart": "npm install serve",
+    "start": "serve -s build",
+    "develop": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

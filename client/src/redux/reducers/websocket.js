@@ -1,6 +1,8 @@
 import { ADD_MESSAGE, ENTER_ROOM, LEAVE_ROOM, CLEAR_WEBSOCKET } from '../types';
 import { toast } from 'react-toastify';
 
+const avatars = ['elliot', 'matt', 'jenny', 'joe', 'stevie', 'christian', 'steve']
+
 const initialState = {
   users: [],
   messages: [],

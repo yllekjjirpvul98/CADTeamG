@@ -26,6 +26,8 @@ def generateTimeslots(room, events):
     timeslot_list = []
     starttime = maya.parse(room.get('starttime')).datetime().timestamp()
     endtime = maya.parse(room.get('endtime')).datetime().timestamp()
+    start_time = maya.parse(room.get('starttime')).datetime().time()
+    end_time = maya.parse(room.get('endtime')).datetime().time()
 
     for event in events:
         event_starttime = maya.parse(event['starttime']).datetime().timestamp()
@@ -98,6 +100,8 @@ def generateTimeslots(room, events):
     if not room.get('weekends'):
         p_list = [x for x in p_list if not datetime.datetime.fromtimestamp(x).weekday() >= 5]
 
+    p_list = [x for x in p_list if datetime.datetime.fromtimestamp(x+duration).time() >= start_time and datetime.datetime.fromtimestamp(x).time() >= start_time and datetime.datetime.fromtimestamp(x + duration).time() <= end_time]
+
     print (p_list)
     p_list = map(lambda x: from_timestamp_to_string(x), p_list)
     print (p_list)
@@ -107,3 +111,4 @@ def generateTimeslots(room, events):
 
 def from_timestamp_to_string(p):
     return datetime.datetime.fromtimestamp(p).isoformat()
+
